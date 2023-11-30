@@ -1,0 +1,23 @@
+.professional_thula {
+  @apply flex flex-col h-screen justify-between;
+
+  .player_cards {
+    @apply flex pb-6 items-center justify-around;
+
+    .display_card {
+      @apply mx-2;
+    }
+  }
+
+  .game_table {
+
+  }
+
+  .opposition{
+    @apply flex justify-between pt-6 mx-7;
+
+    .opposition_player_cards {
+      @apply border py-10 px-6;
+    }
+  }
+}
