@@ -1,5 +1,5 @@
 import { CardDeck } from "@/lib/shared/cardDeck";
-import { GameSettingType } from "./type";
+import { GameSettingType } from "../../views/professional_thula/actions/type";
 const { v4: uuidv4 } = require("uuid");
 
 export const createGame = (setting: GameSettingType) => {
