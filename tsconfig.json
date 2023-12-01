@@ -20,6 +20,7 @@
     ],
     "paths": {
       "@styles/*": ["./assets/styles/*"],
+      "@config/*": ["./config/*"],
       "@/*": ["./*"]
     }
   },
