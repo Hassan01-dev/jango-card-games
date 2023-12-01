@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-	@import '@styles/thula_style';
+	@import '@styles/professional_thula';
 
   input[type='number'] {
     -moz-appearance: textfield;

@@ -1,7 +1,7 @@
 "use client";
 
-import CreateGameModal from "@/views/professional_thula/createGameModal";
-import JoinGameModal from "@/views/professional_thula/joinGameModal";
+import CreateGameModal from "@/views/professional_thula/components/createGameModal";
+import JoinGameModal from "@/views/professional_thula/components/joinGameModal";
 import { Label, TextInput } from "flowbite-react";
 import { useState } from "react";
 
