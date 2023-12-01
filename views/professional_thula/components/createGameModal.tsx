@@ -1,33 +1,25 @@
 "use client";
 
 import { Button, Checkbox, Label, Modal, TextInput } from "flowbite-react";
-import { createGame } from "@/lib/professional_thula";
+import { createGame } from "../actions";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
 
 export default function Component({ playerName }: { playerName: string }) {
   const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
   const [gameSetting, setGameSetting] = useState<{
     playerCount: number;
-    playersName: string[];
     requirePassword: boolean;
     roomName: string;
     roomPassword: string;
   }>({
     playerCount: 4,
-    playersName: [],
     requirePassword: false,
     roomName: "",
     roomPassword: "",
   });
-
-  useEffect(() => {
-    setGameSetting({
-      ...gameSetting,
-      playersName: [playerName, "Player 1", "Player 2", "Player 3"],
-    });
-  }, [playerName]);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.type === "checkbox") {
@@ -40,10 +32,10 @@ export default function Component({ playerName }: { playerName: string }) {
     }
   };
 
-  const handleCreateGame = () => {
-    window.sessionStorage.setItem("playerName", playerName);
-    const roomId = createGame(gameSetting);
-    router.push(`/professional_thula/${roomId}`);
+  const handleCreateGame = async () => {
+    
+    const roomId = await createGame(gameSetting, playerName);
+    router.push(`/professional_thula/room/${roomId}`);
   };
 
   const { playerCount, requirePassword, roomName, roomPassword } = gameSetting;
