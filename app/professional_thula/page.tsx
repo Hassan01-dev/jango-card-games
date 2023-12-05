@@ -3,10 +3,20 @@
 import CreateGameModal from "@/views/professional_thula/components/createGameModal";
 import JoinGameModal from "@/views/professional_thula/components/joinGameModal";
 import { Label, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getProfileName } from "@/utils";
 
 export default function Game() {
   const [playerName, setPlayerName] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const playerName = await getProfileName();
+      setPlayerName(playerName || "")
+    };
+
+    fetchData();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPlayerName(e.target.value);
