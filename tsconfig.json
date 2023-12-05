@@ -21,6 +21,7 @@
     "paths": {
       "@styles/*": ["./assets/styles/*"],
       "@config/*": ["./config/*"],
+      "@views/*": ["./views/*"],
       "@/*": ["./*"]
     }
   },
