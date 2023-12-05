@@ -20,6 +20,13 @@
     margin: 0;
   }
 
+  .games-card-container{
+    @apply w-1/3 mx-auto mt-36;
+
+    .game-card{
+      @apply border p-4;
+    }
+  }
 
   /* :root {
     --foreground-rgb: 0, 0, 0;

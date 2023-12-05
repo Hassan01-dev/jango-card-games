@@ -5,7 +5,6 @@ import { createGame } from "../actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-
 export default function Component({ playerName }: { playerName: string }) {
   const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
