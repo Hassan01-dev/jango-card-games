@@ -4,7 +4,7 @@ const cardGame = new mongoose.Schema({
   roomName: String,
   password: String,
   loser: String,
-  playersName: [String],
+  playerNames: [String],
   hands: [Object],
   playerCount: { type: "number", required: [true, "Player Count is required"] },
   requirePassword: { type: "boolean", default: false },
