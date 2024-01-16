@@ -1,69 +1,109 @@
 "use client";
 
 import { Button, Checkbox, Label, Modal, TextInput } from "flowbite-react";
-import { useRef, useState } from "react";
+import { findGame } from "../actions";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function Component({ playerName }: { playerName: String}) {
+export default function Component({ playerName }: { playerName: string }) {
+  const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
-  const emailInputRef = useRef<HTMLInputElement>(null);
+  const [gameSetting, setGameSetting] = useState<{
+    requirePassword: boolean;
+    roomName: string;
+    roomPassword: string;
+  }>({
+    requirePassword: false,
+    roomName: "",
+    roomPassword: "",
+  });
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.type === "checkbox") {
+      setGameSetting({
+        ...gameSetting,
+        [e.target.name]: e.target.checked,
+      });
+    } else {
+      setGameSetting({ ...gameSetting, [e.target.name]: e.target.value });
+    }
+  };
+
+  const handleJoinGame = async () => {
+    const cardGame = await findGame(gameSetting, playerName);
+    console.log(cardGame);
+    if (cardGame.isCompleted) {
+      router.push("/");
+    } else {
+      if (cardGame.isStarted) {
+        router.push(`/professional_thula/game/${cardGame._id}`);
+      } else {
+        router.push(`/professional_thula/room/${cardGame._id}`);
+      }
+    }
+  };
+
+  const { requirePassword, roomName, roomPassword } = gameSetting;
 
   return (
     <>
-      <Button onClick={() => setOpenModal(true)} className="px-4 py-2 mx-auto my-2 rounded-full w-full justify-center">Join Game</Button>
+      <Button
+        onClick={() => setOpenModal(true)}
+        className="px-4 py-2 mx-auto my-2 rounded-full w-full justify-center"
+      >
+        Join Game
+      </Button>
       <Modal
         show={openModal}
         size="md"
         popup
         onClose={() => setOpenModal(false)}
-        initialFocus={emailInputRef}
       >
         <Modal.Header />
         <Modal.Body>
           <div className="space-y-6">
             <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-              Sign in to our platform
+              Game Settings
             </h3>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="email" value="Your email" />
+                <Label htmlFor="roomName" value="Room Name" />
               </div>
               <TextInput
-                id="email"
-                ref={emailInputRef}
-                placeholder="name@company.com"
-                className="form-control"
+                id="roomName"
+                name="roomName"
+                value={roomName}
+                onChange={handleFormChange}
                 required
               />
             </div>
-            <div>
-              <div className="mb-2 block">
-                <Label htmlFor="password" value="Your password" />
-              </div>
-              <TextInput id="password" type="password" required />
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="requirePassword"
+                name="requirePassword"
+                checked={requirePassword}
+                onChange={handleFormChange}
+              />
+              <Label htmlFor="requirePassword">
+                Require Password to Join the Room
+              </Label>
             </div>
-            <div className="flex justify-between">
-              <div className="flex items-center gap-2">
-                <Checkbox id="remember" />
-                <Label htmlFor="remember">Remember me</Label>
+            {requirePassword && (
+              <div>
+                <div className="mb-2 block">
+                  <Label htmlFor="roomPassword" value="Your password" />
+                </div>
+                <TextInput
+                  id="roomPassword"
+                  name="roomPassword"
+                  value={roomPassword}
+                  onChange={handleFormChange}
+                  required
+                />
               </div>
-              <a
-                href="#"
-                className="text-sm text-cyan-700 hover:underline dark:text-cyan-500"
-              >
-                Lost Password?
-              </a>
-            </div>
+            )}
             <div className="w-full">
-              <Button>Log in to your account</Button>
-            </div>
-            <div className="flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
-              Not registered?&nbsp;
-              <a
-                href="#"
-                className="text-cyan-700 hover:underline dark:text-cyan-500"
-              >
-                Create account
-              </a>
+              <Button onClick={handleJoinGame}>Join Room</Button>
             </div>
           </div>
         </Modal.Body>

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const cardGame = new mongoose.Schema({
   roomName: String,
-  password: String,
+  roomPassword: String,
   loser: String,
   playerNames: [String],
   hands: [Object],
