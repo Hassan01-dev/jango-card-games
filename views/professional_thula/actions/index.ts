@@ -1,21 +1,43 @@
-"use server"
+"use server";
 
 import { connect } from "@config/db/dbConfig";
 import CardGame from "@config/db/models/cardGame";
-import { GameSettingType } from "./type";
-const { v4: uuidv4 } = require("uuid");
-import { cookies } from 'next/headers'
+import { CreateGameSettingType, JoinGameSettingType } from "./type";
+import { cookies } from "next/headers";
 
-
-export const createGame = async (gameSetting: GameSettingType, playerName: string) => {
+export const createGame = async (
+  gameSetting: CreateGameSettingType,
+  playerName: string
+) => {
   if (!cookies().get("playerName")?.value) {
-    cookies().set('playerName', playerName)
+    cookies().set("playerName", playerName);
   }
 
   connect();
 
-  const inviteId = uuidv4();
-  const newGame = new CardGame({ ...gameSetting, inviteId });
-  const savedGame = await newGame.save()
+  const newGame = new CardGame({ ...gameSetting });
+  const savedGame = await newGame.save();
   return savedGame._id;
+};
+
+export const findGame = async (
+  gameSetting: JoinGameSettingType,
+  playerName: string
+) => {
+  if (!cookies().get("playerName")?.value) {
+    cookies().set("playerName", playerName);
+  }
+
+  connect();
+
+  try {
+    const cardGame = await CardGame.findOne({ ...gameSetting });
+    if (!cardGame) {
+      throw new Error("Card game not found");
+    }
+
+    return cardGame;
+  } catch (error) {
+    console.error("Error Joining game:", error);
+  }
 };
