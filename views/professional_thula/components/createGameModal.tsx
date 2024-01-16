@@ -32,7 +32,6 @@ export default function Component({ playerName }: { playerName: string }) {
   };
 
   const handleCreateGame = async () => {
-    
     const roomId = await createGame(gameSetting, playerName);
     router.push(`/professional_thula/room/${roomId}`);
   };

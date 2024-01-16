@@ -1,22 +1,55 @@
-.professional_thula {
+.professional-thula {
   @apply flex flex-col h-screen justify-between;
 
-  .player_cards {
+  .player-cards {
     @apply flex pb-6 items-center justify-around;
 
-    .display_card {
+    .display-card {
       @apply mx-2;
     }
   }
 
-  .game_table {
+  .game-table {
+    @apply flex justify-between;
+
+    .game-area {}
+
+    .chat-area {
+      @apply w-1/4 border border-gray-500 rounded-xl p-2 m-4 h-[20rem];
+
+      .chat-messages {
+        @apply h-[16rem] overflow-y-scroll;
+        
+        .chat-profile {
+          @apply flex items-center gap-1 mb-1;
+        }
+
+        .chat-profile-span {
+          @apply h-8 w-8 rounded-full border border-white flex justify-center items-center text-black bg-teal-400;
+        }
+      }
+
+      .chat-input {
+        form { 
+          @apply flex;
+
+          input {
+            @apply rounded-md h-8 p-1;
+          }
+
+          button {
+            @apply ml-2 block border rounded-md px-2  h-8
+          }
+        }
+      }
+    }
 
   }
 
   .opposition{
     @apply flex justify-between pt-6 mx-7;
 
-    .opposition_player_cards {
+    .opposition-player-cards {
       @apply border py-10 px-6;
     }
   }
