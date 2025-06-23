@@ -1,5 +1,5 @@
 .professional-thula {
-  @apply flex flex-col h-screen justify-between;
+  @apply flex flex-col justify-between;
 
   .player-cards {
     @apply flex pb-6 items-center justify-around;

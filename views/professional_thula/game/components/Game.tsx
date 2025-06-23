@@ -17,7 +17,9 @@ export default function Game({
   roomId: string;
 }) {
   const playerCards = hands.find((x: any) => x.name === playerName);
-  const oppositionCards = hands.filter((x: any) => x.name !== playerName);
+  const oppositionCards: { name: string; cards: string[] }[] = hands.filter(
+    (x: any) => x.name !== playerName
+  );
   const [myCards, setMyCards] = useState(playerCards.cards);
   const [playedCards, setPlayedCards] = useState<string[]>([]);
 
@@ -49,7 +51,22 @@ export default function Game({
     playerName: string;
     card: string;
   }) => {
-    setPlayedCards((prev: any) => [...prev, card ]);
+    setPlayedCards((prev: any) => [...prev, card]);
+  };
+
+  const handleThulla = ({
+    triggeredBy,
+    looser,
+  }: {
+    triggeredBy: string;
+    looser: string;
+  }) => {
+    alert(`${triggeredBy} caught ${looser} with Thulla!`);
+    setPlayedCards([]);
+  };
+
+  const handleCardsTaken = ({ cards }: { cards: string[] }) => {
+    setMyCards((prev: string[]) => [...prev, ...cards]);
   };
 
   useEffect(() => {
@@ -61,6 +78,8 @@ export default function Game({
       socket.on("room_joined", handleRoomJoined);
       socket.on("trick_result", handleTrickResult);
       socket.on("card_played", handlePlayedCards);
+      socket.on("thulla", handleThulla);
+      socket.on("cards_taken", handleCardsTaken);
     }
 
     // Cleanup function to remove event listeners
@@ -70,6 +89,8 @@ export default function Game({
         socket.off("room_joined", handleRoomJoined);
         socket.off("trick_result", handleTrickResult);
         socket.off("card_played", handlePlayedCards);
+        socket.off("thulla", handleThulla);
+        socket.off("cards_taken", handleCardsTaken);
       }
     };
   }, [socket, roomId, playerName]);
@@ -86,81 +107,128 @@ export default function Game({
   };
 
   return (
-    <div className="professional-thula">
-      <div className="opposition">
-        {oppositionCards &&
-          oppositionCards.map((hand: any, index: number) => (
-            <div key={index} className="opposition-player-cards">
-              <p>Player Name : {hand.name}</p>
-              <p>Card Remaining : {hand.cards.length}</p>
+    <div className="professional-thula h-screen flex bg-gradient-to-b from-green-950 to-green-800 p-4">
+      {/* Opposition Players */}
+      <div className="opposition grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
+        {oppositionCards.map((hand, index) => (
+          <div
+            key={index}
+            className="bg-green-800/40 backdrop-blur-md rounded-2xl p-4 sm:p-6 text-white shadow-xl border border-green-600/30"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-600 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold">
+                {hand.name[0].toUpperCase()}
+              </div>
+              <h3 className="text-base sm:text-lg font-semibold">
+                {hand.name}
+              </h3>
             </div>
-          ))}
+            <div className="flex items-center gap-2 text-green-300 text-sm sm:text-base">
+              <span>Cards:</span>
+              <span className="font-bold">{hand.cards.length}</span>
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="game-table bg-green-800 rounded-3xl p-8 shadow-2xl relative min-h-[500px] flex flex-col items-center justify-between">
-        <div className="play-area text-2xl font-bold text-white mb-6">Game Table</div>
-        <div className="played-cards relative h-[200px] w-[150px]">
-          {playedCards.map((card: string, index: number) => (
-            <div 
-              key={index} 
-              className="played-card absolute"
-              style={{
-                transform: `rotate(${(index - playedCards.length/2) * 5}deg) translateY(${index * 2}px)`,
-                zIndex: index,
-                transition: 'all 0.3s ease-in-out'
-              }}
-            >
-              <Image
-                src={`/images/card_images/${card}.png`}
-                alt={card}
-                width={100}
-                height={140}
-                className="rounded-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
+
+      {/* Game Table */}
+      <div className="game-table bg-gradient-to-br from-green-800 to-green-900 rounded-3xl p-6 sm:p-12 shadow-2xl relative flex justify-between items-center border border-green-600/30 backdrop-blur-sm flex-1">
+        <div className="flex play-area text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 tracking-wide">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-300 to-emerald-300">
+            Game Table
+          </span>
+        </div>
+        {/* Turn Indicator */}
+        <div className="turn-indicator text-sm sm:text-lg font-medium text-white bg-green-700/50 px-6 py-2 sm:px-8 sm:py-3 rounded-full shadow-lg mb-6 sm:mb-8 backdrop-blur-sm border border-green-500/30">
+          <span className="animate-pulse inline-block w-3 h-3 bg-green-400 rounded-full mr-2" />
+          {currentTurn === playerName ? "Your" : `${currentTurn}'s`} Turn
+        </div>
+
+        {/* Played Cards */}
+        <div className="played-cards relative h-[200px] sm:h-[250px] w-full flex justify-center">
+          <div className="relative w-[160px] sm:w-[200px]">
+            {playedCards.map((card: string, index: number) => (
+              <div
+                key={index}
+                className="played-card absolute left-1/2 -translate-x-1/2 transition-all duration-300"
                 style={{
-                  filter: "drop-shadow(0 8px 12px rgba(0, 0, 0, 0.2))",
-                  backfaceVisibility: "hidden",
+                  transform: `translateX(-50%) rotate(${
+                    (index - playedCards.length / 2) * 15
+                  }deg) translateY(${index * 2}px)`,
+                  zIndex: index,
                 }}
-              />
-            </div>
-          ))}
+              >
+                <Image
+                  src={`/images/card_images/${card}.png`}
+                  alt={card}
+                  width={120}
+                  height={168}
+                  className="rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all"
+                  style={{
+                    filter: "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
+                    backfaceVisibility: "hidden",
+                  }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="turn-indicator text-xl font-semibold text-white bg-green-900 px-6 py-2 rounded-full shadow-lg mb-6">
-          {currentTurn === playerName ? "Your" : currentTurn + "'s"} Turn
-        </div>
-        <div className="chat-area w-full max-w-md bg-green-900 rounded-xl shadow-xl p-4">
+
+        {/* Chat */}
+        <div className="chat-area w-full max-w-xl bg-green-800/40 rounded-2xl shadow-xl p-4 sm:p-6 backdrop-blur-md border border-green-600/30">
           <GameChat username={playerName} game={game} roomId={roomId} />
         </div>
       </div>
-      <div className="player-cards">
-        <div>
-          <p>Player Name : {playerCards.name}</p>
-          <p>Card Remaining : {myCards.length}</p>
+
+      {/* Player Cards */}
+      <div className="player-cards mt-6 sm:mt-10 bg-green-800/40 rounded-2xl p-4 backdrop-blur-sm border border-green-600/30">
+        <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-600 rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold text-white">
+            {playerCards.name[0].toUpperCase()}
+          </div>
+          <div className="text-white">
+            <h3 className="text-base sm:text-xl font-semibold">
+              {playerCards.name}
+            </h3>
+            <div className="flex items-center gap-2 text-green-300 text-sm sm:text-base">
+              <span>Cards Remaining:</span>
+              <span className="font-bold">{myCards.length}</span>
+            </div>
+          </div>
         </div>
-        <div className="flex">
-          {myCards &&
-            myCards.map((card: string, index: number) => (
+
+        <div className="ml-8 relative flex justify-center items-end min-h-[200px] sm:min-h-[220px] px-4 sm:px-0">
+          {myCards.map((card: string, index: number) => {
+            const middleIndex = Math.floor(myCards.length / 2);
+            const rotation = (index - middleIndex); // Adjust angle per card
+
+            return (
               <div
                 key={index}
-                className="relative group perspective-1000"
+                className="relative group cursor-pointer transition-transform duration-300"
+                style={{
+                  transform: `rotate(${rotation}deg) translateY(-10px)`,
+                  zIndex: index,
+                  marginLeft: index === 0 ? 0 : "-30px",
+                }}
                 onClick={() => handleClick(card)}
               >
-                <div className="card-wrapper transform transition-all duration-300 ease-in-out hover:scale-110 hover:rotate-3 hover:shadow-2xl cursor-pointer">
-                  <div className="card-inner relative">
-                    <Image
-                      src={`/images/card_images/${card}.png`}
-                      alt={card}
-                      width={100}
-                      height={140}
-                      className="rounded-lg shadow-md hover:shadow-playing-card"
-                      style={{
-                        filter: "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))",
-                        backfaceVisibility: "hidden",
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  </div>
+                <div className="transition-transform duration-300 transform-gpu group-hover:scale-110 group-hover:-translate-y-10 group-hover:z-50">
+                  <Image
+                    src={`/images/card_images/${card}.png`}
+                    alt={card}
+                    width={100}
+                    height={150}
+                    className="rounded-xl shadow-lg hover:shadow-2xl"
+                    style={{
+                      filter: "drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25))",
+                      backfaceVisibility: "hidden",
+                    }}
+                  />
                 </div>
               </div>
-            ))}
+            );
+          })}
         </div>
       </div>
     </div>
