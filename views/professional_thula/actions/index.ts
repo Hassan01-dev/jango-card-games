@@ -24,9 +24,7 @@ export const findGame = async (
   gameSetting: JoinGameSettingType,
   playerName: string
 ) => {
-  if (!cookies().get("playerName")?.value) {
-    cookies().set("playerName", playerName);
-  }
+  cookies().set("playerName", playerName);
 
   connect();
 

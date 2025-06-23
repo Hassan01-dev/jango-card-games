@@ -4,22 +4,27 @@ import { redirect } from "next/navigation";
 import RoomComponent from "@views/professional_thula/room/components/Room";
 // import { toast } from "react-hot-toast";
 
-export default function Room({ params }: { params: { roomId: string } }) {
+async function getGameData(roomId: string) {
+  try {
+    await connect();
+    return await CardGame.findById(roomId);
+  } catch (error) {
+    console.error('Error fetching game data:', error);
+    return null;
+  }
+}
+
+export default async function Room({ params }: { params: { roomId: string } }) {
   const { roomId } = params;
+  const game = await getGameData(roomId);
 
-  const fetchData = async () => {
-    connect();
-    const game = await CardGame.findById(roomId);
-    if (game) {
-      if (!game.isStarted) {
-        return <RoomComponent roomId={roomId} />;
-      } else {
-        redirect(`/professional_thula/game/${roomId}`);
-      }
-    } else {
-      redirect("/");
-    }
-  };
+  if (!game) {
+    redirect("/");
+  }
 
-  return <>{fetchData()}</>;
+  if (game.isStarted) {
+    redirect(`/professional_thula/game/${roomId}`);
+  }
+
+  return <RoomComponent roomId={roomId} />;
 }

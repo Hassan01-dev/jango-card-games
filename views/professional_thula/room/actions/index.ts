@@ -3,6 +3,7 @@
 import { connect } from "@config/db/dbConfig";
 import CardGame from "@config/db/models/cardGame";
 import { CardDeck } from "@/utils/cardDeck";
+import { cookies } from "next/headers";
 
 export const startGame = async (roomId: string, playerNames: string[]) => {
   connect();
@@ -25,3 +26,7 @@ export const startGame = async (roomId: string, playerNames: string[]) => {
     console.error('Error starting game:', error);
   }
 };
+
+export const getCookie = (key: string) => {
+  return cookies().get(key)?.value;
+}
