@@ -12,7 +12,7 @@ interface GameRoomProps {
 async function getGameData(roomId: string) {
   try {
     await connect();
-    return await CardGame.findById(roomId);
+    return CardGame.findById(roomId);
   } catch (error) {
     console.error("Error fetching game data:", error);
     return null;
@@ -31,5 +31,23 @@ export default async function GameRoom({ params }: GameRoomProps) {
     redirect(`/professional_thula/room/${roomId}`);
   }
 
-  return <GameComponent hands={cardGame.hands} game={cardGame} />;
+  // Convert MongoDB document to plain object and serialize specific fields
+  const serializedGame = {
+    id: cardGame._id.toString(),
+    roomName: cardGame.roomName,
+    playerNames: cardGame.playerNames,
+    hands: cardGame.hands.map((hand: { name: string; cards: string[] }) => ({
+      name: hand.name,
+      cards: hand.cards
+    })),
+    playerCount: cardGame.playerCount,
+    requirePassword: cardGame.requirePassword,
+    isStarted: cardGame.isStarted,
+    isCompleted: cardGame.isCompleted
+  };
+
+  return <GameComponent 
+    hands={serializedGame.hands} 
+    game={serializedGame}
+  />;
 }
