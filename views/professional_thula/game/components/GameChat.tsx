@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 interface IMsgDataTypes {
   gameId: String | number;
@@ -8,6 +8,9 @@ interface IMsgDataTypes {
   msg: String;
   time: String;
 }
+
+var socket: Socket;
+socket = io("http://localhost:3001");
 
 const GameChat = ({ username, game }: any) => {
   const [currentMsg, setCurrentMsg] = useState("");
@@ -29,9 +32,6 @@ const GameChat = ({ username, game }: any) => {
       setCurrentMsg("");
     }
   };
-  
-  var socket: any;
-  socket = io("http://localhost:3001");
 
   useEffect(() => {
     socket.emit("join_game", game?._id);
