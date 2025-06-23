@@ -1,25 +1,26 @@
 "use client"
+import { useSocket } from "@views/professional_thula/hooks/useSocket";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
 interface IMsgDataTypes {
-  gameId: String | number;
+  roomId: String | number;
   user: String;
   msg: String;
   time: String;
 }
 
-const socket = io("http://localhost:3001");
-
-const GameChat = ({ username, game }: any) => {
+const GameChat = ({ username, game, roomId }: any) => {
   const [currentMsg, setCurrentMsg] = useState("");
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
+
+  const { socket } = useSocket();
 
   const sendData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (currentMsg !== "") {
       const msgData: IMsgDataTypes = {
-        gameId: game?.id,
+        roomId: roomId,
         user: username,
         msg: currentMsg,
         time:
@@ -27,7 +28,7 @@ const GameChat = ({ username, game }: any) => {
           ":" +
           new Date(Date.now()).getMinutes(),
       };
-      await socket.emit("game_chat", msgData);
+      await socket?.emit("game_chat", msgData);
       setCurrentMsg("");
     }
   };
@@ -35,20 +36,20 @@ const GameChat = ({ username, game }: any) => {
   const handleChatMessage = (data: IMsgDataTypes) => {
     setChat((pre) =>[...pre, data]);
   }
+  
 
   useEffect(() => {
-    socket.emit("join_game", game?.id);
-    socket.on("chat_message", handleChatMessage);
+    socket?.on("chat_message", handleChatMessage);
 
     return () => {
-      socket.off("chat_message", handleChatMessage);
+      socket?.off("chat_message", handleChatMessage);
     }
   }, []);
 
   return (
     <div>
       <div className="chat-messages">
-        {chat.map(({ gameId, user, msg, time }, key) => (
+        {chat.map(({ roomId, user, msg, time }, key) => (
           <div
             key={key}
             className={`chat-profile ${ user == username && "flex-row-reverse" }`}
