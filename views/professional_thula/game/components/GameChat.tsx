@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 interface IMsgDataTypes {
   gameId: String | number;
@@ -8,6 +8,8 @@ interface IMsgDataTypes {
   msg: String;
   time: String;
 }
+
+const socket = io("http://localhost:3001");
 
 const GameChat = ({ username, game }: any) => {
   const [currentMsg, setCurrentMsg] = useState("");
@@ -17,7 +19,7 @@ const GameChat = ({ username, game }: any) => {
     e.preventDefault();
     if (currentMsg !== "") {
       const msgData: IMsgDataTypes = {
-        gameId: game?._id,
+        gameId: game?.id,
         user: username,
         msg: currentMsg,
         time:
@@ -30,19 +32,18 @@ const GameChat = ({ username, game }: any) => {
     }
   };
   
-  var socket: any;
-  socket = io("http://localhost:3001");
+  const handleChatMessage = (data: IMsgDataTypes) => {
+    setChat((pre) =>[...pre, data]);
+  }
 
   useEffect(() => {
-    socket.emit("join_game", game?._id);
+    socket.emit("join_game", game?.id);
+    socket.on("chat_message", handleChatMessage);
+
+    return () => {
+      socket.off("chat_message", handleChatMessage);
+    }
   }, []);
-
-  useEffect(() => {
-    socket.on("chat_message", (data: IMsgDataTypes) => {
-      setChat((pre) =>[...pre, data]);
-    });
-  }, [socket]);
-
 
   return (
     <div>
