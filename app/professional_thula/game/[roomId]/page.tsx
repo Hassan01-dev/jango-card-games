@@ -2,6 +2,7 @@ import { connect } from "@config/db/dbConfig";
 import CardGame from "@config/db/models/cardGame";
 import { redirect } from "next/navigation";
 import GameComponent from "@views/professional_thula/game/components/Game";
+import { cookies } from "next/headers";
 
 interface GameRoomProps {
   params: {
@@ -21,6 +22,7 @@ async function getGameData(roomId: string) {
 
 export default async function GameRoom({ params }: GameRoomProps) {
   const { roomId } = params;
+  const playerName = cookies().get("playerName")?.value;
   const cardGame = await getGameData(roomId);
 
   if (!cardGame) {
@@ -49,5 +51,7 @@ export default async function GameRoom({ params }: GameRoomProps) {
   return <GameComponent 
     hands={serializedGame.hands} 
     game={serializedGame}
+    playerName={playerName || ""}
+    roomId={roomId}
   />;
 }
