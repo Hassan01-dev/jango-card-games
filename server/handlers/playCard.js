@@ -16,36 +16,29 @@ function handlePlayCard(socket, io) {
       const playedCard = { playerName, card, suit: parsed.suit, value: parsed.value, socketId: socket.id };
       room.playedCards.push(playedCard);
 
-      console.log(room.playedCards)
       io.to(roomId).emit("card_played", { playerName, card });
 
-    //   const leadSuit = room.currentTrick[0].suit;
+      const leadSuit = room.playedCards[0].suit;
 
-    //   // 🔥 Detect Thulla: card does not match lead suit
-    //   if (parsed.suit !== leadSuit) {
-    //     const leadSuitCards = room.currentTrick.filter(c => c.suit === leadSuit);
-    //     const highest = leadSuitCards.reduce((max, curr) => (curr.value > max.value ? curr : max));
+    // 🔥 Detect Thulla: card does not match lead suit
+      if (parsed.suit !== leadSuit) {
+        const highest = room.playedCards.reduce((max, curr) => (curr.value > max.value ? curr : max));
 
-    //     io.to(roomId).emit("thulla", {
-    //       triggeredBy: playerName,
-    //       looser: highest.playerName,
-    //       cardsTaken: room.currentTrick,
-    //     });
+        io.to(roomId).emit("thulla", {
+          triggeredBy: playerName,
+          looser: highest.playerName,
+          cardsTaken: room.playedCards.count,
+        });
 
-    //     // TODO: Add cards to looser's hand if you're tracking hands on server
-    //     // TODO: Optionally broadcast updated hand count
+        // TODO: Add cards to looser's hand if you're tracking hands on server
+        io.to(highest.socketId).emit("cards_taken", {
+          cards: room.playedCards.map(c => c.card),
+        });
+        // TODO: Optionally broadcast updated hand count
 
-    //     // Reset for next round
-    //     room.currentTrick = [];
-    //     room.currentRoundNumber = (room.currentRoundNumber || 1) + 1;
-    //     room.currentTurn = socket.id; // You can also pass to next player if needed
-
-    //     io.to(roomId).emit("update_turn", {
-    //       currentTurn: room.currentTurn,
-    //     });
-
-    //     return; // end trick early
-    //   }
+        // Reset for next round
+        room.playedCards = [];
+      }
 
       // No thulla yet → pass to next player
       const currentIndex = room.players.findIndex(p => p.id === socket.id);
