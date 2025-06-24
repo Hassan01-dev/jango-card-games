@@ -13,7 +13,7 @@ export function handleJoinRoom(socket: any, io: any) {
       const room = getRoom(roomId) || createRoom(roomId);
       const targetRoom = getRoom(roomId);
 
-      targetRoom?.players.push({ id: socket.id, name: playerName });
+      targetRoom?.players.push({ id: socket.id, name: playerName, isWon: false });
 
       if (!targetRoom?.currentTurn && targetRoom?.players.length === 1) {
         targetRoom.currentTurn = socket.id;

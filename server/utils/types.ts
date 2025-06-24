@@ -1,6 +1,7 @@
 export type Player = {
   id: string;
   name: string;
+  isWon: boolean;
 }
 
 export type Room = {

@@ -4,6 +4,8 @@ import { handleJoinRoom } from "./handlers/joinRoom.ts";
 import { handleGameChat } from "./handlers/gameChat.ts";
 import { handlePlayCard } from "./handlers/playCard.ts";
 import { handleDisconnect } from "./handlers/disconnect.ts";
+import { handleWon } from "./handlers/won.ts";
+import { handleStartGame } from "./handlers/handleStartGame.ts";
 
 const io = new Server({
   cors: {
@@ -18,6 +20,8 @@ io.on("connection", (socket: any) => {
   handleGameChat(socket, io);
   handlePlayCard(socket, io);
   handleDisconnect(socket, io);
+  handleStartGame(socket, io);
+  handleWon(socket, io);
 });
 
 await serve(io.handler(), {
