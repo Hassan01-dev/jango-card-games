@@ -1,10 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { getCookie, startGame } from "../actions";
-import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
-
-const socket = io("http://localhost:3001");
+import { useSocket } from "@views/professional_thula/hooks/useSocket";
 
 export default function Room({ roomId }: { roomId: string }) {
   const router = useRouter()
@@ -14,6 +12,8 @@ export default function Room({ roomId }: { roomId: string }) {
     await startGame(roomId, playerNames)
     router.push(`/professional_thula/game/${roomId}`);
   }
+
+  const { socket } = useSocket();
 
   const joinRoom = async () => {
     const playerName = await getCookie("playerName");
