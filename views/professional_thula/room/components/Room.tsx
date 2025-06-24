@@ -7,13 +7,14 @@ import { useSocket } from "@views/professional_thula/hooks/useSocket";
 export default function Room({ roomId }: { roomId: string }) {
   const router = useRouter()
   const [playerNames, setPlayerNames] = useState<string[]>([]);
+  const { socket } = useSocket();
 
   const handleStartGame = async () => {
     await startGame(roomId, playerNames)
+    socket.emit("start_game", roomId);
     router.push(`/professional_thula/game/${roomId}`);
   }
 
-  const { socket } = useSocket();
 
   const joinRoom = async () => {
     const playerName = await getCookie("playerName");
@@ -47,14 +48,20 @@ export default function Room({ roomId }: { roomId: string }) {
     }
   };
 
+  const handleGameStarted = ({ roomId: gameRoomId }: { roomId: string } ) => {
+    router.push(`/professional_thula/game/${gameRoomId}`);
+  }
+
   useEffect(() => {
     socket.on("room_joined", handleRoomJoin);
     socket.on("player_left", handlePlayerLeft);
+    socket.on("game_started", handleGameStarted);
     joinRoom();
 
     return () => {
       socket.off("room_joined", handleRoomJoin);
       socket.off("player_left", handlePlayerLeft);
+      socket.off("game_started", handleGameStarted);
       const playerName = getCookie("playerName");
       socket.emit("left", { roomId, playerName });
     }

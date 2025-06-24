@@ -4,6 +4,7 @@ import Image from "next/image";
 import GameChat from "./GameChat";
 import { useEffect, useState } from "react";
 import { useSocket } from "@views/professional_thula/hooks/useSocket";
+import toast from "react-hot-toast";
 
 export default function Game({
   hands,
@@ -25,6 +26,8 @@ export default function Game({
 
   const { socket } = useSocket();
   const [currentTurn, setCurrentTurn] = useState("");
+  const [gameOver, setGameOver] = useState(false);
+  const [looser, setLooser] = useState("");
 
   const handleUpdateTurn = ({ currentTurn }: { currentTurn: string }) => {
     setCurrentTurn(currentTurn);
@@ -73,6 +76,17 @@ export default function Game({
     setPlayedCards([]);
   };
 
+  const handleGameOver = ({ looser }: { looser: string }) => {
+    toast.success(`${looser} lost the game!`);
+    setMyCards([]);
+    setLooser(looser);
+    setGameOver(true);
+  };
+
+  const handlePlayerWon = ({ playerName }: { playerName: string }) => {
+    toast.success(`${playerName} won the game!`);
+  };
+
   useEffect(() => {
     // Join room and register event listeners
     if (socket) {
@@ -85,6 +99,8 @@ export default function Game({
       socket.on("thulla", handleThulla);
       socket.on("cards_taken", handleCardsTaken);
       socket.on("empty_table", handleEmptyTable);
+      socket.on("game_over", handleGameOver);
+      socket.on("player_won", handlePlayerWon);
     }
     // Cleanup function to remove event listeners
     return () => {
@@ -95,18 +111,24 @@ export default function Game({
         socket.off("card_played", handlePlayedCards);
         socket.off("thulla", handleThulla);
         socket.off("cards_taken", handleCardsTaken);
-        socket.on("empty_table", handleEmptyTable);
+        socket.off("empty_table", handleEmptyTable);
+        socket.off("game_over", handleGameOver);
+        socket.off("player_won", handlePlayerWon);
       }
     };
   }, [socket, roomId, playerName]);
 
   const handleClick = (card: string) => {
-    setMyCards((prev: any) => [...prev.filter((c: string) => c !== card)]);
+    const remainingCards = myCards.filter((c: string) => c !== card);
+    setMyCards(remainingCards);
     socket.emit("play_card", {
       roomId,
       playerName,
       card,
     });
+    if (remainingCards.length === 0) {
+      socket.emit("won", { roomId, playerName });
+    }
   };
 
   const handleSort = () => {
@@ -172,12 +194,13 @@ export default function Game({
         </div>
 
         {/* Played Cards */}
-        <div className="played-cards relative h-[200px] sm:h-[250px] w-full flex justify-center">
-          <div className="relative w-[160px] sm:w-[200px]">
-            {playedCards.map((card: string, index: number) => (
-              <div
-                key={index}
-                className="played-card absolute left-1/2 -translate-x-1/2 transition-all duration-300"
+        {!gameOver && (
+          <div className="played-cards relative h-[200px] sm:h-[250px] w-full flex justify-center">
+            <div className="relative w-[160px] sm:w-[200px]">
+              {playedCards.map((card: string, index: number) => (
+                <div
+                  key={index}
+                  className="played-card absolute left-1/2 -translate-x-1/2 transition-all duration-300"
                 style={{
                   transform: `translateX(-50%) rotate(${
                     (index - playedCards.length / 2) * 15
@@ -200,6 +223,17 @@ export default function Game({
             ))}
           </div>
         </div>
+        )}
+
+        {/* Game Over Modal */}
+        {gameOver && (
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-md shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Game Over</h2>
+            <p className="text-lg">
+              {looser} lost the game!
+            </p>
+          </div>
+        )}
 
         {/* Chat */}
         <div className="chat-area w-full max-w-xl bg-green-800/40 rounded-2xl shadow-xl p-4 sm:p-6 backdrop-blur-md border border-green-600/30">

@@ -5,9 +5,9 @@ import GameComponent from "@views/professional_thula/game/components/Game";
 import { cookies } from "next/headers";
 
 interface GameRoomProps {
-  params: {
+  params: Promise<{
     roomId: string;
-  };
+  }>;
 }
 
 async function getGameData(roomId: string) {
@@ -21,7 +21,7 @@ async function getGameData(roomId: string) {
 }
 
 export default async function GameRoom({ params }: GameRoomProps) {
-  const { roomId } = params;
+  const { roomId } = await params;
   const playerName = cookies().get("playerName")?.value;
   const cardGame = await getGameData(roomId);
 
