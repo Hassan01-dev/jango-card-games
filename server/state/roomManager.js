@@ -9,6 +9,7 @@ function createRoom(roomId) {
     players: [],
     currentTurn: null,
     playedCards: null,
+    noOfTurns: 0,
   };
 }
 

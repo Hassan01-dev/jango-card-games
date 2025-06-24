@@ -8,21 +8,20 @@ function handlePlayCard(socket, io) {
 
       const room = getRoom(roomId);
       if (!room) throw new Error("Room not found");
-      if (room.currentTurn !== socket.id) throw new Error("Not your turn");
 
       room.playedCards = room.playedCards || [];
       const parsed = parseCard(card); // { rank, suit, value }
-
+      
       const playedCard = { playerName, card, suit: parsed.suit, value: parsed.value, socketId: socket.id };
       room.playedCards.push(playedCard);
 
       io.to(roomId).emit("card_played", { playerName, card });
 
       const leadSuit = room.playedCards[0].suit;
+      const highest = room.playedCards.reduce((max, curr) => (curr.suit === leadSuit && curr.value > max.value ? curr : max));
 
     // 🔥 Detect Thulla: card does not match lead suit
       if (parsed.suit !== leadSuit) {
-        const highest = room.playedCards.reduce((max, curr) => (curr.value > max.value ? curr : max));
 
         io.to(roomId).emit("thulla", {
           triggeredBy: playerName,
@@ -38,6 +37,26 @@ function handlePlayCard(socket, io) {
 
         // Reset for next round
         room.playedCards = [];
+        room.noOfTurns = 0;
+
+        io.to(roomId).emit("update_turn", {
+          currentTurn: highest.playerName,
+        })
+        return;
+      }
+
+      room.noOfTurns += 1;
+      if (room.noOfTurns === room.players.length) {
+
+        // Reset for next round
+        room.playedCards = [];
+        room.noOfTurns = 0;
+
+        io.to(roomId).emit("empty_table");
+        io.to(roomId).emit("update_turn", {
+            currentTurn: highest.playerName,
+        })
+        return;
       }
 
       // No thulla yet → pass to next player
