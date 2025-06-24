@@ -69,6 +69,10 @@ export default function Game({
     setMyCards((prev: string[]) => [...prev, ...cards]);
   };
 
+  const handleEmptyTable = () => {
+    setPlayedCards([]);
+  };
+
   useEffect(() => {
     // Join room and register event listeners
     if (socket) {
@@ -80,8 +84,8 @@ export default function Game({
       socket.on("card_played", handlePlayedCards);
       socket.on("thulla", handleThulla);
       socket.on("cards_taken", handleCardsTaken);
+      socket.on("empty_table", handleEmptyTable);
     }
-
     // Cleanup function to remove event listeners
     return () => {
       if (socket) {
@@ -91,20 +95,43 @@ export default function Game({
         socket.off("card_played", handlePlayedCards);
         socket.off("thulla", handleThulla);
         socket.off("cards_taken", handleCardsTaken);
+        socket.on("empty_table", handleEmptyTable);
       }
     };
   }, [socket, roomId, playerName]);
 
   const handleClick = (card: string) => {
-    if (playerName === currentTurn) {
-      setMyCards((prev: any) => [...prev.filter((c: string) => c !== card)]);
-      socket.emit("play_card", {
-        roomId,
-        playerName,
-        card,
-      });
-    }
+    setMyCards((prev: any) => [...prev.filter((c: string) => c !== card)]);
+    socket.emit("play_card", {
+      roomId,
+      playerName,
+      card,
+    });
   };
+
+  const handleSort = () => {
+    const suitOrder = { 'hearts': 1, 'diamonds': 3, 'clubs': 2, 'spades': 4 };
+    
+    const sortedCards = [...myCards].sort((a: string, b: string) => {
+      const [aRank, , aSuit] = a.split('_');
+      const [bRank, , bSuit] = b.split('_');
+      
+      // Compare suits first
+      const suitComparison = suitOrder[aSuit as keyof typeof suitOrder] - suitOrder[bSuit as keyof typeof suitOrder];
+      
+      if (suitComparison !== 0) {
+        return suitComparison;
+      }
+      
+      // If suits are equal, compare ranks
+      return parseInt(aRank) - parseInt(bRank);
+    });
+    
+    setMyCards(sortedCards);
+  };
+
+  const playingSuit =
+    playedCards.length > 0 ? playedCards[0].split("_")[2] : "";
 
   return (
     <div className="professional-thula h-screen flex bg-gradient-to-b from-green-950 to-green-800 p-4">
@@ -194,26 +221,55 @@ export default function Game({
               <span>Cards Remaining:</span>
               <span className="font-bold">{myCards.length}</span>
             </div>
+            <div>
+              <button onClick={handleSort}>Sort</button>
+            </div>
           </div>
         </div>
 
         <div className="ml-8 relative flex justify-center items-end min-h-[200px] sm:min-h-[220px] px-4 sm:px-0">
           {myCards.map((card: string, index: number) => {
             const middleIndex = Math.floor(myCards.length / 2);
-            const rotation = (index - middleIndex); // Adjust angle per card
+            const rotation = index - middleIndex;
+            const [, , suit] = card.split("_");
+
+            const isPlayerTurn = currentTurn === playerName;
+            const leadSuit = playingSuit; // lead suit from first card played in this round
+
+            const hasLeadSuit = myCards.some(
+              (c: any) => c.split("_")[2] === leadSuit
+            );
+
+            const mustFollowSuit = !!leadSuit && hasLeadSuit;
+            const isValidCard = !mustFollowSuit || suit === leadSuit;
+
+            const isDisabled =
+              !isPlayerTurn || (mustFollowSuit && suit !== leadSuit);
 
             return (
               <div
                 key={index}
-                className="relative group cursor-pointer transition-transform duration-300"
+                className={`relative group transition-transform duration-300 ${
+                  isDisabled
+                    ? "cursor-not-allowed brightness-50"
+                    : "cursor-pointer"
+                }`}
                 style={{
                   transform: `rotate(${rotation}deg) translateY(-10px)`,
                   zIndex: index,
                   marginLeft: index === 0 ? 0 : "-30px",
                 }}
-                onClick={() => handleClick(card)}
+                onClick={() => {
+                  if (!isDisabled) handleClick(card);
+                }}
               >
-                <div className="transition-transform duration-300 transform-gpu group-hover:scale-110 group-hover:-translate-y-10 group-hover:z-50">
+                <div
+                  className={`transition-transform duration-300 transform-gpu ${
+                    !isDisabled
+                      ? "group-hover:scale-110 group-hover:-translate-y-10 group-hover:z-50"
+                      : ""
+                  }`}
+                >
                   <Image
                     src={`/images/card_images/${card}.png`}
                     alt={card}
