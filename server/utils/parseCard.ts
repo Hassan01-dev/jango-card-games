@@ -14,14 +14,14 @@ const rankOrder = {
     "ace": 14,
   };
   
-  function parseCard(cardStr) {
+  export function parseCard(cardStr: string) {
     const [rank, , suit] = cardStr.split("_"); // e.g. "jack_of_hearts"
     return {
       rank,
       suit,
-      value: rankOrder[rank.toLowerCase()]
+      value: rankOrder[rank.toLowerCase() as keyof typeof rankOrder]
     };
   }
   
-  module.exports = parseCard;
+
   
