@@ -1,6 +1,7 @@
-const { getAllRooms, deleteRoom } = require("../state/roomManager");
+import { deleteRoom, getAllRooms } from "../state/roomManager.ts";
 
-function handleDisconnect(socket, io) {
+
+export function handleDisconnect(socket: any, io: any) {
   socket.on("disconnect", () => {
     try {
       console.log("User disconnected:", socket.id);
@@ -37,5 +38,3 @@ function handleDisconnect(socket, io) {
     }
   });
 }
-
-module.exports = handleDisconnect;

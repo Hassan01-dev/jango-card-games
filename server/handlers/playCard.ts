@@ -1,8 +1,12 @@
-const { getRoom } = require("../state/roomManager");
-const parseCard = require("../utils/parseCard");
+import { parseCard } from "../utils/parseCard.ts";
+import { getRoom } from "../state/roomManager.ts";
 
-function handlePlayCard(socket, io) {
-  socket.on("play_card", ({ roomId, card, playerName }) => {
+export function handlePlayCard(socket: any, io: any) {
+  socket.on("play_card", ({ roomId, card, playerName }: {
+    roomId: string;
+    card: string;
+    playerName: string;
+  }) => {
     try {
       if (!roomId || !card || !playerName) throw new Error("Invalid play");
 
@@ -26,7 +30,7 @@ function handlePlayCard(socket, io) {
         io.to(roomId).emit("thulla", {
           triggeredBy: playerName,
           looser: highest.playerName,
-          cardsTaken: room.playedCards.count,
+          cardsTaken: room.playedCards.length,
         });
 
         // TODO: Add cards to looser's hand if you're tracking hands on server
@@ -68,11 +72,11 @@ function handlePlayCard(socket, io) {
         currentTurn: room.players[nextIndex].name,
       });
 
-    } catch (error) {
-      socket.emit("error", { message: error.message });
-      console.error("Error in play_card:", error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        socket.emit("error", { message: error.message });
+        console.error("Error in play_card:", error);
+      }
     }
   });
 }
-
-module.exports = handlePlayCard;

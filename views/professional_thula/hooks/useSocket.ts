@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-interface UseSocketProps {
-  url: string;
-  options?: any;
-}
-
 const socket = io("http://localhost:3001");
 
 export const useSocket = () => {
