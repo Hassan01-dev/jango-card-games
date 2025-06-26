@@ -15,8 +15,14 @@ function getNextEligiblePlayer(room: Room, startIndex: number) {
   }
 }
 
+async function waitFor() {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 2000);
+  });
+}
+
 export function handlePlayCard(socket: any, io: any) {
-  socket.on("play_card", ({ roomId, card, playerName }: {
+  socket.on("play_card", async ({ roomId, card, playerName }: {
     roomId: string;
     card: string;
     playerName: string;
@@ -48,15 +54,17 @@ export function handlePlayCard(socket: any, io: any) {
 
       // 🔥 Thulla detection
       if (parsed.suit !== leadSuit) {
-        io.to(roomId).emit("thulla", {
-          triggeredBy: playerName,
-          looser: highest.playerName,
-          cardsTaken: room.playedCards.length,
-        });
+          await waitFor();
+          io.to(roomId).emit("thulla", {
+            triggeredBy: playerName,
+            looser: highest.playerName,
+            cardsTaken: room.playedCards.length,
+          });
 
-        io.to(highest.socketId).emit("cards_taken", {
-          cards: room.playedCards.map(c => c.card),
-        });
+          io.to(highest.socketId).emit("cards_taken", {
+            cards: room.playedCards.map((c) => c.card),
+          });
+
 
         room.playedCards = [];
         room.noOfTurns = 0;
@@ -71,9 +79,9 @@ export function handlePlayCard(socket: any, io: any) {
           throw new Error("No next turn player found");
         }
 
-        room.currentTurn = nextTurnPlayer.id;
+        room.currentTurn = { id: nextTurnPlayer.id, name: nextTurnPlayer.name };
         io.to(roomId).emit("update_turn", {
-          currentTurn: nextTurnPlayer.name,
+          currentTurn: room.currentTurn
         });
         return;
       }
@@ -85,9 +93,9 @@ export function handlePlayCard(socket: any, io: any) {
       if (room.noOfTurns === activePlayers.length) {
         room.playedCards = [];
         room.noOfTurns = 0;
-
+        await waitFor();
         io.to(roomId).emit("empty_table");
-
+       
         let nextTurnPlayer = room.players.find(p => p.name === highest.playerName);
         if (!nextTurnPlayer || nextTurnPlayer.isWon) {
           const startIndex = room.players.findIndex(p => p.id === socket.id);
@@ -98,9 +106,9 @@ export function handlePlayCard(socket: any, io: any) {
           throw new Error("No next turn player found");
         }
 
-        room.currentTurn = nextTurnPlayer.id;
+        room.currentTurn = { id: nextTurnPlayer.id, name: nextTurnPlayer.name };
         io.to(roomId).emit("update_turn", {
-          currentTurn: nextTurnPlayer.name,
+          currentTurn: room.currentTurn,
         });
         return;
       }
@@ -113,9 +121,9 @@ export function handlePlayCard(socket: any, io: any) {
         throw new Error("No next player found");
       }
 
-      room.currentTurn = nextPlayer.id;
+      room.currentTurn = { id: nextPlayer.id, name: nextPlayer.name };
       io.to(roomId).emit("update_turn", {
-        currentTurn: nextPlayer.name,
+        currentTurn: room.currentTurn,
       });
 
     } catch (error: unknown) {

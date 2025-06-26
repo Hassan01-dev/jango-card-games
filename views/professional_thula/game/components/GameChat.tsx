@@ -10,7 +10,7 @@ interface IMsgDataTypes {
   time: String;
 }
 
-const GameChat = ({ username, game, roomId }: any) => {
+const GameChat = ({ username, roomId }: any) => {
   const [currentMsg, setCurrentMsg] = useState("");
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
 

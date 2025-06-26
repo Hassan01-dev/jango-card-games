@@ -1,14 +1,19 @@
 export type Player = {
   id: string;
   name: string;
+  socketId: string;
+  cards: string[];
   isWon: boolean;
 }
 
 export type Room = {
   players: Player[];
-  currentTurn: string | null;
-  playedCards: PlayedCard[]; // Consider creating a specific type for played cards
+  currentTurn: { id: string; name: string } | null;
+  playedCards: PlayedCard[];
   noOfTurns: number;
+  isStarted: boolean;
+  ownerId: string;
+  ownerName: string;
 }
 
 export type PlayedCard = {
