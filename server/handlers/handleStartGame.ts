@@ -1,4 +1,6 @@
 import { getRoom } from "../state/roomManager.ts";
+import { CardDeck } from "../utils/cardDeck.ts";
+import { Player } from "../utils/types.ts";
 
 export function handleStartGame(socket: any, io: any) {
   socket.on("start_game", (roomId: string) => {
@@ -8,7 +10,26 @@ export function handleStartGame(socket: any, io: any) {
       const room = getRoom(roomId);
       if (!room) throw new Error("Room not found");
 
-      io.to(roomId).emit("game_started", { roomId });
+      const currentDeck = new CardDeck();
+      currentDeck.shuffleDeck();
+      const firstPlayer = currentDeck.distributeCards(room.players) as Player;
+      room.currentTurn = { id: firstPlayer.id, name: firstPlayer.name };
+      room.isStarted = true
+
+      io.to(roomId).emit("game_started");
+
+      room.players.forEach((player) => {
+        io.to(player.socketId).emit("hand_received", {
+          currentTurn: room.currentTurn,
+          hand: player.cards,
+          opponents: room.players
+            .filter((p) => p.id !== player.id)
+            .map((opponent) => ({
+              name: opponent.name,
+              cardsCount: opponent.cards.length,
+            })),
+        });
+      });
 
     } catch (error: unknown) {
       if (error instanceof Error) {

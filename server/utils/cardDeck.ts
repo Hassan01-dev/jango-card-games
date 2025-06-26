@@ -1,3 +1,5 @@
+import { Player } from "./types.ts";
+
 const suits = ["hearts", "diamonds", "clubs", "spades"];
 const ranks = [
   "2",
@@ -55,23 +57,21 @@ export class CardDeck {
     }
   }
   
-  public distributeCards(playersName: string[]): PlayerHand[] {
-    const numPlayers = playersName.length
-    if (numPlayers <= 0) {
-      console.log("Invalid number of players");
-      return [];
-    }
-  
-    const playerHands: PlayerHand[] = playersName.map((name) => ({ name, cards: [] }));
+  public distributeCards(players: Player[]): Player {
+    const numPlayers = players.length
+    let firstTurn;
   
     while (this.cards.length > 0) {
       for (let i = 0; i < numPlayers && this.cards.length > 0; i++) {
         const card = this.dealCard()!;
-        playerHands[i].cards.push(card);
+        if (card === "ace_of_spades") {
+          firstTurn = players[i];
+        }
+        players[i].cards.push(card);
       }
     }
   
-    return playerHands;
+    return firstTurn;
   }
 
   public resetDeck(): void {

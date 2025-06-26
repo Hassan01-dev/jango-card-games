@@ -4,8 +4,6 @@ import { deleteRoom, getAllRooms } from "../state/roomManager.ts";
 export function handleDisconnect(socket: any, io: any) {
   socket.on("disconnect", () => {
     try {
-      console.log("User disconnected:", socket.id);
-
       const rooms = getAllRooms();
 
       for (const roomId in rooms) {
@@ -14,10 +12,13 @@ export function handleDisconnect(socket: any, io: any) {
 
         if (playerIndex !== -1) {
           const playerName = room.players[playerIndex].name;
-          room.players.splice(playerIndex, 1);
+          if (!room.isStarted) {
+            room.players.splice(playerIndex, 1);
+          }
 
-          if (room.currentTurn === socket.id) {
-            room.currentTurn = room.players[0]?.id ?? null;
+          if (room.currentTurn?.id === socket.id) {
+            const player = room.players[0]
+            room.currentTurn = player ? { id: player.id, name: player.name } : null;
           }
 
           io.to(roomId).emit("player_left", {
@@ -27,10 +28,10 @@ export function handleDisconnect(socket: any, io: any) {
             currentTurn: room.currentTurn,
           });
 
-          if (room.players.length === 0) {
-            deleteRoom(roomId);
-          }
-          break;
+          // if (room.players.length === 0) {
+          //   deleteRoom(roomId);
+          // }
+          // break;
         }
       }
     } catch (error) {
