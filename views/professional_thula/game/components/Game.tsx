@@ -116,6 +116,13 @@ export default function Game({ roomId }: { roomId: string }) {
     };
   }, [socket]);
 
+  useEffect(() => {
+    if (currentTurn.id === playerId) {
+      const audio = new Audio("/turn.wav");
+      audio.play().catch((e) => console.error("Audio play failed:", e));
+    }
+  }, [currentTurn]);
+
   const playingSuit = playedCards.length > 0 ? playedCards[0].split("_")[2] : "";
 
   const handleCardPlayed = (card: string) => {
