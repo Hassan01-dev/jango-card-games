@@ -5,6 +5,18 @@ import GameChat from "./GameChat";
 import Confetti from "react-confetti"
 import { useEffect } from "react";
 import { Socket } from "socket.io-client";
+import PlayerCard from "./PlayerCard";
+
+const opponentPositions = [
+  { top: "5%", left: "50%", transform: "translate(-50%, 0)" }, // Top
+  { top: "15%", left: "80%", transform: "translate(-50%, 0)" }, // Top-Right
+  { top: "45%", left: "95%", transform: "translate(-50%, -50%)" }, // Right
+  { top: "80%", left: "80%", transform: "translate(-50%, -100%)" }, // Bottom-Right
+  { top: "85%", left: "50%", transform: "translate(-50%, -100%)" }, // Bottom (Player)
+  { top: "80%", left: "20%", transform: "translate(-50%, -100%)" }, // Bottom-Left
+  { top: "45%", left: "5%", transform: "translate(-50%, -50%)" }, // Left
+  { top: "15%", left: "20%", transform: "translate(-50%, 0)" }, // Top-Left
+];
 
 export default function GameStarted({
   roomId,
@@ -19,7 +31,9 @@ export default function GameStarted({
   gameOver,
   looser,
   opponents,
-  socket
+  socket,
+  isLoading,
+  isCardPlayed,
 }: {
   roomId: string;
   playerId: string;
@@ -34,18 +48,18 @@ export default function GameStarted({
   looser: string;
   opponents: Array<{ name: string; cardsCount: number }>;
   socket: Socket;
+  isLoading: boolean;
+  isCardPlayed: boolean;
 }) {
   const playerName = localStorage.getItem("playerName") || "";
 
-
-useEffect(() => {
-  if (thullaOccured) {
-    // Play audio
-    const audio = new Audio("/thulla.wav");
-    audio.play();
-  }
-}, [thullaOccured]);
-
+  useEffect(() => {
+    if (thullaOccured) {
+      // Play audio
+      const audio = new Audio("/thulla.wav");
+      audio.play();
+    }
+  }, [thullaOccured]);
 
   useEffect(() => {
     const handlePlayAudio = () => {
@@ -71,152 +85,138 @@ useEffect(() => {
   }, []);
 
   return (
-    <div className="professional-thula h-screen flex bg-gradient-to-b from-green-950 to-green-800 p-4">
-      <div className="opposition grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
-        {opponents.map((opponent, index) => (
-          <div
-            key={index}
-            className="bg-green-800/40 backdrop-blur-md rounded-2xl p-4 sm:p-6 text-white shadow-xl border border-green-600/30"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-600 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold">
-                {opponent.name[0].toUpperCase()}
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold">
-                {opponent.name}
-              </h3>
-            </div>
-            <div className="flex items-center gap-2 text-green-300 text-sm sm:text-base">
-              <span>Cards:</span>
-              <span className="font-bold">{opponent.cardsCount}</span>
-            </div>
+    <div className="relative w-full h-screen bg-gradient-to-b from-green-950 to-green-800 overflow-hidden">
+      {/* Game Table in Center */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-green-800 to-green-900 rounded-full shadow-2xl border border-green-600/30 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+        <div className="text-2xl sm:text-3xl font-bold text-white mb-4">
+          Game Table
+        </div>
+
+        {isLoading && (
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <Image
+              src="/dealing.gif"
+              alt="Loading"
+              width={200}
+              height={200}
+              className="rounded-2xl"
+            />
           </div>
-        ))}
-      </div>
+        )}
 
-      {/* Game Table */}
-      <div className="game-table bg-gradient-to-br from-green-800 to-green-900 rounded-3xl p-6 sm:p-12 shadow-2xl relative flex justify-between items-center border border-green-600/30 backdrop-blur-sm flex-1">
-        <div className="flex play-area text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 tracking-wide">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-300 to-emerald-300">
-            Game Table
-          </span>
-        </div>
-        {/* Turn Indicator */}
-        <div className="turn-indicator text-sm sm:text-lg font-medium text-white bg-green-700/50 px-6 py-2 sm:px-8 sm:py-3 rounded-full shadow-lg mb-6 sm:mb-8 backdrop-blur-sm border border-green-500/30">
-          <span className="animate-pulse inline-block w-3 h-3 bg-green-400 rounded-full mr-2" />
-          {currentTurn.id === playerId ? "Your" : `${currentTurn.name}'s`} Turn
-        </div>
-
-        {/* Played Cards */}
         {!gameOver && (
-          <div className="w-full flex flex-col items-center">
-            <div className="played-cards relative h-[200px] sm:h-[250px]">
-              <div className="relative w-[160px] sm:w-[200px]">
-                {playedCards.map((card: string, index: number) => (
-                  <div
-                    key={index}
-                    className="played-card absolute left-1/2 -translate-x-1/2 transition-all duration-300"
-                  style={{
-                    transform: `translateX(-50%) rotate(${
-                      (index - playedCards.length / 2) * 15
-                    }deg) translateY(${index * 2}px)`,
-                    zIndex: index,
-                  }}
-                >
-                  <Image
-                    src={`/images/card_images/${card}.png`}
-                    alt={card}
-                    width={120}
-                    height={168}
-                    className="rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all"
-                    style={{
-                      filter: "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
-                      backfaceVisibility: "hidden",
-                    }}
-                  />
-                </div>
-              ))}
-              </div>
-            </div>
-            {thullaOccured && (
-              <div className="animate-[fadeOut_2s_ease-in-out]">
+          <div className="relative h-[200px] w-full flex justify-center items-center">
+            {playedCards.map((card, index) => (
+              <div
+                key={index}
+                className="absolute transition-all duration-300"
+                style={{
+                  transform: `rotate(${
+                    (index - playedCards.length / 2) * 15
+                  }deg) translateY(${index * 2}px)`,
+                  zIndex: index,
+                }}
+              >
                 <Image
-                  src="/thulla.gif"
-                  alt="Waiting animation"
+                  src={`/images/card_images/${card}.png`}
+                  alt={card}
                   width={120}
-                  height={120}
-                  className="z-10"
+                  height={168}
+                  className="rounded-xl shadow-lg hover:shadow-2xl"
+                  style={{
+                    filter: "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
+                    backfaceVisibility: "hidden",
+                  }}
                 />
               </div>
-            )}
+            ))}
           </div>
         )}
 
-        {/* Game Over Modal */}
+        {thullaOccured && (
+          <div className="mt-4">
+            <Image src="/thulla.gif" alt="Thulla" width={120} height={120} />
+          </div>
+        )}
+
         {gameOver && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-md shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Game Over</h2>
-            <p className="text-lg">
-              {looser} lost the game!
-            </p>
+          <div className="absolute bg-white p-6 rounded-lg shadow-xl z-50">
+            <h2 className="text-xl font-bold mb-2">Game Over</h2>
+            <p>{looser} lost the game!</p>
           </div>
         )}
 
-        {/* Chat */}
-        <div className="chat-area rounded-2xl p-4">
-          <GameChat username={playerName} roomId={roomId} />
+        <div className="mt-4 px-4">
+          <div className="turn-indicator text-white bg-green-700/50 px-6 py-2 rounded-full shadow">
+            <span className="animate-pulse inline-block w-3 h-3 bg-green-400 rounded-full mr-2" />
+            {currentTurn.id === playerId ? "Your" : `${currentTurn.name}'s`}{" "}
+            Turn
+          </div>
         </div>
       </div>
 
-      {/* Player Cards */}
-      <div className="player-cards mt-6 sm:mt-10 bg-green-800/40 rounded-2xl p-4 backdrop-blur-sm border border-green-600/30">
-        <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-600 rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold text-white">
+      {/* Opponents Around Table */}
+      {opponents.map((opponent, index) => {
+        const position = opponentPositions[index];
+        if (!position) return null;
+
+        return (
+          <div
+            key={index}
+            className="absolute"
+            style={{
+              top: position.top,
+              left: position.left,
+              transform: position.transform,
+            }}
+          >
+            <PlayerCard player={opponent} />
+          </div>
+        );
+      })}
+
+      {/* Player Cards at Bottom */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-5xl px-4">
+        <div className="flex items-center gap-4 mb-2">
+          <div className="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-xl font-bold text-white">
             {playerName?.[0].toUpperCase()}
           </div>
           <div className="text-white">
-            <h3 className="text-base sm:text-xl font-semibold">
-              {playerName}
-            </h3>
-            <div className="flex items-center gap-2 text-green-300 text-sm sm:text-base">
-              <span>Cards Remaining:</span>
-              <span className="font-bold">{myCards.length}</span>
-            </div>
-            <div>
-              <button onClick={() => handleSort(playingSuit)}>Sort</button>
-            </div>
+            <h3 className="text-lg font-semibold">{playerName}</h3>
+            <p className="text-green-300 text-sm">Cards: {myCards.length}</p>
+            <button
+              onClick={() => handleSort(playingSuit)}
+              className="text-sm underline"
+            >
+              Sort
+            </button>
           </div>
         </div>
 
-        <div className="ml-8 relative flex justify-center items-end min-h-[200px] sm:min-h-[220px] px-4 sm:px-0">
-          {myCards.map((card: string, index: number) => {
+        <div className="flex justify-center relative min-h-[200px]">
+          {myCards.map((card, index) => {
             const middleIndex = Math.floor(myCards.length / 2);
             const rotation = index - middleIndex;
             const [, , suit] = card.split("_");
 
             const isPlayerTurn = currentTurn.id === playerId;
-            const leadSuit = playingSuit; // lead suit from first card played in this round
-
             const hasLeadSuit = myCards.some(
-              (c: any) => c.split("_")[2] === leadSuit
+              (c) => c.split("_")[2] === playingSuit
             );
-
-            const mustFollowSuit = !!leadSuit && hasLeadSuit;
-            const isValidCard = !mustFollowSuit || suit === leadSuit;
-
+            const mustFollowSuit = !!playingSuit && hasLeadSuit;
             const isDisabled =
-              !isPlayerTurn || (mustFollowSuit && suit !== leadSuit);
+              !isPlayerTurn || (mustFollowSuit && suit !== playingSuit) || isCardPlayed;
 
             return (
               <div
                 key={index}
-                className={`relative group transition-transform duration-300 ${
+                className={`relative transition duration-300 ${
                   isDisabled
                     ? "cursor-not-allowed brightness-50"
                     : "cursor-pointer"
                 }`}
                 style={{
-                  transform: `rotate(${rotation}deg) translateY(-10px)`,
+                  transform: `rotate(${rotation}deg)`,
                   zIndex: index,
                   marginLeft: index === 0 ? 0 : "-30px",
                 }}
@@ -224,38 +224,34 @@ useEffect(() => {
                   if (!isDisabled) handleClick(card);
                 }}
               >
-                <div
-                  className={`transition-transform duration-300 transform-gpu ${
-                    !isDisabled
-                      ? "group-hover:scale-110 group-hover:-translate-y-10 group-hover:z-50"
-                      : ""
-                  }`}
-                >
-                  <Image
-                    src={`/images/card_images/${card}.png`}
-                    alt={card}
-                    width={100}
-                    height={150}
-                    className="rounded-xl shadow-lg hover:shadow-2xl"
-                    style={{
-                      filter: "drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25))",
-                      backfaceVisibility: "hidden",
-                    }}
-                  />
-                </div>
+                <Image
+                  src={`/images/card_images/${card}.png`}
+                  alt={card}
+                  width={100}
+                  height={150}
+                  className="rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-4 transition-all"
+                />
               </div>
             );
           })}
         </div>
       </div>
-      { thullaOccured && <Confetti
-        width={window.innerWidth}
-        height={window.innerHeight}
-        recycle={false}
-        numberOfPieces={100}
-        gravity={0.5} 
+
+      {/* Chat Area */}
+      <div className="absolute right-4 bottom-4 w-64">
+        <GameChat username={playerName} roomId={roomId} />
+      </div>
+
+      {/* Confetti on Thulla */}
+      {thullaOccured && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={100}
+          gravity={0.5}
         />
-      }
+      )}
     </div>
   );
 }
