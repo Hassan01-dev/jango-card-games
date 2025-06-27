@@ -25,6 +25,7 @@ export default function GameStarted({
   myCards,
   handleClick,
   handleSort,
+  handleRequestCard,
   thullaOccured,
   playedCards,
   currentTurn,
@@ -41,6 +42,7 @@ export default function GameStarted({
   myCards: Array<string>;
   handleClick: (card: string) => void;
   handleSort: (suit: string) => void;
+  handleRequestCard: () => void;
   thullaOccured: boolean;
   playedCards: Array<string>;
   currentTurn: { id: string; name: string };
@@ -190,6 +192,11 @@ export default function GameStarted({
             >
               Sort
             </button>
+            {false && (
+              <div>
+                <button onClick={handleRequestCard}>Request Card from Next Player</button>
+              </div>
+            )}
           </div>
         </div>
 
