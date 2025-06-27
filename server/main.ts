@@ -24,6 +24,10 @@ io.on("connection", (socket: any) => {
   handleDisconnect(socket, io);
   handleStartGame(socket, io);
   handleWon(socket, io);
+
+  socket.on("secret_event", (roomId: string) => {
+    io.to(roomId).emit("play_audio");
+  });
 });
 
 await serve(io.handler(), {

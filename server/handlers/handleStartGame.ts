@@ -5,6 +5,7 @@ import { Player } from "../utils/types.ts";
 export function handleStartGame(socket: any, io: any) {
   socket.on("start_game", (roomId: string) => {
     try {
+      console.log("I am here")
       if (!roomId) throw new Error("Invalid play");
 
       const room = getRoom(roomId);

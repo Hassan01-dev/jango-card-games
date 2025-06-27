@@ -32,8 +32,7 @@ export function handleJoinGame(socket: any, io: any) {
           name: playerName,
           socketId: socket.id,
           isWon: false,
-          cards: [],
-          left: false,
+          cards: []
         });
 
         if (!targetRoom?.currentTurn && targetRoom?.players.length === 1) {
