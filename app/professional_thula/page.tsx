@@ -1,9 +1,13 @@
 "use client";
 
 import { useSocket } from "@views/professional_thula/hooks/useSocket";
-import { Button, Label, TextInput } from "flowbite-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 
 export default function Game() {
   const [playerName, setPlayerName] = useState("");
@@ -27,21 +31,20 @@ export default function Game() {
     }
   }, [searchParams]);
 
-  const handleRoomCreated = useCallback(({ roomId }: { roomId: string }) => {
-    // router.push(`/professional_thula/room/${roomId}`);
-    router.push(`/professional_thula/${roomId}`);
-  }, [router]);
+  const handleRoomCreated = useCallback(
+    ({ roomId }: { roomId: string }) => {
+      router.push(`/professional_thula/${roomId}`);
+    },
+    [router]
+  );
 
   useEffect(() => {
     if (!socket) return;
-
     socket.on("room_created", handleRoomCreated);
-    
     return () => {
       socket.off("room_created", handleRoomCreated);
     };
   }, [socket, handleRoomCreated]);
-
 
   const handleCreateGame = async () => {
     if (!playerName.trim()) {
@@ -52,7 +55,7 @@ export default function Game() {
     const playerId = crypto.randomUUID();
     localStorage.setItem("playerName", playerName);
     localStorage.setItem("playerId", playerId);
-    
+
     emit("create_room", { playerId, playerName });
   };
 
@@ -65,44 +68,47 @@ export default function Game() {
     const playerId = crypto.randomUUID();
     localStorage.setItem("playerName", playerName);
     localStorage.setItem("playerId", playerId);
-    
-    // router.push(`/professional_thula/room/${roomId}`);
+
     router.push(`/professional_thula/${roomId}`);
   };
 
   return (
-    <div className="mx-auto mt-24 w-1/3">
-      <div className="flex items-center justify-between">
-        <div className="mb-2 block">
-          <Label htmlFor="player_name" value="Your Name" />
-        </div>
-        <TextInput
-          id="player_name"
-          className="w-3/4"
-          addon="@"
-          value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-          required
-        />
-      </div>
-      <hr className="m-4" />
-      <div className="flex flex-col items-center">
-        <Button onClick={handleCreateGame}>Create Room</Button>
-        <span className="m-2">OR</span>
-        <div className="flex items-center justify-between">
-          <div className="mb-2 block">
-            <Label htmlFor="room_id" value="Room ID" />
-          </div>
-          <TextInput
-            id="room_id"
-            className="w-3/4"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-            required
+    <div className="flex justify-center mt-24">
+      <Card className="w-full max-w-xl p-6 shadow-xl space-y-6 rounded-2xl">
+        <div>
+          <Label htmlFor="player_name" className="text-sm mb-1 block">
+            Your Name
+          </Label>
+          <Input
+            id="player_name"
+            placeholder="Enter your name"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
           />
         </div>
-        <Button onClick={handleJoinGame}>Join Room</Button>
-      </div>
+
+        <Button onClick={handleCreateGame} className="w-full">
+          Create Room
+        </Button>
+
+        <Separator className="my-4" />
+
+        <div>
+          <Label htmlFor="room_id" className="text-sm mb-1 block">
+            Room ID
+          </Label>
+          <Input
+            id="room_id"
+            placeholder="Enter room ID"
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+          />
+        </div>
+
+        <Button onClick={handleJoinGame} variant="secondary" className="w-full">
+          Join Room
+        </Button>
+      </Card>
     </div>
   );
 }

@@ -3,7 +3,6 @@ import type { Config } from "tailwindcss";
 const config: Config = {
     darkMode: ["class"],
     content: [
-    "./node_modules/flowbite-react/**/*.js",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./views/**/*.{js,ts,jsx,tsx}",
   ],
@@ -63,11 +62,10 @@ const config: Config = {
   	}
   },
   plugins: [
-    require("flowbite/plugin"),
     require("@tailwindcss/forms"),
     require("@tailwindcss/aspect-ratio"),
     require("@tailwindcss/typography"),
-      require("tailwindcss-animate")
+	require("tailwindcss-animate")
 ],
 };
 export default config;
