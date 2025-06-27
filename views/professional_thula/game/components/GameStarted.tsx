@@ -31,11 +31,10 @@ export default function GameStarted({
   looser: string;
   opponents: Array<{ name: string; cardsCount: number }>;
 }) {
-  const playerName = localStorage.getItem("playerName");
+  const playerName = localStorage.getItem("playerName") || "";
 
   return (
     <div className="professional-thula h-screen flex bg-gradient-to-b from-green-950 to-green-800 p-4">
-      {/* Opposition Players */}
       <div className="opposition grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
         {opponents.map((opponent, index) => (
           <div
@@ -114,7 +113,7 @@ export default function GameStarted({
         )}
 
         {/* Chat */}
-        <div className="chat-area w-full max-w-xl bg-green-800/40 rounded-2xl shadow-xl p-4 sm:p-6 backdrop-blur-md border border-green-600/30">
+        <div className="chat-area w-full max-w-xl rounded-2xl p-4">
           <GameChat username={playerName} roomId={roomId} />
         </div>
       </div>
