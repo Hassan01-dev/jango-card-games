@@ -6,8 +6,9 @@ export const handlePlayerLeft = (roomId: string, setPlayerNames: Function) => ({
   }
 };
 
-export const handleUpdateTurn = (setCurrentTurn: Function) => ({ currentTurn: { id, name } }: { currentTurn: { id: string; name: string } }) => {
+export const handleUpdateTurn = (setCurrentTurn: Function, setIsCardPlayed: Function) => ({ currentTurn: { id, name } }: { currentTurn: { id: string; name: string } }) => {
   setCurrentTurn({ id, name });
+  setIsCardPlayed(false);
 };
 
 export const handlePlayedCards = (setPlayedCards: Function) => ({ card }: { playerName: string; card: string }) => {
