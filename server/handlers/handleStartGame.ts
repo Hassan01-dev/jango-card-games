@@ -32,7 +32,7 @@ export function handleStartGame(socket: any, io: any) {
               })),
           });
         });
-      }, 2000);
+      }, 4000);
 
     } catch (error: unknown) {
       if (error instanceof Error) {
