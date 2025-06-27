@@ -8,22 +8,17 @@ export function handleDisconnect(socket: any, io: any) {
 
       for (const roomId in rooms) {
         const room = rooms[roomId];
-        const playerIndex = room.players.findIndex((p) => p.id === socket.id);
+        const player = room.players.find((p) => p.socketId === socket.id);
+        const playerIndex = room.players.findIndex((p) => p.socketId === socket.id);
 
-        if (playerIndex !== -1) {
-          const playerName = room.players[playerIndex].name;
-          if (!room.isStarted) {
-            room.players.splice(playerIndex, 1);
-          }
+        if (player && playerIndex !== -1) {
 
-          if (room.currentTurn?.id === socket.id) {
-            const player = room.players[0]
-            room.currentTurn = player ? { id: player.id, name: player.name } : null;
-          }
+          room.players.splice(playerIndex, 1);
+
 
           io.to(roomId).emit("player_left", {
             roomId,
-            playerName,
+            playerName: player.name,
             players: room.players,
             currentTurn: room.currentTurn,
           });

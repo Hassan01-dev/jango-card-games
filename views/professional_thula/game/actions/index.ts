@@ -63,11 +63,12 @@ export const handleClick = (
   setMyCards: Function,
   socket: any,
   roomId: string,
-  playerName: string
+  playerName: string,
+  playerId: string
 ) => {
   const remaining = myCards.filter((c) => c !== card);
   setMyCards(remaining);
-  socket.emit("play_card", { roomId, playerName, card });
+  socket.emit("play_card", { roomId, playerName, card, playerId });
   if (remaining.length === 0) {
     socket.emit("won", { roomId, playerName });
   }
