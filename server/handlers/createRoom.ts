@@ -7,7 +7,7 @@ export function handleCreateRoom(socket: any, io: any) {
       const roomId = generatRoomId()
       createRoom(roomId, playerId, playerName);
 
-      io.emit("room_created", {
+      io.to(socket.id).emit("room_created", {
         roomId,
       });
       
