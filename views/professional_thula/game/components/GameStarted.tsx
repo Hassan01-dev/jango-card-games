@@ -65,7 +65,6 @@ export default function GameStarted({
 
   useEffect(() => {
     const handlePlayAudio = () => {
-      console.log("Play Audio")
       const audio = new Audio("/secret_audio.mp3");
       audio.play().catch((e) => console.error("Audio play failed:", e));
     };
