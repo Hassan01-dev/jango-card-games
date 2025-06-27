@@ -36,6 +36,8 @@ export default function Game({ roomId }: { roomId: string }) {
   const [currentTurn, setCurrentTurn] = useState<{ id: string; name: string }>({ id: "", name: "" });
   const [gameOver, setGameOver] = useState(false);
   const [looser, setLooser] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCardPlayed, setIsCardPlayed] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
 
   const startGame = () => socket.emit("start_game", roomId);
@@ -55,6 +57,7 @@ export default function Game({ roomId }: { roomId: string }) {
     setMyCards(hand);
     setOpponents(opponents);
     setCurrentTurn({ id, name });
+    setIsLoading(false);
   };
 
   const handleStartedRoomJoined = ({ currentTurn: { id, name } }: { currentTurn: { id: string; name: string } }) => {
@@ -76,7 +79,7 @@ export default function Game({ roomId }: { roomId: string }) {
     socket.on("hand_received", handleHandReceived);
     socket.on("started_room_joined", handleStartedRoomJoined);
     socket.on("player_left", handlePlayerLeft(roomId, setPlayerNames));
-    socket.on("update_turn", handleUpdateTurn(setCurrentTurn));
+    socket.on("update_turn", handleUpdateTurn(setCurrentTurn, setIsCardPlayed));
     socket.on("card_played", handlePlayedCards(setPlayedCards));
     socket.on("thulla", handleThulla(setThullaOccured, setPlayedCards));
     socket.on("cards_taken", handleCardsTaken(setMyCards));
@@ -105,13 +108,18 @@ export default function Game({ roomId }: { roomId: string }) {
 
   const playingSuit = playedCards.length > 0 ? playedCards[0].split("_")[2] : "";
 
+  const handleCardPlayed = (card: string) => {
+    setIsCardPlayed(true);
+    handleClick(card, myCards, setMyCards, socket, roomId, playerName, playerId)
+  };
+
   return gameStarted ? (
     <GameStarted
       roomId={roomId}
       playerId={playerId}
       playingSuit={playingSuit}
       myCards={myCards}
-      handleClick={(card) => handleClick(card, myCards, setMyCards, socket, roomId, playerName, playerId)}
+      handleClick={(card) => handleCardPlayed(card)}
       handleSort={() => handleSort(myCards, setMyCards)}
       thullaOccured={thullaOccured}
       playedCards={playedCards}
@@ -120,6 +128,8 @@ export default function Game({ roomId }: { roomId: string }) {
       looser={looser}
       opponents={opponents}
       socket={socket}
+      isLoading={isLoading}
+      isCardPlayed={isCardPlayed}
     />
   ) : (
     <GameNotStarted playerNames={playerNames} handleStartGame={startGame} playerId={playerId} ownerId={ownerId} />
