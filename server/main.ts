@@ -7,6 +7,7 @@ import { handleWon } from "./handlers/won.ts";
 import { handleStartGame } from "./handlers/handleStartGame.ts";
 import { handleCreateRoom } from "./handlers/createRoom.ts";
 import { handleJoinGame } from "./handlers/handleJoinGame.ts";
+import { handleRequestCard, handleApproveRequestCard } from "./handlers/handleRequestCard.ts";
 
 const io = new Server({
   cors: {
@@ -24,6 +25,8 @@ io.on("connection", (socket: any) => {
   handleDisconnect(socket, io);
   handleStartGame(socket, io);
   handleWon(socket, io);
+  handleRequestCard(socket, io);
+  handleApproveRequestCard(socket, io);
 
   socket.on("secret_event", (roomId: string) => {
     io.to(roomId).emit("play_audio");

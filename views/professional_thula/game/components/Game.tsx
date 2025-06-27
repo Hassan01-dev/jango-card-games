@@ -29,7 +29,7 @@ export default function Game({ roomId }: { roomId: string }) {
   const [playerNames, setPlayerNames] = useState<string[]>([]);
   const [ownerId, setOwnerId] = useState<string>("");
 
-  const [opponents, setOpponents] = useState<Array<{ name: string; cardsCount: number }>>([]);
+  const [opponents, setOpponents] = useState<Array<{ id: string, name: string; cardsCount: number }>>([]);
   const [myCards, setMyCards] = useState<string[]>([]);
   const [thullaOccured, setThullaOccured] = useState(false);
   const [playedCards, setPlayedCards] = useState<string[]>([]);
@@ -53,7 +53,7 @@ export default function Game({ roomId }: { roomId: string }) {
     setOwnerId(ownerId);
   };
 
-  const handleHandReceived = ({ hand, opponents, currentTurn: { id, name } }: { hand: string[]; opponents: { name: string; cardsCount: number }[]; currentTurn: { id: string; name: string } }) => {
+  const handleHandReceived = ({ hand, opponents, currentTurn: { id, name } }: { hand: string[]; opponents: { id: string, name: string; cardsCount: number }[]; currentTurn: { id: string; name: string } }) => {
     setMyCards(hand);
     setOpponents(opponents);
     setCurrentTurn({ id, name });
@@ -62,6 +62,16 @@ export default function Game({ roomId }: { roomId: string }) {
 
   const handleStartedRoomJoined = ({ currentTurn: { id, name } }: { currentTurn: { id: string; name: string } }) => {
     setCurrentTurn({ id, name });
+  };
+
+  const handleRequestCard = () => {
+    socket.emit("request_card", { roomId, playerId });
+  };
+
+  const handleRequestReceived = ({ playerName, RequesterPlayerId }: { playerName: string, RequesterPlayerId: string }) => {
+    if (confirm(`${playerName} has requested for your cards. Do you want to approve?`)) {
+      socket.emit('approve_hand_received', { roomId, RequesterPlayerId, playerId });
+    }
   };
 
   useEffect(() => {
@@ -79,14 +89,14 @@ export default function Game({ roomId }: { roomId: string }) {
     socket.on("hand_received", handleHandReceived);
     socket.on("started_room_joined", handleStartedRoomJoined);
     socket.on("player_left", handlePlayerLeft(roomId, setPlayerNames));
-    socket.on("update_turn", handleUpdateTurn(setCurrentTurn, setIsCardPlayed));
+    socket.on("update_turn", handleUpdateTurn(setCurrentTurn, setIsCardPlayed, setOpponents, playerId));
     socket.on("card_played", handlePlayedCards(setPlayedCards));
     socket.on("thulla", handleThulla(setThullaOccured, setPlayedCards));
     socket.on("cards_taken", handleCardsTaken(setMyCards));
     socket.on("empty_table", handleEmptyTable(setPlayedCards));
     socket.on("game_over", handleGameOver(setGameOver, setLooser, setMyCards));
     socket.on("player_won", handlePlayerWon());
-
+    socket.on("request_received", handleRequestReceived);
     return () => {
       socket.off("non_started_room_joined");
       socket.off("started_room_joined");
@@ -121,6 +131,7 @@ export default function Game({ roomId }: { roomId: string }) {
       myCards={myCards}
       handleClick={(card) => handleCardPlayed(card)}
       handleSort={() => handleSort(myCards, setMyCards)}
+      handleRequestCard={handleRequestCard}
       thullaOccured={thullaOccured}
       playedCards={playedCards}
       currentTurn={currentTurn}
