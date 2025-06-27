@@ -21,6 +21,14 @@ const GameChat = ({ username, roomId }: { username: string; roomId: string }) =>
 
   const { socket } = useSocket();
 
+  const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      notificationAudioRef.current = new Audio("/notification.wav");
+    }
+  }, []);
+
   const sendData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (currentMsg.trim() === "") return;
@@ -38,6 +46,9 @@ const GameChat = ({ username, roomId }: { username: string; roomId: string }) =>
 
   const handleChatMessage = (data: IMsgDataTypes) => {
     setChat((prev) => [...prev, data]);
+    if (data.user !== username && notificationAudioRef.current) {
+      notificationAudioRef.current.play().catch();
+    }
   };
 
   useEffect(() => {
