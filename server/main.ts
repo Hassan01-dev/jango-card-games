@@ -27,10 +27,6 @@ io.on("connection", (socket: any) => {
   handleWon(socket, io);
   handleRequestCard(socket, io);
   handleApproveRequestCard(socket, io);
-
-  socket.on("secret_event", (roomId: string) => {
-    io.to(roomId).emit("play_audio");
-  });
 });
 
 await serve(io.handler(), {
