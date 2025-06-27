@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 interface Props {
   playerNames: string[];
@@ -21,50 +21,57 @@ export default function GameNotStarted({
 }: Props) {
   const isOwner = playerId === ownerId;
 
+  // Position players evenly in a circle
+  const angleStep = 360 / Math.max(playerNames.length, 1);
+  const radius = 160; // radius of the circle
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8 space-y-8">
-      <Card className="w-full max-w-xl p-6 space-y-6 shadow-2xl rounded-2xl">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Waiting for Players...</h2>
-          <p className="text-muted-foreground">
-            The game will start once all players have joined.
-          </p>
-        </div>
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8 space-y-8 bg-background text-foreground">
+      <Card className="relative w-[400px] h-[400px] rounded-full border-2 border-muted shadow-xl flex items-center justify-center">
+        {/* Centered waiting gif */}
+        <Image
+          src="/Waiting.gif"
+          alt="Waiting animation"
+          width={120}
+          height={120}
+          className="z-10"
+        />
 
-        <ScrollArea className="h-48 rounded-md border p-4 bg-muted/20">
-          <div className="space-y-2">
-            {playerNames.map((name, index) => (
-              <Card key={index} className="p-3 flex items-center justify-between">
-                <span>{name}</span>
-                {ownerId === name && (
-                  <Badge variant="default">Owner</Badge>
-                )}
-                {playerId === name && (
-                  <Badge variant="secondary">You</Badge>
-                )}
-              </Card>
-            ))}
-          </div>
-        </ScrollArea>
+        {/* Player badges around the circle */}
+        {playerNames.map((name, index) => {
+          const angle = angleStep * index - 90; // -90 to start from top
+          const x = radius * Math.cos((angle * Math.PI) / 180);
+          const y = radius * Math.sin((angle * Math.PI) / 180);
 
-        <div className="flex justify-center">
-          <Button
-            onClick={handleStartGame}
-            disabled={!isOwner}
-            className="w-full"
-          >
-            {isOwner ? "Start Game" : "Waiting for Owner"}
-          </Button>
-        </div>
+          return (
+            <div
+              key={index}
+              className={cn(
+                "absolute transform -translate-x-1/2 -translate-y-1/2 text-center",
+                "text-sm font-medium bg-muted px-3 py-1 rounded-full shadow-md"
+              )}
+              style={{
+                left: `calc(50% + ${x}px)`,
+                top: `calc(50% + ${y}px)`,
+              }}
+            >
+              <div>{name}</div>
+              {ownerId === name && <Badge variant="default">Owner</Badge>}
+              {playerId === name && <Badge variant="secondary">You</Badge>}
+            </div>
+          );
+        })}
       </Card>
 
-      <Image
-        src="/Waiting.gif"
-        alt="Waiting animation"
-        width={300}
-        height={300}
-        className="rounded-lg shadow-md"
-      />
+      <div className="w-full max-w-sm">
+        <Button
+          onClick={handleStartGame}
+          disabled={!isOwner}
+          className="w-full"
+        >
+          {isOwner ? "Start Game" : "Waiting for Owner to Start"}
+        </Button>
+      </div>
     </div>
   );
 }
