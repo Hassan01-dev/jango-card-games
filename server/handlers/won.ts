@@ -11,7 +11,7 @@ export function handleWon(socket: any, io: any) {
       const room = getRoom(roomId);
       if (!room) throw new Error("Room not found");
 
-      const player = room.players.find((player) => player.id === socket.id);
+      const player = room.players.find((player) => player.socketId === socket.id);
       if (!player) throw new Error("Player not found");
 
       player.isWon = true
@@ -23,7 +23,7 @@ export function handleWon(socket: any, io: any) {
         return;
       }
 
-      io.to(roomId).emit("player_won", { playerName });
+      io.to(roomId).emit("player_won", { playerName: player.name, playerId: player.id });
 
     } catch (error: unknown) {
       if (error instanceof Error) {

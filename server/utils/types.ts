@@ -22,6 +22,7 @@ export type PlayedCard = {
     suit: string;
     value: number;
     socketId: string;
+    playerId: string;
 }
 
 export type RoomCollection = {

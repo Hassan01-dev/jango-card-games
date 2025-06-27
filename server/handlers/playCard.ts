@@ -5,27 +5,32 @@ import { Room } from "../utils/types.ts";
 function getNextEligiblePlayer(room: Room, startIndex: number) {
   const players = room.players;
   let index = startIndex;
-  let attempts = 0;
+  let count = 0;
 
-  while (attempts < players.length) {
+  while (count < players.length) {
     index = (index + 1) % players.length;
+    if (index === startIndex) {
+      continue;
+    }
     const player = players[index];
     if (!player.isWon) return player;
-    attempts++;
+    count++;
   }
+  return players[startIndex]; // Fallback if no other eligible player found
 }
 
 async function waitFor() {
   return new Promise((resolve) => {
-    setTimeout(resolve, 2000);
+    setTimeout(resolve, 1000);
   });
 }
 
 export function handlePlayCard(socket: any, io: any) {
-  socket.on("play_card", async ({ roomId, card, playerName }: {
+  socket.on("play_card", async ({ roomId, card, playerName, playerId }: {
     roomId: string;
     card: string;
     playerName: string;
+    playerId: string;
   }) => {
     try {
       if (!roomId || !card || !playerName) throw new Error("Invalid play");
@@ -41,11 +46,16 @@ export function handlePlayCard(socket: any, io: any) {
         card,
         suit: parsed.suit,
         value: parsed.value,
+        playerId,
         socketId: socket.id
       };
       room.playedCards.push(playedCard);
 
       io.to(roomId).emit("card_played", { playerName, card });
+      const currentPlayer = room.players.find(p => p.id === playerId);
+      if (currentPlayer) {
+        currentPlayer.cards = currentPlayer.cards.filter(c => c !== card);
+      }
 
       const leadSuit = room.playedCards[0].suit;
       const highest = room.playedCards.reduce((max, curr) =>
@@ -65,21 +75,15 @@ export function handlePlayCard(socket: any, io: any) {
             cards: room.playedCards.map((c) => c.card),
           });
 
+          const highestPlayer = room.players.find(p => p.id === highest.playerId);
+          if (highestPlayer) {
+            highestPlayer.cards = [...highestPlayer.cards, ...room.playedCards.map(c => c.card)];
+          }
 
         room.playedCards = [];
         room.noOfTurns = 0;
 
-        let nextTurnPlayer = room.players.find(p => p.name === highest.playerName);
-        if (!nextTurnPlayer || nextTurnPlayer.isWon) {
-          const startIndex = room.players.findIndex(p => p.id === socket.id);
-          nextTurnPlayer = getNextEligiblePlayer(room, startIndex);
-        }
-
-        if (!nextTurnPlayer) {
-          throw new Error("No next turn player found");
-        }
-
-        room.currentTurn = { id: nextTurnPlayer.id, name: nextTurnPlayer.name };
+        room.currentTurn = { id: highest.playerId, name: highest.playerName };
         io.to(roomId).emit("update_turn", {
           currentTurn: room.currentTurn
         });
@@ -96,16 +100,15 @@ export function handlePlayCard(socket: any, io: any) {
         await waitFor();
         io.to(roomId).emit("empty_table");
        
-        let nextTurnPlayer = room.players.find(p => p.name === highest.playerName);
+        let nextTurnPlayer = room.players.find(p => p.id === highest.playerId);
         if (!nextTurnPlayer || nextTurnPlayer.isWon) {
-          const startIndex = room.players.findIndex(p => p.id === socket.id);
+          const startIndex = room.players.findIndex(p => p.id === playerId);
           nextTurnPlayer = getNextEligiblePlayer(room, startIndex);
         }
 
         if (!nextTurnPlayer) {
           throw new Error("No next turn player found");
         }
-
         room.currentTurn = { id: nextTurnPlayer.id, name: nextTurnPlayer.name };
         io.to(roomId).emit("update_turn", {
           currentTurn: room.currentTurn,
@@ -114,9 +117,8 @@ export function handlePlayCard(socket: any, io: any) {
       }
 
       // Pass to next eligible player
-      const currentIndex = room.players.findIndex(p => p.id === socket.id);
+      const currentIndex = room.players.findIndex(p => p.id === playerId);
       const nextPlayer = getNextEligiblePlayer(room, currentIndex);
-
       if (!nextPlayer) {
         throw new Error("No next player found");
       }

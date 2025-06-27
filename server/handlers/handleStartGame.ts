@@ -18,18 +18,20 @@ export function handleStartGame(socket: any, io: any) {
 
       io.to(roomId).emit("game_started");
 
-      room.players.forEach((player) => {
-        io.to(player.socketId).emit("hand_received", {
-          currentTurn: room.currentTurn,
-          hand: player.cards,
-          opponents: room.players
-            .filter((p) => p.id !== player.id)
-            .map((opponent) => ({
-              name: opponent.name,
-              cardsCount: opponent.cards.length,
-            })),
+      setTimeout(() => {
+        room.players.forEach((player) => {
+          io.to(player.socketId).emit("hand_received", {
+            currentTurn: room.currentTurn,
+            hand: player.cards,
+            opponents: room.players
+              .filter((p) => p.id !== player.id)
+              .map((opponent) => ({
+                name: opponent.name,
+                cardsCount: opponent.cards.length,
+              })),
+          });
         });
-      });
+      }, 2000);
 
     } catch (error: unknown) {
       if (error instanceof Error) {
