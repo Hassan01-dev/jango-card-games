@@ -3,6 +3,7 @@
 import Image from "next/image";
 import GameChat from "./GameChat";
 import Confetti from "react-confetti"
+import { useEffect, useState } from "react";
 
 export default function GameStarted({
   roomId,
@@ -32,6 +33,16 @@ export default function GameStarted({
   opponents: Array<{ name: string; cardsCount: number }>;
 }) {
   const playerName = localStorage.getItem("playerName") || "";
+
+
+useEffect(() => {
+  if (thullaOccured) {
+    // Play audio
+    const audio = new Audio("/thulla.wav");
+    audio.play();
+  }
+}, [thullaOccured]);
+
 
   return (
     <div className="professional-thula h-screen flex bg-gradient-to-b from-green-950 to-green-800 p-4">
@@ -104,7 +115,7 @@ export default function GameStarted({
             {thullaOccured && (
               <div className="animate-[fadeOut_2s_ease-in-out]">
                 <Image
-                  src="/thula.gif"
+                  src="/thulla.gif"
                   alt="Waiting animation"
                   width={120}
                   height={120}
@@ -126,7 +137,7 @@ export default function GameStarted({
         )}
 
         {/* Chat */}
-        <div className="chat-area w-full max-w-xl rounded-2xl p-4">
+        <div className="chat-area rounded-2xl p-4">
           <GameChat username={playerName} roomId={roomId} />
         </div>
       </div>
