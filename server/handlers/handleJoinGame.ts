@@ -19,67 +19,32 @@ export function handleJoinGame(socket: any, io: any) {
 
         const targetRoom = getRoom(roomId);
         if (!targetRoom) throw new Error("Room not found");
+
         if (targetRoom.isStarted) {
-          const existingPlayer = targetRoom.players.find(
-            (player) => player.id === playerId
-          );
-          if (!existingPlayer) {
-            throw new Error("Cannot join started room as a new player");
-          }
+          throw new Error("Cannot join started room as a new player");
         }
         if (targetRoom?.players.length === 8) throw new Error("Room is full");
 
         socket.join(roomId);
 
-        if (targetRoom.isStarted) {
-          io.to(roomId).emit("started_room_joined", {
-            currentTurn: targetRoom.currentTurn,
-          });
+        targetRoom?.players.push({
+          id: playerId,
+          name: playerName,
+          socketId: socket.id,
+          isWon: false,
+          cards: [],
+          left: false,
+        });
 
-          // socket.emit("hand_received", {
-          //   hand: targetRoom?.players.find(
-          //     (player) => player.name === playerName
-          //   )?.cards,
-          //   opponents: targetRoom?.players.reduce(
-          //     (acc, player) =>
-          //       player.id !== socket.id
-          //         ? [
-          //             ...acc,
-          //             {
-          //               name: player.name,
-          //               cardsCount: player.cards.length,
-          //             },
-          //           ]
-          //         : acc,
-          //     [] as { name: string; cardsCount: number }[]
-          //   ),
-          // });
-        } else {
-          const existingPlayerIndex = targetRoom?.players.findIndex(
-            (player) => player.id === playerId
-          );
-          if (existingPlayerIndex !== -1) {
-            targetRoom.players.splice(existingPlayerIndex, 1);
-          }
-
-          targetRoom?.players.push({
-            id: playerId,
-            name: playerName,
-            socketId: socket.id,
-            isWon: false,
-            cards: [],
-          });
-
-          if (!targetRoom?.currentTurn && targetRoom?.players.length === 1) {
-            targetRoom.currentTurn = { id: playerId, name: playerName };
-          }
-
-          io.to(roomId).emit("non_started_room_joined", {
-            players: targetRoom?.players,
-            ownerId: targetRoom.ownerId,
-            ownerName: targetRoom.ownerName,
-          });
+        if (!targetRoom?.currentTurn && targetRoom?.players.length === 1) {
+          targetRoom.currentTurn = { id: playerId, name: playerName };
         }
+
+        io.to(roomId).emit("non_started_room_joined", {
+          players: targetRoom?.players,
+          ownerId: targetRoom.ownerId,
+          ownerName: targetRoom.ownerName,
+        });
       } catch (error: unknown) {
         if (error instanceof Error) {
           socket.emit("error", { message: error.message });

@@ -111,7 +111,7 @@ export default function Game({ roomId }: { roomId: string }) {
       playerId={playerId}
       playingSuit={playingSuit}
       myCards={myCards}
-      handleClick={(card) => handleClick(card, myCards, setMyCards, socket, roomId, playerName)}
+      handleClick={(card) => handleClick(card, myCards, setMyCards, socket, roomId, playerName, playerId)}
       handleSort={() => handleSort(myCards, setMyCards)}
       thullaOccured={thullaOccured}
       playedCards={playedCards}
