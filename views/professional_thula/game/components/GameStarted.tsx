@@ -72,34 +72,47 @@ export default function GameStarted({
 
         {/* Played Cards */}
         {!gameOver && (
-          <div className="played-cards relative h-[200px] sm:h-[250px] w-full flex justify-center">
-            <div className="relative w-[160px] sm:w-[200px]">
-              {playedCards.map((card: string, index: number) => (
-                <div
-                  key={index}
-                  className="played-card absolute left-1/2 -translate-x-1/2 transition-all duration-300"
-                style={{
-                  transform: `translateX(-50%) rotate(${
-                    (index - playedCards.length / 2) * 15
-                  }deg) translateY(${index * 2}px)`,
-                  zIndex: index,
-                }}
-              >
-                <Image
-                  src={`/images/card_images/${card}.png`}
-                  alt={card}
-                  width={120}
-                  height={168}
-                  className="rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all"
+          <div className="w-full flex flex-col items-center">
+            <div className="played-cards relative h-[200px] sm:h-[250px]">
+              <div className="relative w-[160px] sm:w-[200px]">
+                {playedCards.map((card: string, index: number) => (
+                  <div
+                    key={index}
+                    className="played-card absolute left-1/2 -translate-x-1/2 transition-all duration-300"
                   style={{
-                    filter: "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
-                    backfaceVisibility: "hidden",
+                    transform: `translateX(-50%) rotate(${
+                      (index - playedCards.length / 2) * 15
+                    }deg) translateY(${index * 2}px)`,
+                    zIndex: index,
                   }}
+                >
+                  <Image
+                    src={`/images/card_images/${card}.png`}
+                    alt={card}
+                    width={120}
+                    height={168}
+                    className="rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all"
+                    style={{
+                      filter: "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
+                      backfaceVisibility: "hidden",
+                    }}
+                  />
+                </div>
+              ))}
+              </div>
+            </div>
+            {thullaOccured && (
+              <div className="animate-[fadeOut_2s_ease-in-out]">
+                <Image
+                  src="/thula.gif"
+                  alt="Waiting animation"
+                  width={120}
+                  height={120}
+                  className="z-10"
                 />
               </div>
-            ))}
+            )}
           </div>
-        </div>
         )}
 
         {/* Game Over Modal */}
