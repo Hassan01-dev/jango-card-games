@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const socket = io("https://hassanraza-jango-card-57.deno.dev", {
-    transports: ["websocket"],
+// const socket = io("https://hassanraza-jango-card-57.deno.dev", {
+//     transports: ["websocket"],
+//   });
+  const socket = io("http://localhost:3001", {
+    transports: ["websocket"]
   });
-  // const socket = io("http://localhost:3001", {
-  //   transports: ["websocket"]
-  // });
   
   export const useSocket = () => {
   const [isConnected, setIsConnected] = useState(false);

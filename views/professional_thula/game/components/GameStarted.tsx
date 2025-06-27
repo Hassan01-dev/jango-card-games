@@ -3,7 +3,8 @@
 import Image from "next/image";
 import GameChat from "./GameChat";
 import Confetti from "react-confetti"
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { Socket } from "socket.io-client";
 
 export default function GameStarted({
   roomId,
@@ -17,7 +18,8 @@ export default function GameStarted({
   currentTurn,
   gameOver,
   looser,
-  opponents
+  opponents,
+  socket
 }: {
   roomId: string;
   playerId: string;
@@ -31,6 +33,7 @@ export default function GameStarted({
   gameOver: boolean;
   looser: string;
   opponents: Array<{ name: string; cardsCount: number }>;
+  socket: Socket;
 }) {
   const playerName = localStorage.getItem("playerName") || "";
 
@@ -43,6 +46,29 @@ useEffect(() => {
   }
 }, [thullaOccured]);
 
+
+  useEffect(() => {
+    const handlePlayAudio = () => {
+      console.log("Play Audio")
+      const audio = new Audio("/secret_audio.mp3");
+      audio.play().catch((e) => console.error("Audio play failed:", e));
+    };
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.metaKey && event.shiftKey && event.key.toLowerCase() === "p") {
+        event.preventDefault();
+        socket.emit("secret_event", roomId);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeydown);
+    socket.on("play_audio", handlePlayAudio);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+      socket.off("play_audio", handlePlayAudio);
+    };
+  }, []);
 
   return (
     <div className="professional-thula h-screen flex bg-gradient-to-b from-green-950 to-green-800 p-4">

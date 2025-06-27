@@ -119,6 +119,7 @@ export default function Game({ roomId }: { roomId: string }) {
       gameOver={gameOver}
       looser={looser}
       opponents={opponents}
+      socket={socket}
     />
   ) : (
     <GameNotStarted playerNames={playerNames} handleStartGame={startGame} playerId={playerId} ownerId={ownerId} />
