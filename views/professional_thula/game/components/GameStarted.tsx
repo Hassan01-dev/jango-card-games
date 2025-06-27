@@ -3,7 +3,7 @@
 import Image from "next/image";
 import GameChat from "./GameChat";
 import Confetti from "react-confetti";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react"; // Added useMemo
 import { Socket } from "socket.io-client";
 import PlayerCard from "./PlayerCard";
 
@@ -18,6 +18,7 @@ export default function GameStarted({
   thullaOccured,
   playedCards,
   currentTurn,
+  nextTurn,
   gameOver,
   looser,
   opponents,
@@ -35,6 +36,7 @@ export default function GameStarted({
   thullaOccured: boolean;
   playedCards: Array<string>;
   currentTurn: { id: string; name: string };
+  nextTurn: { id: string; name: string };
   gameOver: boolean;
   looser: string;
   opponents: Array<{ name: string; cardsCount: number }>;
@@ -44,39 +46,53 @@ export default function GameStarted({
 }) {
   const playerName = typeof window !== "undefined" ? localStorage.getItem("playerName") || "" : "";
 
-  const [opponentPositions, setOpponentPositions] = useState<
-    { top: string; left: string; transform: string }[]
-  >([]);
-
   // Dynamically calculate opponent positions around the arc
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const opponentPositions = useMemo(() => {
+    if (typeof window === "undefined") return [];
 
     const getOpponentPositions = (count: number) => {
-      const radius = 400;
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      const minAngle = 240;
-      const maxAngle = 180;
-      const effectiveCount = Math.min(count, 7);
-      const angleStep = (maxAngle + 360 - minAngle) % 360 / (effectiveCount - 1 || 1);
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
 
-      return Array.from({ length: effectiveCount }).map((_, i) => {
-        const angleDeg = (minAngle + i * angleStep) % 360;
-        const angleRad = (angleDeg * Math.PI) / 180;
-        const x = centerX + radius * Math.cos(angleRad);
-        const y = centerY + radius * Math.sin(angleRad);
+      // Define the center of the arc (relative to the game table)
+      const tableCenterX = screenWidth / 2;
+      // Adjust this value to position the arc higher or lower relative to the screen center
+      // A smaller value moves the center of the arc higher up the screen.
+      const arcCenterY = screenHeight * 0.25; // Example: 25% from the top of the screen
+
+      // Radius of the arc. Adjust based on screen size and desired spread.
+      const radius = Math.min(screenWidth, screenHeight) * 0.3; // Responsive radius
+
+      // Define the start and end angles for the arc (in degrees)
+      // 270 degrees is top-left, 90 degrees is top-right.
+      // We want to sweep from left to right across the top.
+      const startAngleDeg = 200; // Starting angle (e.g., more to the left)
+      const endAngleDeg = 340;   // Ending angle (e.g., more to the right)
+      const sweepAngleDeg = (endAngleDeg - startAngleDeg + 360) % 360;
+
+      // Ensure we have at least one opponent for division
+      const effectiveCount = Math.max(count, 1);
+
+      // Calculate the angle step
+      const angleStep = effectiveCount > 1 ? sweepAngleDeg / (effectiveCount - 1) : 0;
+
+      return Array.from({ length: count }).map((_, i) => {
+        const angleDeg = (startAngleDeg + i * angleStep) % 360;
+        const angleRad = (angleDeg * Math.PI) / 180; // Convert to radians
+
+        const x = tableCenterX + radius * Math.cos(angleRad);
+        const y = arcCenterY + radius * Math.sin(angleRad);
 
         return {
           left: `${x}px`,
           top: `${y}px`,
-          transform: "translate(-50%, -50%)",
+          transform: "translate(-50%, -50%)", // Center the player card element
         };
       });
     };
 
-    setOpponentPositions(getOpponentPositions(opponents.length));
-  }, [opponents.length]);
+    return getOpponentPositions(opponents.length);
+  }, [opponents.length]); // Recalculate only when opponent count changes
 
   // Audio Effects
   useEffect(() => {
@@ -133,10 +149,13 @@ export default function GameStarted({
           </div>
         )}
 
-        <div className="mt-4 px-4">
+        <div className="mt-4 px-4 space-y-2">
           <div className="turn-indicator text-white bg-green-700/50 px-6 py-2 rounded-full shadow">
             <span className="animate-pulse inline-block w-3 h-3 bg-green-400 rounded-full mr-2" />
             {currentTurn.id === playerId ? "Your" : `${currentTurn.name}'s`} Turn
+          </div>
+          <div className="text-white text-center text-sm opacity-75">
+            Next: {nextTurn.id === playerId ? "You" : nextTurn.name}
           </div>
         </div>
       </div>
@@ -152,7 +171,8 @@ export default function GameStarted({
             transform: position.transform,
           }}
         >
-          <PlayerCard player={opponents[index]} />
+          {/* Ensure opponents[index] exists before rendering PlayerCard */}
+          {opponents[index] && <PlayerCard player={opponents[index]} />}
         </div>
       ))}
 

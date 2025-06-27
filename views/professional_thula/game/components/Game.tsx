@@ -34,6 +34,7 @@ export default function Game({ roomId }: { roomId: string }) {
   const [thullaOccured, setThullaOccured] = useState(false);
   const [playedCards, setPlayedCards] = useState<string[]>([]);
   const [currentTurn, setCurrentTurn] = useState<{ id: string; name: string }>({ id: "", name: "" });
+  const [nextTurn, setNextTurn] = useState<{ id: string; name: string }>({ id: "", name: "" });
   const [gameOver, setGameOver] = useState(false);
   const [looser, setLooser] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -89,7 +90,7 @@ export default function Game({ roomId }: { roomId: string }) {
     socket.on("hand_received", handleHandReceived);
     socket.on("started_room_joined", handleStartedRoomJoined);
     socket.on("player_left", handlePlayerLeft(roomId, setPlayerNames));
-    socket.on("update_turn", handleUpdateTurn(setCurrentTurn, setIsCardPlayed, setOpponents, playerId));
+    socket.on("update_turn", handleUpdateTurn(setCurrentTurn, setIsCardPlayed, setOpponents, playerId, setNextTurn));
     socket.on("card_played", handlePlayedCards(setPlayedCards));
     socket.on("thulla", handleThulla(setThullaOccured, setPlayedCards));
     socket.on("cards_taken", handleCardsTaken(setMyCards));
@@ -142,6 +143,7 @@ export default function Game({ roomId }: { roomId: string }) {
       thullaOccured={thullaOccured}
       playedCards={playedCards}
       currentTurn={currentTurn}
+      nextTurn={nextTurn}
       gameOver={gameOver}
       looser={looser}
       opponents={opponents}

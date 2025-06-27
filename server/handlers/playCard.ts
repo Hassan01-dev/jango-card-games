@@ -79,8 +79,10 @@ export function handlePlayCard(socket: any, io: any) {
           room.noOfTurns = 0;
 
           room.currentTurn = { id: highest.playerId, name: highest.playerName };
+          const nextPlayer = getNextEligiblePlayer(room, room.players.findIndex(p => p.id === highest.playerId));
           io.to(roomId).emit("update_turn", {
             currentTurn: room.currentTurn,
+            nextTurn: { id: nextPlayer.id, name: nextPlayer.name },
             playersDetail: room.players.map((p) => ({
               id: p.id,
               name: p.name,
@@ -115,8 +117,10 @@ export function handlePlayCard(socket: any, io: any) {
             id: nextTurnPlayer.id,
             name: nextTurnPlayer.name,
           };
+          const nextPlayer = getNextEligiblePlayer(room, room.players.findIndex(p => p.id === nextTurnPlayer.id));
           io.to(roomId).emit("update_turn", {
             currentTurn: room.currentTurn,
+            nextTurn: { id: nextPlayer.id, name: nextPlayer.name },
             playersDetail: room.players.map((p) => ({
               id: p.id,
               name: p.name,
@@ -134,8 +138,10 @@ export function handlePlayCard(socket: any, io: any) {
         }
 
         room.currentTurn = { id: nextPlayer.id, name: nextPlayer.name };
+        const nextNextPlayer = getNextEligiblePlayer(room, room.players.findIndex(p => p.id === nextPlayer.id));
         io.to(roomId).emit("update_turn", {
           currentTurn: room.currentTurn,
+          nextTurn: { id: nextNextPlayer.id, name: nextNextPlayer.name },
           playersDetail: room.players.map((p) => ({
             id: p.id,
             name: p.name,

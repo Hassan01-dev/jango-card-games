@@ -11,16 +11,20 @@ export const handleUpdateTurn =
     setCurrentTurn: Function,
     setIsCardPlayed: Function,
     setOpponents: Function,
-    playerId: string
+    playerId: string,
+    setNextTurn: Function
   ) =>
   ({
     currentTurn: { id, name },
+    nextTurn: { id: nextTurnId, name: nextTurnName },
     playersDetail,
   }: {
     currentTurn: { id: string; name: string };
+    nextTurn: { id: string; name: string };
     playersDetail: { id: string; name: string; cardsCount: number }[];
   }) => {
     setCurrentTurn({ id, name });
+    setNextTurn({ id: nextTurnId, name: nextTurnName });
     setIsCardPlayed(false);
     setOpponents(playersDetail.filter((p) => p.id !== playerId));
   };
