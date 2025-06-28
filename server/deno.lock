@@ -1,7 +1,13 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@std/dotenv@*": "0.225.5",
     "npm:socket.io@4.7.4": "4.7.4"
+  },
+  "jsr": {
+    "@std/dotenv@0.225.5": {
+      "integrity": "9ce6f9d0ec3311f74a32535aa1b8c62ed88b1ab91b7f0815797d77a6f60c922f"
+    }
   },
   "npm": {
     "@socket.io/component-emitter@3.1.2": {
@@ -143,6 +149,8 @@
     "https://deno.land/std@0.150.0/bytes/bytes_list.ts": "aba5e2369e77d426b10af1de0dcc4531acecec27f9b9056f4f7bfbf8ac147ab4",
     "https://deno.land/std@0.150.0/bytes/equals.ts": "3c3558c3ae85526f84510aa2b48ab2ad7bdd899e2e0f5b7a8ffc85acb3a6043a",
     "https://deno.land/std@0.150.0/bytes/mod.ts": "763f97d33051cc3f28af1a688dfe2830841192a9fea0cbaa55f927b49d49d0bf",
+    "https://deno.land/std@0.150.0/dotenv/mod.ts": "7b24a0e2d6daf1b5ab167547161766949e0cb7d6e3cf5c49783753aec72e4440",
+    "https://deno.land/std@0.150.0/dotenv/util.ts": "6cc392f087577a26a27f0463f77cc0c31a390aa055917099935b36eb2454592d",
     "https://deno.land/std@0.150.0/fmt/colors.ts": "6f9340b7fb8cc25a993a99e5efc56fe81bb5af284ff412129dd06df06f53c0b4",
     "https://deno.land/std@0.150.0/fs/exists.ts": "cb734d872f8554ea40b8bff77ad33d4143c1187eac621a55bf37781a43c56f6d",
     "https://deno.land/std@0.150.0/http/server.ts": "0b0a9f3abfcfecead944b31ee9098a0c11a59b0495bf873ee200eb80e7441483",
@@ -153,6 +161,9 @@
     "https://deno.land/std@0.150.0/log/mod.ts": "65d2702785714b8d41061426b5c279f11b3dcbc716f3eb5384372a430af63961",
     "https://deno.land/std@0.208.0/async/delay.ts": "a6142eb44cdd856b645086af2b811b1fcce08ec06bb7d50969e6a872ee9b8659",
     "https://deno.land/std@0.208.0/http/server.ts": "f3cde6672e631d3e00785743cfa96bfed275618c0352c5ae84abbe5a2e0e4afc",
+    "https://deno.land/std@0.224.0/dotenv/mod.ts": "0180eaeedaaf88647318811cdaa418cc64dc51fb08354f91f5f480d0a1309f7d",
+    "https://deno.land/std@0.224.0/dotenv/parse.ts": "09977ff88dfd1f24f9973a338f0f91bbdb9307eb5ff6085446e7c423e4c7ba0c",
+    "https://deno.land/std@0.224.0/dotenv/stringify.ts": "275da322c409170160440836342eaa7cf012a1d11a7e700d8ca4e7f2f8aa4615",
     "https://deno.land/x/socket_io@0.1.1/deps.ts": "136b3fc7c55f2a06a367965da3395f1bf7de66d36a0d91c5f795084fa8c67ab3",
     "https://deno.land/x/socket_io@0.1.1/mod.ts": "cc52c1f6fc1a647d7ac62d22d3125063cc598e8b291b14c0d51dc66c722afb9b",
     "https://deno.land/x/socket_io@0.1.1/packages/engine.io-parser/base64-arraybuffer.ts": "57ccea6679609df5416159fcc8a47936ad28ad6fe32235ef78d9223a3a823407",

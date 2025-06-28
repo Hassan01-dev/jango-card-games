@@ -30,3 +30,10 @@ export type RoomCollection = {
 }
 
 export const rooms: RoomCollection = {};
+
+export type EventType = "create_room";
+
+export type SecureEventPayload = {
+  event_type: EventType;
+  data: any;
+}

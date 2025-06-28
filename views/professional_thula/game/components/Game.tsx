@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSocket } from "@views/professional_thula/hooks/useSocket";
+import { useSocket } from "@/hooks/useSocket";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import GameNotStarted from "./GameNotStarted";
@@ -40,7 +40,7 @@ export default function Game({ roomId }: { roomId: string }) {
   const [isCardPlayed, setIsCardPlayed] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
 
-  const startGame = () => socket.emit("start_game", roomId);
+  const startGame = () => socket.emit("start_game", roomId);  
 
   useEffect(() => {
     if (!playerName || !playerId) {

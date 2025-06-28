@@ -1,76 +1,21 @@
 "use client";
 
-import { useSocket } from "@views/professional_thula/hooks/useSocket";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import useGame from "@/hooks/useGame";
 
 export default function Game() {
-  const [playerName, setPlayerName] = useState("");
-  const [roomId, setRoomId] = useState("");
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { socket, emit } = useSocket();
-
-  useEffect(() => {
-    const savedName = typeof window !== "undefined"
-      ? localStorage.getItem("playerName")
-      : "";
-
-    if (savedName) {
-      setPlayerName(savedName);
-    }
-
-    const queryRoomId = searchParams.get("roomId");
-    if (queryRoomId) {
-      setRoomId(queryRoomId);
-    }
-  }, [searchParams]);
-
-  const handleRoomCreated = useCallback(
-    ({ roomId }: { roomId: string }) => {
-      router.push(`/professional_thula/${roomId}`);
-    },
-    [router]
-  );
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.on("room_created", handleRoomCreated);
-    return () => {
-      socket.off("room_created", handleRoomCreated);
-    };
-  }, [socket, handleRoomCreated]);
-
-  const handleCreateGame = async () => {
-    if (!playerName.trim()) {
-      alert("Please enter your name before creating a game");
-      return;
-    }
-
-    const playerId = crypto.randomUUID();
-    localStorage.setItem("playerName", playerName);
-    localStorage.setItem("playerId", playerId);
-
-    emit("create_room", { playerId, playerName });
-  };
-
-  const handleJoinGame = async () => {
-    if (!playerName.trim()) {
-      alert("Please enter your name before joining a game");
-      return;
-    }
-
-    const playerId = crypto.randomUUID();
-    localStorage.setItem("playerName", playerName);
-    localStorage.setItem("playerId", playerId);
-
-    router.push(`/professional_thula/${roomId}`);
-  };
+  const {
+    playerName,
+    setPlayerName,
+    roomId,
+    setRoomId,
+    createGame,
+    joinGame,
+  } = useGame();
 
   return (
     <div className="flex justify-center mt-24">
@@ -87,7 +32,7 @@ export default function Game() {
           />
         </div>
 
-        <Button onClick={handleCreateGame} className="w-full">
+        <Button onClick={createGame} className="w-full">
           Create Room
         </Button>
 
@@ -105,7 +50,7 @@ export default function Game() {
           />
         </div>
 
-        <Button onClick={handleJoinGame} variant="secondary" className="w-full">
+        <Button onClick={joinGame} variant="secondary" className="w-full">
           Join Room
         </Button>
       </Card>

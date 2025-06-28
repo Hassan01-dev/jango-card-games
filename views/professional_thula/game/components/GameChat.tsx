@@ -1,6 +1,6 @@
 "use client";
 
-import { useSocket } from "@views/professional_thula/hooks/useSocket";
+import { useSocket } from "@/hooks/useSocket";
 import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
