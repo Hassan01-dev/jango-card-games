@@ -1,30 +1,76 @@
-// hooks/useGame.ts
-import { useEffect, useState, useCallback } from "react";
+"use client";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { encryptPayload, decryptPayload } from "@/utils/crypto";
 import {
   UseGameReturn,
-  GameCreatedData,
+  GameCreatedDataType,
   DecryptedPayload,
   EncryptedPayload,
+  OpponentType,
+  TurnType,
+  StartedRoomJoinedDataType,
+  NonStartedRoomJoinedDataType,
+  HandReceivedDataType,
+  UpdateTurnDataType,
+  CardPlayedDataType,
+  ThullaDataType,
+  CardsTakenDataType,
+  GameOverDataType,
+  PlayerWonDataType,
+  RequestReceivedDataType,
+  IMsgDataTypes,
 } from "@/utils/types";
 import { useSocket } from "./useSocket";
+import { toast } from "react-hot-toast";
 
-const useGame = (): UseGameReturn => {
+const useGame = (roomIdParam: string): UseGameReturn => {
   const { socket } = useSocket();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [playerName, setPlayerName] = useState<string>("");
-  const [roomId, setRoomId] = useState<string>("");
+  const [playerId, setPlayerId] = useState<string>("");
+  const [ownerId, setOwnerId] = useState<string>("");
+  const [roomId, setRoomId] = useState<string>(roomIdParam);
+  const [joinedPlayerList, setJoinedPlayerList] = useState<string[]>([]);
+  const [opponents, setOpponents] = useState<OpponentType[]>([]);
+  const [myCards, setMyCards] = useState<string[]>([]);
+  const [thullaOccured, setThullaOccured] = useState(false);
+  const [playedCards, setPlayedCards] = useState<string[]>([]);
+  const [chat, setChat] = useState<IMsgDataTypes[]>([]);
+  const [currentTurn, setCurrentTurn] = useState<TurnType>({
+    id: "",
+    name: "",
+  });
+  const [gameOver, setGameOver] = useState(false);
+  const [looser, setLooser] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCardPlayed, setIsCardPlayed] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      notificationAudioRef.current = new Audio("/notification.wav");
+    }
+  }, []);
 
   useEffect(() => {
     const savedName =
       typeof window !== "undefined" ? localStorage.getItem("playerName") : "";
     if (savedName) setPlayerName(savedName);
 
+    const savedId =
+      typeof window !== "undefined" ? localStorage.getItem("playerId") : "";
+    if (savedId) setPlayerId(savedId);
+
     const queryRoomId = searchParams.get("roomId");
-    if (queryRoomId) setRoomId(queryRoomId);
+    if (queryRoomId) {
+      setRoomId(queryRoomId);
+    }
+
+    setIsLoading(false)
   }, [searchParams]);
 
   useEffect(() => {
@@ -36,67 +82,295 @@ const useGame = (): UseGameReturn => {
     };
   }, [socket]);
 
+  useEffect(() => {
+    if (!roomId) return; 
+
+    if (currentTurn?.id === playerId) {
+      const audio = new Audio("/turn.wav");
+      audio.play().catch((e) => console.error("Audio play failed:", e));
+    }
+  }, [roomId, currentTurn, playerId]);
+
+
+  const emitSecureEvent = async (event_type: string, data: any) => {
+    const encrypted = await encryptPayload({ event_type, data });
+    socket?.emit("secure_event", encrypted);
+  };
+
   const handleEncryptedEvent = async (payload: EncryptedPayload) => {
     try {
-      const decrypted = (await decryptPayload(payload)) as DecryptedPayload;
+      const { event_type, data } = (await decryptPayload(
+        payload
+      )) as DecryptedPayload;
 
-      switch (decrypted.event_type) {
-        case "game_created": {
-          handleGameCreated(decrypted);
+      console.log("event_type", event_type)
+      console.log("data", data)
+
+      switch (event_type) {
+        case "game_created":
+          handleGameCreated(data as GameCreatedDataType);
           break;
-        }
-
+        case "non_started_room_joined":
+          handleNonStartedGameJoined(data as NonStartedRoomJoinedDataType);
+          break;
+        case "game_started":
+          setGameStarted(true);
+          break;
+        case "hand_received":
+          handleHandReceived(data as HandReceivedDataType);
+          break;
+        case "started_room_joined":
+          handleStartedRoomJoined(data as StartedRoomJoinedDataType);
+          break;
+        case "player_left":
+          handlePlayerLeft(data as { roomId: string; playerName: string });
+          break;
+        case "update_turn":
+          handleUpdateTurn(data as UpdateTurnDataType);
+          break;
+        case "card_played":
+          handlePlayedCards(data as CardPlayedDataType);
+          break;
+        case "thulla":
+          handleThulla(data as ThullaDataType);
+          break;
+        case "cards_taken":
+          handleCardsTaken(data as CardsTakenDataType);
+          break;
+        case "empty_table":
+          setPlayedCards([]);
+          break;
+        case "game_over":
+          handleGameOver(data as GameOverDataType);
+          break;
+        case "player_won":
+          handlePlayerWon(data as PlayerWonDataType);
+          break;
+        case "request_received":
+          handleRequestReceived(data as RequestReceivedDataType);
+          break;
+        case "chat_message":
+          handleChatMessage(data as IMsgDataTypes);
+          break;
+        case "error":
+          toast.error("Something went wrong");
+          router.replace("/professional_thula");
+          break;
         default:
-          console.warn("Unhandled event_type:", decrypted.event_type);
+          console.warn("Unhandled event_type:", event_type);
       }
     } catch (error) {
       console.error("Failed to decrypt payload:", error);
     }
   };
 
-  const handleGameCreated = (decrypted: DecryptedPayload) => {
-    const gameData = decrypted.data as GameCreatedData;
-    router.push(`/professional_thula/${gameData.roomId}`);
-  };
+  // Event Handlers
 
-  const createGame = async () => {
-    if (!playerName.trim()) {
-      alert("Please enter your name before creating a game");
-      return;
-    }
-
-    const playerId = crypto.randomUUID();
-    localStorage.setItem("playerName", playerName);
-    localStorage.setItem("playerId", playerId);
-
-    const encrypted = await encryptPayload({
-      event_type: "create_room",
-      data: { playerId, playerName },
-    });
-
-    socket?.emit("secure_event", encrypted);
-  };
-
-  const joinGame = () => {
-    if (!playerName.trim()) {
-      alert("Please enter your name before joining a game");
-      return;
-    }
-
-    const playerId = crypto.randomUUID();
-    localStorage.setItem("playerName", playerName);
-    localStorage.setItem("playerId", playerId);
-
+  const handleGameCreated = (data: GameCreatedDataType) => {
+    const { roomId } = data
     router.push(`/professional_thula/${roomId}`);
   };
 
-  return {
+  const handleNonStartedGameJoined = ({
+    players,
+    ownerId,
+  }: NonStartedRoomJoinedDataType) => {
+    setJoinedPlayerList(players.map((p) => p.name));
+    setOwnerId(ownerId);
+  };
+
+  const handleHandReceived = ({
+    hand,
+    opponents,
+    currentTurn,
+  }: HandReceivedDataType) => {
+    setMyCards(hand);
+    setOpponents(opponents);
+    setCurrentTurn(currentTurn);
+    setIsLoading(false);
+  };
+
+  const handleStartedRoomJoined = ({
+    currentTurn,
+  }: StartedRoomJoinedDataType) => {
+    setCurrentTurn(currentTurn);
+  };
+
+  const handlePlayerLeft = ({
+    roomId: leftRoomId,
     playerName,
-    setPlayerName,
+  }: {
+    roomId: string;
+    playerName: string;
+  }) => {
+    if (leftRoomId === roomId) {
+      setJoinedPlayerList((prev) => prev.filter((name) => name !== playerName));
+    }
+  };
+
+  const handleUpdateTurn = ({
+    currentTurn,
+    playersDetail,
+  }: UpdateTurnDataType) => {
+    setCurrentTurn(currentTurn);
+    setIsCardPlayed(false);
+    setOpponents(playersDetail.filter((p) => p.id !== playerId));
+  };
+
+  const handlePlayedCards = ({ card }: CardPlayedDataType) => {
+    setPlayedCards((prev) => [...prev, card]);
+  };
+
+  const handleThulla = ({ triggeredBy, looser }: ThullaDataType) => {
+    toast.success(`${triggeredBy} caught ${looser} with Thulla!`);
+    setThullaOccured(true);
+    setPlayedCards([]);
+    setTimeout(() => setThullaOccured(false), 3000);
+  };
+
+  const handleCardsTaken = ({ cards }: CardsTakenDataType) => {
+    setMyCards((prev) => [...prev, ...cards]);
+  };
+
+  const handleGameOver = ({ looser }: GameOverDataType) => {
+    toast.success(`${looser} lost the game!`);
+    setGameOver(true);
+    setLooser(looser);
+    setMyCards([]);
+  };
+
+  const handlePlayerWon = ({ playerName }: PlayerWonDataType) => {
+    toast.success(`${playerName} won the game!`);
+  };
+
+  const handleRequestReceived = ({
+    playerName,
+    RequesterPlayerId,
+  }: RequestReceivedDataType) => {
+    if (
+      confirm(`${playerName} has requested your cards. Do you want to approve?`)
+    ) {
+      emitSecureEvent("approve_hand_received", {
+        roomId,
+        RequesterPlayerId,
+        playerId,
+      });
+    }
+  };
+
+  // Game Actions
+
+  const createGame = async () => {
+    if (!playerName.trim()) return alert("Enter name before creating game");
+
+    const newId = crypto.randomUUID();
+    localStorage.setItem("playerId", newId);
+    localStorage.setItem("playerName", playerName);
+
+    emitSecureEvent("create_room", { playerId: newId, playerName });
+  };
+
+  const joinGame = () => {
+    if (!playerName.trim()) return alert("Enter name before joining game");
+
+    const newId = crypto.randomUUID();
+    localStorage.setItem("playerId", newId);
+    localStorage.setItem("playerName", playerName);
+    router.push(`/professional_thula/${roomId}`);
+  };
+
+  const emitJoinGame = () => {
+    if (!socket || !roomId || !playerName) return;
+    emitSecureEvent("join_game", { roomId, playerName, playerId });
+  }
+
+  const handleCardPlayed = (card: string) => {
+    setIsCardPlayed(true);
+    handleClick(card, myCards, setMyCards);
+  };
+
+  const handleRequestCard = () => {
+    emitSecureEvent("request_card", { roomId, playerId });
+  };
+
+  const handleStartGame = () => emitSecureEvent("start_game", { roomId });
+
+  const handleClick = (
+    card: string,
+    myCards: string[],
+    setMyCards: Function
+  ) => {
+    const remaining = myCards.filter((c) => c !== card);
+    setMyCards(remaining);
+    emitSecureEvent("play_card", { roomId, playerName, card, playerId });
+    if (remaining.length === 0) {
+      emitSecureEvent("won", { roomId, playerName });
+    }
+  };
+
+  const handleSort = (myCards: string[], setMyCards: Function) => {
+    const suitOrder = { hearts: 1, clubs: 2, diamonds: 3, spades: 4 };
+    const sorted = [...myCards].sort((a, b) => {
+      const [aRank, , aSuit] = a.split("_");
+      const [bRank, , bSuit] = b.split("_");
+      const suitDiff =
+        suitOrder[aSuit as keyof typeof suitOrder] -
+        suitOrder[bSuit as keyof typeof suitOrder];
+      return suitDiff !== 0 ? suitDiff : parseInt(aRank) - parseInt(bRank);
+    });
+    setMyCards(sorted);
+  };
+
+  const emitChatEvent = (msgData: IMsgDataTypes) =>{
+    emitSecureEvent("game_chat", msgData);
+  }
+
+  const handleChatMessage = (data: IMsgDataTypes) => {
+    setChat((prev) => [...prev, data]);
+    if (data.user !== playerName && notificationAudioRef.current) {
+      notificationAudioRef.current.play().catch();
+    }
+  };
+
+  return {
+    playerId,
+    playerName,
     roomId,
-    setRoomId,
+    joinedPlayerList,
+    ownerId,
+    opponents,
+    myCards,
+    thullaOccured,
+    playedCards,
+    currentTurn,
+    gameOver,
+    looser,
+    isLoading,
+    isCardPlayed,
+    gameStarted,
+    chat,
     createGame,
     joinGame,
+    setPlayerName,
+    setRoomId,
+    setJoinedPlayerList,
+    setOwnerId,
+    setMyCards,
+    setOpponents,
+    setThullaOccured,
+    setPlayedCards,
+    setCurrentTurn,
+    setGameOver,
+    setLooser,
+    setIsLoading,
+    setIsCardPlayed,
+    setGameStarted,
+    handleCardPlayed,
+    handleSort,
+    handleRequestCard,
+    handleStartGame,
+    emitJoinGame,
+    emitChatEvent
   };
 };
 

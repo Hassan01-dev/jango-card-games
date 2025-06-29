@@ -1,11 +1,12 @@
 import { createRoom } from "../state/roomManager.ts";
 import { generatRoomId } from "../utils/helper.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
+import { CreateRoomEventData } from "../utils/types.ts";
 
 export async function handleCreateRoomEvent(
   socket: any,
   io: any,
-  data: { playerId: string; playerName: string }
+  data: CreateRoomEventData
 ) {
   try {
     const { playerId, playerName } = data;
@@ -16,6 +17,11 @@ export async function handleCreateRoomEvent(
     await sendEncryptedEvent("game_created", { roomId }, socket.id, io);
   } catch (error: any) {
     console.error("Error in createRoom handler:", error.message);
-    await sendEncryptedEvent("error", { message: error.message }, socket.id, io);
+    await sendEncryptedEvent(
+      "error",
+      { message: error.message },
+      socket.id,
+      io
+    );
   }
 }

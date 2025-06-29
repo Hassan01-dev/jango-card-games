@@ -15,7 +15,7 @@ export default function Game() {
     setRoomId,
     createGame,
     joinGame,
-  } = useGame();
+  } = useGame("");
 
   return (
     <div className="flex justify-center mt-24">

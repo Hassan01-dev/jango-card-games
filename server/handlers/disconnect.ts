@@ -1,36 +1,40 @@
-import { deleteRoom, getAllRooms } from "../state/roomManager.ts";
+import { getAllRooms } from "../state/roomManager.ts";
+import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 
+export async function handleDisconnect(socket: any, io: any) {
+  try {
+    const rooms = getAllRooms();
 
-export function handleDisconnect(socket: any, io: any) {
-  socket.on("disconnect", () => {
-    try {
-      const rooms = getAllRooms();
+    for (const roomId in rooms) {
+      const room = rooms[roomId];
+      const player = room.players.find((p) => p.socketId === socket.id);
+      const playerIndex = room.players.findIndex(
+        (p) => p.socketId === socket.id
+      );
 
-      for (const roomId in rooms) {
-        const room = rooms[roomId];
-        const player = room.players.find((p) => p.socketId === socket.id);
-        const playerIndex = room.players.findIndex((p) => p.socketId === socket.id);
+      if (player && playerIndex !== -1) {
+        room.players.splice(playerIndex, 1);
 
-        if (player && playerIndex !== -1) {
-
-          room.players.splice(playerIndex, 1);
-
-
-          io.to(roomId).emit("player_left", {
+        await sendEncryptedEvent(
+          "player_left",
+          {
             roomId,
             playerName: player.name,
             players: room.players,
             currentTurn: room.currentTurn,
-          });
-
-          // if (room.players.length === 0) {
-          //   deleteRoom(roomId);
-          // }
-          // break;
-        }
+          },
+          roomId,
+          io
+        );
       }
-    } catch (error) {
-      console.error("Error in disconnect handler:", error);
     }
-  });
+  } catch (error) {
+    await sendEncryptedEvent(
+      "error",
+      { message: error.message },
+      socket.id,
+      io
+    );
+    console.error("Error in disconnect handler:", error);
+  }
 }
