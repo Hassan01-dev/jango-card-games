@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import useGame from "@/hooks/useGame";
+import AdSenseAd from "@views/professional_thula/AdSenseAd";
 
 export default function Game() {
   const {
@@ -54,6 +55,8 @@ export default function Game() {
           Join Room
         </Button>
       </Card>
+
+      <AdSenseAd slot="2209300670" />
     </div>
   );
 }
