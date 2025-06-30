@@ -20,9 +20,6 @@ export default function RootLayout({
       <head>
         <meta name="google-adsense-account" content="ca-pub-8741211413490579" />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8741211413490579" crossOrigin="anonymous"></script>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
       </head>
       <body className={inter.className}>
         <Toaster position="top-center" reverseOrder={true} />
