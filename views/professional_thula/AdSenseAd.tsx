@@ -22,7 +22,7 @@ export default function AdSenseAd({
       
       if (typeof window !== 'undefined') {
         const windowWithAds = window as unknown as WindowWithAdSense;
-        if (windowWithAds.adsbygoogle) {
+        if (windowWithAds.adsbygoogle && windowWithAds.adsbygoogle.length > 0) {
           windowWithAds.adsbygoogle[0].push({});
         }
       }
