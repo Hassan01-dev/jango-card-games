@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from 'react-hot-toast'
 import "@styles/globals.css";
+import AdSense from "@views/professional_thula/AdSense";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,18 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="google-adsense-account" content="ca-pub-8741211413490579" />
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8741211413490579" crossOrigin="anonymous"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (adsbygoogle = window.adsbygoogle || []).push({
-                google_ad_client: "ca-pub-8741211413490579",
-                enable_page_level_ads: true
-              });
-            `,
-          }}
-        />
+        <AdSense pId="8741211413490579"/>
       </head>
       <body className={inter.className}>
         <Toaster position="top-center" reverseOrder={true} />
