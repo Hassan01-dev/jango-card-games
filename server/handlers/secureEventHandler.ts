@@ -10,6 +10,7 @@ import { handleJoinGame } from "./handleJoinGame.ts";
 import {
   handleRequestCard,
   handleApproveRequestCard,
+  handleRejectRequestCard,
 } from "./handleRequestCard.ts";
 import {
   CreateRoomEventData,
@@ -21,6 +22,7 @@ import {
   WonEventData,
   RequestCardEventData,
   ApproveRequestCardEventData,
+  RejectRequestCardEventData,
 } from "../utils/types.ts";
 
 export function handleSecureEvent(socket: any, io: any) {
@@ -56,11 +58,10 @@ export function handleSecureEvent(socket: any, io: any) {
           await handleRequestCard(socket, io, data as RequestCardEventData);
           break;
         case "approve_request_card":
-          await handleApproveRequestCard(
-            socket,
-            io,
-            data as ApproveRequestCardEventData
-          );
+          await handleApproveRequestCard(socket, io, data as ApproveRequestCardEventData);
+          break;
+        case "reject_request_card":
+          await handleRejectRequestCard(socket, io, data as RejectRequestCardEventData);
           break;
         default:
           console.warn("Unknown event_type:", event_type);

@@ -47,7 +47,7 @@ export async function handlePlayCard(
     );
 
     // 🔥 Thulla detection
-    if (parsed.suit !== leadSuit) {
+    if (parsed.suit !== leadSuit && !room.isFirstTurn) {
       await waitFor();
       await sendEncryptedEvent("play_card", { playerName, card }, roomId, io);
       await sendEncryptedEvent(
@@ -108,6 +108,7 @@ export async function handlePlayCard(
     if (room.noOfTurns === activePlayers.length) {
       room.playedCards = [];
       room.noOfTurns = 0;
+      room.isFirstTurn = false;
       await waitFor();
       await sendEncryptedEvent("empty_table", {}, roomId, io);
 

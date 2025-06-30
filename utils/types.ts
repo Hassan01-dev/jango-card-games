@@ -14,7 +14,8 @@ export type EventType =
   | "player_won"
   | "request_received"
   | "error"
-  | "chat_message";
+  | "chat_message"
+  | "request_rejected";
 
 export type GameCreatedDataType = {
   roomId: string;
@@ -82,7 +83,7 @@ export type PlayerWonDataType = {
 
 export type RequestReceivedDataType = {
   playerName: string;
-  RequesterPlayerId: string;
+  playerId: string;
 };
 
 export type IMsgDataTypes = {
@@ -90,6 +91,14 @@ export type IMsgDataTypes = {
   user: string;
   message: string;
   time: string;
+}
+
+export type RequestRejectedDataType = {
+  playerName: string;
+}
+
+export type ErrorType = {
+  message: string;
 }
 
 export type UseGameReturn = {
@@ -109,6 +118,8 @@ export type UseGameReturn = {
   isCardPlayed: boolean;
   gameStarted: boolean;
   chat: IMsgDataTypes[];
+  isRequestReceived: boolean;
+  requestData: RequestReceivedDataType | null;
   createGame: () => void;
   joinGame: () => void;
   setPlayerName: (name: string) => void;
@@ -131,4 +142,6 @@ export type UseGameReturn = {
   handleStartGame: () => void;
   emitJoinGame: () => void;
   emitChatEvent: (msgData: IMsgDataTypes) => void;
+  handleApproveRequest: () => void;
+  handleRejectRequest: () => void;
 };

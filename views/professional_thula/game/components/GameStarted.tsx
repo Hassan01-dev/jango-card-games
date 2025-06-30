@@ -4,8 +4,10 @@ import Image from "next/image";
 import GameChat from "./GameChat";
 import Confetti from "react-confetti";
 import { useEffect } from "react";
-import { IMsgDataTypes, OpponentType } from "@/utils/types";
+import { IMsgDataTypes, OpponentType, RequestReceivedDataType } from "@/utils/types";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function GameStarted({
   roomId,
@@ -25,6 +27,10 @@ export default function GameStarted({
   isCardPlayed,
   emitChatEvent,
   chat,
+  isRequestReceived,
+  handleApproveRequest,
+  handleRejectRequest,
+  requestData
 }: {
   roomId: string;
   playerId: string;
@@ -43,6 +49,10 @@ export default function GameStarted({
   isCardPlayed: boolean;
   emitChatEvent: (msgData: IMsgDataTypes) => void;
   chat: IMsgDataTypes[];
+  isRequestReceived: boolean;
+  handleApproveRequest: () => void;
+  handleRejectRequest: () => void;
+  requestData: RequestReceivedDataType | null;
 }) {
   const playerName =
     typeof window !== "undefined"
@@ -60,7 +70,7 @@ export default function GameStarted({
   const angleStep = 360 / Math.max(opponents.length, 1);
 
   return (
-    <div className="relative w-full h-screen bg-gradient-to-b from-green-950 to-green-800 overflow-hidden">
+    <div className="w-full h-screen bg-gradient-to-b from-green-950 to-green-800 overflow-y-auto">
       {/* Game Table in Center */}
       <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-green-800 to-green-900 rounded-full shadow-2xl border border-green-600/30 backdrop-blur-sm flex flex-col items-center justify-center z-10">
         <div className="text-2xl sm:text-3xl font-bold text-white mb-4">
@@ -99,8 +109,7 @@ export default function GameStarted({
                   height={168}
                   className="rounded-xl shadow-lg hover:shadow-2xl"
                   style={{
-                    filter:
-                      "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
+                    filter: "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
                     backfaceVisibility: "hidden",
                   }}
                 />
@@ -146,10 +155,16 @@ export default function GameStarted({
             className="absolute transform -translate-x-1/2 -translate-y-1/2 text-center"
             style={{
               left: `calc(50% + ${x}px)`,
-              top: `calc(40% + ${y}px)`, // match table center
+              top: `calc(40% + ${y}px)`,
             }}
           >
-            <div className={cn("bg-green-700 text-white px-3 py-2 rounded-xl shadow-lg w-32", currentTurn.id === opponent.id && "ring-2 ring-yellow-400 animate-pulse")}>
+            <div
+              className={cn(
+                "bg-green-700 text-white px-3 py-2 rounded-xl shadow-lg w-32",
+                currentTurn.id === opponent.id &&
+                  "ring-2 ring-yellow-400 animate-pulse"
+              )}
+            >
               <div className="font-semibold truncate">{opponent.name}</div>
               <div className="text-sm text-green-200">
                 Cards: {opponent.cardsCount}
@@ -159,20 +174,27 @@ export default function GameStarted({
         );
       })}
 
+      <div>
+        <Button onClick={handleRequestCard} className="absolute bottom-[15%] left-4">
+          Request Card
+        </Button>
+      </div>
+
       {/* Player Cards at Bottom */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-5xl px-4">
         <div className="flex items-center gap-4 mb-2">
-          <div className={cn(
+          <div
+            className={cn(
               "w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-xl font-bold text-white",
-              currentTurn.id === playerId && "ring-2 ring-yellow-400 animate-pulse"
-            )}>
+              currentTurn.id === playerId &&
+                "ring-2 ring-yellow-400 animate-pulse"
+            )}
+          >
             {playerName?.[0]?.toUpperCase()}
           </div>
           <div className="text-white">
             <h3 className="text-lg font-semibold">{playerName}</h3>
-            <p className="text-green-300 text-sm">
-              Cards: {myCards.length}
-            </p>
+            <p className="text-green-300 text-sm">Cards: {myCards.length}</p>
             <button
               onClick={() => handleSort(playingSuit)}
               className="text-sm underline"
@@ -248,6 +270,26 @@ export default function GameStarted({
           gravity={0.5}
         />
       )}
+
+      {/* Request Card Modal */}
+      <Dialog open={isRequestReceived && requestData !== null}>
+        <DialogContent className="z-[9999]">
+          <DialogHeader className="text-center">
+            <DialogTitle>Request Received</DialogTitle>
+            <DialogDescription>
+              {requestData?.playerName} requested for your cards
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-center gap-4 pt-4">
+            <Button variant="default" onClick={handleApproveRequest}>
+              Confirm
+            </Button>
+            <Button variant="outline" onClick={handleRejectRequest}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

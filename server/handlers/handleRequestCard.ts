@@ -3,6 +3,7 @@ import { getNextEligiblePlayer } from "../utils/helper.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 import {
   ApproveRequestCardEventData,
+  RejectRequestCardEventData,
   RequestCardEventData,
 } from "../utils/types.ts";
 
@@ -30,7 +31,7 @@ export async function handleRequestCard(
       "request_received",
       {
         playerName: currentPlayer.name,
-        RequesterPlayerId: currentPlayer.id,
+        playerId: currentPlayer.id,
       },
       nextPlayer.socketId,
       io
@@ -54,7 +55,7 @@ export async function handleApproveRequestCard(
   io: any,
   data: ApproveRequestCardEventData
 ) {
-  const { roomId, playerId, RequesterPlayerId } = data;
+  const { roomId, playerId, requesterPlayerId } = data;
   try {
     if (!roomId) throw new Error("Invalid play");
 
@@ -62,7 +63,7 @@ export async function handleApproveRequestCard(
     if (!room) throw new Error("Room not found");
 
     const requesterPlayer = room.players.find(
-      (player) => player.id === RequesterPlayerId
+      (player) => player.id === requesterPlayerId
     );
     if (!requesterPlayer) throw new Error("Requester Player not found");
 
@@ -126,6 +127,43 @@ export async function handleApproveRequestCard(
       );
 
       console.error("Error in play_card:", error);
+    }
+  }
+}
+
+export async function handleRejectRequestCard(
+  socket: any,
+  io: any,
+  data: RejectRequestCardEventData
+) {
+  const { roomId, playerName, requesterPlayerId } = data;
+  try {
+    if (!roomId) throw new Error("Invalid play");
+
+    const room = getRoom(roomId);
+    if (!room) throw new Error("Room not found");
+
+    const requesterPlayer = room.players.find(
+      (player) => player.id === requesterPlayerId
+    );
+    if (!requesterPlayer) throw new Error("Requester Player not found");
+
+    await sendEncryptedEvent(
+      "request_rejected",
+      {
+        playerName,
+      },
+      requesterPlayer.socketId,
+      io
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      await sendEncryptedEvent(
+        "error",
+        { message: error.message },
+        socket.id,
+        io
+      );
     }
   }
 }

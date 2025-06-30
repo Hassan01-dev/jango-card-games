@@ -35,7 +35,11 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     handleStartGame,
     emitJoinGame,
     emitChatEvent,
-    chat
+    chat,
+    isRequestReceived,
+    handleApproveRequest,
+    handleRejectRequest,
+    requestData
   } = useGame(roomIdParam);
 
   useEffect(() => {
@@ -70,6 +74,10 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       isCardPlayed={isCardPlayed}
       emitChatEvent={emitChatEvent}
       chat={chat}
+      isRequestReceived={isRequestReceived}
+      handleApproveRequest={handleApproveRequest}
+      handleRejectRequest={handleRejectRequest}
+      requestData={requestData}
     />
   ) : (
     <GameNotStarted

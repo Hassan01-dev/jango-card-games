@@ -20,6 +20,8 @@ import {
   PlayerWonDataType,
   RequestReceivedDataType,
   IMsgDataTypes,
+  RequestRejectedDataType,
+  ErrorType,
 } from "@/utils/types";
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
@@ -28,6 +30,9 @@ const useGame = (roomIdParam: string): UseGameReturn => {
   const { socket } = useSocket();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const [requestData, setRequestData] = useState<RequestReceivedDataType | null>(null);
+  const [isRequestReceived, setIsRequestReceived] = useState<boolean>(false);
 
   const [playerName, setPlayerName] = useState<string>("");
   const [playerId, setPlayerId] = useState<string>("");
@@ -152,8 +157,12 @@ const useGame = (roomIdParam: string): UseGameReturn => {
         case "chat_message":
           handleChatMessage(data as IMsgDataTypes);
           break;
+        case "request_rejected":
+          handleRequestRejected(data as RequestRejectedDataType);
+          break;
         case "error":
-          toast.error("Something went wrong");
+          const error = data as ErrorType;
+          toast.error(error.message);
           router.replace("/professional_thula");
           break;
         default:
@@ -245,18 +254,39 @@ const useGame = (roomIdParam: string): UseGameReturn => {
 
   const handleRequestReceived = ({
     playerName,
-    RequesterPlayerId,
+    playerId,
   }: RequestReceivedDataType) => {
-    if (
-      confirm(`${playerName} has requested your cards. Do you want to approve?`)
-    ) {
-      emitSecureEvent("approve_hand_received", {
-        roomId,
-        RequesterPlayerId,
-        playerId,
-      });
-    }
+    console.log("handleRequestReceived", playerName, playerId)
+    setRequestData({
+      playerName,
+      playerId,
+    })
+    setIsRequestReceived(true)
   };
+
+  const handleApproveRequest = () => {
+    emitSecureEvent("approve_request_card", {
+      roomId,
+      requesterPlayerId: requestData?.playerId,
+      playerId,
+    });
+    setIsRequestReceived(false)
+    setRequestData(null)
+  };
+
+  const handleRejectRequest = () => {
+    emitSecureEvent("reject_request_card", {
+      roomId,
+      playerName,
+      requesterPlayerId: requestData?.playerId
+    });
+    setIsRequestReceived(false)
+    setRequestData(null)
+  };
+
+  const handleRequestRejected = ({ playerName }: RequestRejectedDataType) => {
+    toast.error(`${playerName} rejected your request`);
+  }
 
   // Game Actions
 
@@ -349,6 +379,8 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     isCardPlayed,
     gameStarted,
     chat,
+    isRequestReceived,
+    requestData,
     createGame,
     joinGame,
     setPlayerName,
@@ -370,7 +402,9 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     handleRequestCard,
     handleStartGame,
     emitJoinGame,
-    emitChatEvent
+    emitChatEvent,
+    handleApproveRequest,
+    handleRejectRequest,
   };
 };
 

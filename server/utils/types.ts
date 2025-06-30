@@ -14,6 +14,7 @@ export type Room = {
   isStarted: boolean;
   ownerId: string;
   ownerName: string;
+  isFirstTurn: boolean;
 };
 
 export type PlayedCard = {
@@ -72,9 +73,16 @@ export type RequestCardEventData = {
 
 export type ApproveRequestCardEventData = {
   roomId: string;
-  RequesterPlayerId: string;
+  requesterPlayerId: string;
   playerId: string;
 };
+
+export type RejectRequestCardEventData = {
+  roomId: string;
+  playerName: string;
+  requesterPlayerId: string;
+};
+
 export type EventType =
   | "create_room"
   | "join_game"
@@ -84,7 +92,8 @@ export type EventType =
   | "start_game"
   | "won"
   | "request_card"
-  | "approve_request_card";
+  | "approve_request_card"
+  | "reject_request_card";
 
 export type SecureEventPayload = {
   event_type: EventType;

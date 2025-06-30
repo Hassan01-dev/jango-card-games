@@ -13,6 +13,7 @@ export const createRoom = (roomId: string, playerId: string, playerName: string)
     playedCards: [],
     noOfTurns: 0,
     isStarted: false,
+    isFirstTurn: true,
     ownerId: playerId,
     ownerName: playerName,
   };
