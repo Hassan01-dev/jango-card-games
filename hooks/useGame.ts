@@ -22,6 +22,7 @@ import {
   IMsgDataTypes,
   RequestRejectedDataType,
   ErrorType,
+  PlayCardDataType,
 } from "@/utils/types";
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
@@ -160,6 +161,9 @@ const useGame = (roomIdParam: string): UseGameReturn => {
         case "request_rejected":
           handleRequestRejected(data as RequestRejectedDataType);
           break;
+        case "play_card":
+          handlePlayCard(data as PlayCardDataType);
+          break;
         case "error":
           const error = data as ErrorType;
           toast.error(error.message);
@@ -179,6 +183,11 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     const { roomId } = data
     router.push(`/professional_thula/${roomId}`);
   };
+
+  const handlePlayCard = (data: PlayCardDataType) => {
+    const { playerName, card } = data;
+    setPlayedCards((prev) => [...prev, card]);
+  }
 
   const handleNonStartedGameJoined = ({
     players,
@@ -316,20 +325,6 @@ const useGame = (roomIdParam: string): UseGameReturn => {
 
   const handleCardPlayed = (card: string) => {
     setIsCardPlayed(true);
-    handleClick(card, myCards, setMyCards);
-  };
-
-  const handleRequestCard = () => {
-    emitSecureEvent("request_card", { roomId, playerId });
-  };
-
-  const handleStartGame = () => emitSecureEvent("start_game", { roomId });
-
-  const handleClick = (
-    card: string,
-    myCards: string[],
-    setMyCards: Function
-  ) => {
     const remaining = myCards.filter((c) => c !== card);
     setMyCards(remaining);
     emitSecureEvent("play_card", { roomId, playerName, card, playerId });
@@ -337,6 +332,9 @@ const useGame = (roomIdParam: string): UseGameReturn => {
       emitSecureEvent("won", { roomId, playerName });
     }
   };
+
+  const handleRequestCard = () => emitSecureEvent("request_card", { roomId, playerId })
+  const handleStartGame = () => emitSecureEvent("start_game", { roomId });
 
   const handleSort = (myCards: string[], setMyCards: Function) => {
     const suitOrder = { hearts: 1, clubs: 2, diamonds: 3, spades: 4 };

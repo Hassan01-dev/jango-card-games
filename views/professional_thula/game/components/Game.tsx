@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSocket } from "@/hooks/useSocket";
 import { useRouter } from "next/navigation";
 import GameNotStarted from "./GameNotStarted";
 import GameStarted from "./GameStarted";
@@ -10,7 +9,6 @@ import useGame from "@/hooks/useGame";
 
 export default function Game({ roomId: roomIdParam }: {roomId: string}) {
   const router = useRouter();
-  const { socket } = useSocket();
 
   const {
     playerId,
@@ -42,6 +40,8 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     requestData
   } = useGame(roomIdParam);
 
+  console.log("Played Cards:", playedCards)
+
   useEffect(() => {
     if (isLoading) return;
 
@@ -61,7 +61,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       playerId={playerId}
       playingSuit={playingSuit}
       myCards={myCards}
-      handleClick={(card) => handleCardPlayed(card)}
+      handleCardPlayed={handleCardPlayed}
       handleSort={() => handleSort(myCards, setMyCards)}
       handleRequestCard={handleRequestCard}
       thullaOccured={thullaOccured}

@@ -15,7 +15,8 @@ export type EventType =
   | "request_received"
   | "error"
   | "chat_message"
-  | "request_rejected";
+  | "request_rejected"
+  | "play_card";
 
 export type GameCreatedDataType = {
   roomId: string;
@@ -99,6 +100,11 @@ export type RequestRejectedDataType = {
 
 export type ErrorType = {
   message: string;
+}
+
+export type PlayCardDataType = {
+  playerName: string;
+  card: string;
 }
 
 export type UseGameReturn = {
