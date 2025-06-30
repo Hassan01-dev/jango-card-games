@@ -32,6 +32,7 @@ export function handleSecureEvent(socket: any, io: any) {
         encryptedPayload
       )) as SecureEventPayload;
 
+      console.log("event_type", event_type);
       switch (event_type) {
         case "create_room":
           await handleCreateRoomEvent(socket, io, data as CreateRoomEventData);
@@ -44,9 +45,6 @@ export function handleSecureEvent(socket: any, io: any) {
           break;
         case "play_card":
           await handlePlayCard(socket, io, data as PlayCardEventData);
-          break;
-        case "disconnect":
-          await handleDisconnect(socket, io);
           break;
         case "start_game":
           await handleStartGame(socket, io, data as StartGameEventData);

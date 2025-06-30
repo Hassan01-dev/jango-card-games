@@ -61,8 +61,6 @@ export async function handlePlayCard(
         io
       );
 
-      await sendEncryptedEvent("play_card", { playerName, card }, roomId, io);
-
       await sendEncryptedEvent(
         "cards_taken",
         {

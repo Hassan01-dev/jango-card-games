@@ -3,6 +3,7 @@ import { Server } from "https://deno.land/x/socket_io@0.1.1/mod.ts";
 import "jsr:@std/dotenv/load";
 
 import { handleSecureEvent } from "./handlers/secureEventHandler.ts";
+import { handleDisconnect } from "./handlers/disconnect.ts";
 
 const io = new Server({
   cors: {
@@ -13,6 +14,7 @@ const io = new Server({
 io.on("connection", (socket: any) => {
   console.log(`socket ${socket.id} connected`);
 
+  handleDisconnect(socket, io);
   handleSecureEvent(socket, io);
 });
 

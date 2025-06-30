@@ -28,6 +28,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     looser,
     opponents,
     isLoading,
+    isUserInfo,
     isCardPlayed,
     gameStarted,
     handleStartGame,
@@ -43,7 +44,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
   console.log("Played Cards:", playedCards)
 
   useEffect(() => {
-    if (isLoading) return;
+    if (!isUserInfo) return;
 
     if (!playerName || !playerId) {
       router.replace(`/professional_thula?roomId=${roomId}`);

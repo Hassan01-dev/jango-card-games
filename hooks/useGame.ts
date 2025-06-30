@@ -35,6 +35,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
   const [requestData, setRequestData] = useState<RequestReceivedDataType | null>(null);
   const [isRequestReceived, setIsRequestReceived] = useState<boolean>(false);
 
+  const [isUserInfo, setIsUserInfo] = useState<boolean>(false);
   const [playerName, setPlayerName] = useState<string>("");
   const [playerId, setPlayerId] = useState<string>("");
   const [ownerId, setOwnerId] = useState<string>("");
@@ -76,7 +77,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
       setRoomId(queryRoomId);
     }
 
-    setIsLoading(false)
+    setIsUserInfo(true);
   }, [searchParams]);
 
   useEffect(() => {
@@ -374,6 +375,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     gameOver,
     looser,
     isLoading,
+    isUserInfo,
     isCardPlayed,
     gameStarted,
     chat,

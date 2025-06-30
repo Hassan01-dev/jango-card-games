@@ -121,6 +121,7 @@ export type UseGameReturn = {
   gameOver: boolean;
   looser: string;
   isLoading: boolean;
+  isUserInfo: boolean;
   isCardPlayed: boolean;
   gameStarted: boolean;
   chat: IMsgDataTypes[];
