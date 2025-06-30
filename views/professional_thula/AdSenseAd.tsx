@@ -10,31 +10,22 @@ type Props = {
 
 export default function AdSenseAd({
   slot,
-  style = { display: 'block' },
   format = 'auto',
   responsive = 'true',
 }: Props) {
   useEffect(() => {
     try {
-      interface WindowWithAdSense extends Window {
-        adsbygoogle: Array<{ push(obj: { [key: string]: any }): void }>;
-      }
-      
-      if (typeof window !== 'undefined') {
-        const windowWithAds = window as unknown as WindowWithAdSense;
-        if (windowWithAds.adsbygoogle && windowWithAds.adsbygoogle.length > 0) {
-          windowWithAds.adsbygoogle[0].push({});
-        }
-      }
+      (window as any).adsbygoogle = (window as any).adsbygoogle || [];
+      (window as any).adsbygoogle.push({});
     } catch (e) {
-      console.error('AdSense error:', e);
+      console.error('Error loading ads:', e);
     }
   }, []);
 
   return (
     <ins
       className="adsbygoogle"
-      style={style}
+      style={{ display: 'block' }}
       data-ad-client="ca-pub-8741211413490579"
       data-ad-slot={slot}
       data-ad-format={format}
