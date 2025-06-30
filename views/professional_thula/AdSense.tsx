@@ -1,18 +1,14 @@
-import Script from "next/script";
-import React from "react";
+"use client"
+import { useEffect } from "react";
 
-type AdsenseTypes = {
-  pId: string;
-};
+export default function AdsenseLoader({ pId }: { pId: string }) {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-${pId}`;
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }, [pId]);
 
-const AdSense = ({ pId }: AdsenseTypes) => {
-  return (
-    <Script
-      async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-${pId}`}
-      crossOrigin="anonymous"
-    ></Script>
-  );
-};
-
-export default AdSense;
+  return null;
+}
