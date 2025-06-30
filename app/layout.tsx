@@ -19,10 +19,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+         <meta
+          name="google-adsense-account"
+          content="ca-pub-8741211413490579"
+        />
         <AdSense pId="8741211413490579"/>
       </head>
       <body className={inter.className}>
         <Toaster position="top-center" reverseOrder={true} />
+        <AdSense pId="8741211413490579" />
         {children}
       </body>
     </html>
