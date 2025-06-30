@@ -16,10 +16,16 @@ export default function AdSenseAd({
 }: Props) {
   useEffect(() => {
     try {
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({
-        google_ad_client: 'ca-pub-8741211413490579',
-        enable_page_level_ads: true,
-      });
+      interface WindowWithAdSense extends Window {
+        adsbygoogle: Array<{ push(obj: { [key: string]: any }): void }>;
+      }
+      
+      if (typeof window !== 'undefined') {
+        const windowWithAds = window as unknown as WindowWithAdSense;
+        if (windowWithAds.adsbygoogle) {
+          windowWithAds.adsbygoogle[0].push({});
+        }
+      }
     } catch (e) {
       console.error('AdSense error:', e);
     }
