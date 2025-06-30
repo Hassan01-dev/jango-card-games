@@ -1,23 +1,18 @@
-import Script from 'next/script';
-import React from 'react'
+import Script from "next/script";
+import React from "react";
 
 type AdsenseTypes = {
-    pId: string;
-}
+  pId: string;
+};
 
 const AdSense = ({ pId }: AdsenseTypes) => {
   return (
-    <>
-        <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-${pId}`}
-            crossOrigin='anonymous'
-        ></Script>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </>
-  )
-}
+    <Script
+      async
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-${pId}`}
+      crossOrigin="anonymous"
+    ></Script>
+  );
+};
 
-export default AdSense
+export default AdSense;

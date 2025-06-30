@@ -13,15 +13,6 @@ const AdBanner = ({
   dataAdFormat,
   dataFullWidthResponsive,
 }: AdBannerTypes) => {
-  useEffect(() => {
-    try {
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
-        {}
-      );
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  }, []);
 
   return (
     <ins
