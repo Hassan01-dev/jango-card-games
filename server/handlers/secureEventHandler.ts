@@ -3,7 +3,6 @@ import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 import { handleCreateRoomEvent } from "./handleCreateGame.ts";
 import { handleGameChat } from "./gameChat.ts";
 import { handlePlayCard } from "./playCard.ts";
-import { handleDisconnect } from "./disconnect.ts";
 import { handleWon } from "./won.ts";
 import { handleStartGame } from "./handleStartGame.ts";
 import { handleJoinGame } from "./handleJoinGame.ts";
@@ -26,6 +25,7 @@ import {
   RejectRequestCardEventData,
   KickPlayerEventData,
 } from "../utils/types.ts";
+import { handeleAutoPlayCard } from "./handleAutoPlayCard.ts";
 
 export function handleSecureEvent(socket: any, io: any) {
   socket.on("secure_event", async (encryptedPayload: string) => {
@@ -34,7 +34,6 @@ export function handleSecureEvent(socket: any, io: any) {
         encryptedPayload
       )) as SecureEventPayload;
 
-      console.log("event_type", event_type);
       switch (event_type) {
         case "create_room":
           await handleCreateRoomEvent(socket, io, data as CreateRoomEventData);
@@ -73,6 +72,9 @@ export function handleSecureEvent(socket: any, io: any) {
           break;
         case "kick_player":
           await handleKickPlayer(socket, io, data as KickPlayerEventData);
+          break;
+        case "auto_play_card":
+          await handeleAutoPlayCard(socket, io, data as { roomId: string });
           break;
         default:
           console.warn("Unknown event_type:", event_type);

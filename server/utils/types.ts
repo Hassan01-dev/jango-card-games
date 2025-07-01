@@ -100,7 +100,8 @@ export type EventType =
   | "request_card"
   | "approve_request_card"
   | "reject_request_card"
-  | "kick_player";
+  | "kick_player"
+  | "auto_play_card";
 
 export type SecureEventPayload = {
   event_type: EventType;

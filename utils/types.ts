@@ -18,11 +18,19 @@ export type EventType =
   | "request_rejected"
   | "play_card"
   | "player_kicked"
-  | "kicked";
+  | "kicked"
+  | "auto_card_played";
 
 export type GameCreatedDataType = {
   roomId: string;
 };
+
+export type AutoCardPlayedDataType = {
+  playedCard: string;
+  playerId: string;
+  playerName: string;
+  cardName?: string;
+}
 
 export type DecryptedPayload<T = unknown> = {
   event_type: EventType;

@@ -1,7 +1,8 @@
 import { getRoom } from "../state/roomManager.ts";
 import { CardDeck } from "../utils/cardDeck.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { Player, StartGameEventData } from "../utils/types.ts";
+import { PlayCardEventData, Player, StartGameEventData } from "../utils/types.ts";
+import { handlePlayCard } from "./playCard.ts";
 
 export async function handleStartGame(
   socket: any,
@@ -23,7 +24,7 @@ export async function handleStartGame(
 
     await sendEncryptedEvent("game_started", {}, roomId, io);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       room.players.forEach(async (player) => {
         await sendEncryptedEvent(
           "hand_received",
@@ -42,6 +43,9 @@ export async function handleStartGame(
           io
         );
       });
+
+      const data = {roomId, card: "ace_of_spades", playerName: firstPlayer.name, playerId: firstPlayer.id}
+      await handlePlayCard(socket, io, data as PlayCardEventData);
     }, 4000);
   } catch (error: unknown) {
     if (error instanceof Error) {

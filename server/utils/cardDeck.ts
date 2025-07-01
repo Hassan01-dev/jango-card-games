@@ -55,21 +55,22 @@ export class CardDeck {
       [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
     }
   }
-  
+
   public distributeCards(players: Player[]): Player {
-    const numPlayers = players.length
+    const numPlayers = players.length;
     let firstTurn;
-  
+
     while (this.cards.length > 0) {
       for (let i = 0; i < numPlayers && this.cards.length > 0; i++) {
         const card = this.dealCard()!;
         if (card === "ace_of_spades") {
           firstTurn = players[i];
+        } else {
+          players[i].cards.push(card);
         }
-        players[i].cards.push(card);
       }
     }
-  
+
     return firstTurn;
   }
 

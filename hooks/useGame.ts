@@ -24,6 +24,7 @@ import {
   ErrorType,
   PlayCardDataType,
   PlayerLeftDataType,
+  AutoCardPlayedDataType,
 } from "@/utils/types";
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
@@ -102,11 +103,11 @@ const useGame = (roomIdParam: string) => {
 
   useEffect(() => {
     if (gameStarted && !isLoading) {
-      startTimer();
+      startTimer(currentTurn);
     } else {
       stopTimer();
     }
-  }, [gameStarted, isLoading]);
+  }, [gameStarted, isLoading, currentTurn]);
 
   useEffect(() => {
     return () => {
@@ -132,6 +133,7 @@ const useGame = (roomIdParam: string) => {
           handleNonStartedGameJoined(data as NonStartedRoomJoinedDataType);
           break;
         case "game_started":
+          toast.success("Game started");
           setGameStarted(true);
           break;
         case "hand_received":
@@ -176,6 +178,9 @@ const useGame = (roomIdParam: string) => {
         case "play_card":
           handlePlayCard(data as PlayCardDataType);
           break;
+        case "auto_card_played":
+          handleAutoCardPlayed(data as AutoCardPlayedDataType);
+          break;
         case "error":
           toast.error((data as ErrorType).message);
           router.replace("/professional_thula");
@@ -208,7 +213,7 @@ const useGame = (roomIdParam: string) => {
   };
 
   const handlePlayCard = (data: PlayCardDataType) => {
-    const { playerName, card } = data;
+    const { card } = data;
     setPlayedCards((prev) => [...prev, card]);
   };
 
@@ -253,7 +258,7 @@ const useGame = (roomIdParam: string) => {
     setCurrentTurn(currentTurn);
     setIsCardPlayed(false);
     setOpponents(playersDetail.filter((p) => p.id !== playerId));
-    startTimer();
+    startTimer(currentTurn);
   };
 
   const handlePlayedCards = ({ card }: CardPlayedDataType) => {
@@ -402,25 +407,30 @@ const useGame = (roomIdParam: string) => {
     setTurnTimer(0);
   };
 
-  const startTimer = () => {
-    stopTimer();
-    setTurnTimer(15);
-    timerRef.current = setInterval(() => {
-      setTurnTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current!);
-          timerRef.current = null;
-          if (currentTurn.id === playerId && myCards.length > 0) {
-            const randomCard =
-              myCards[Math.floor(Math.random() * myCards.length)];
-            handleCardPlayed(randomCard);
-          }
-          return 0;
+const startTimer = (currentTurn: TurnType) => {
+  stopTimer();
+  setTurnTimer(15);
+  timerRef.current = setInterval(() => {
+    setTurnTimer(prev => {
+      if (prev <= 1) {
+        clearInterval(timerRef.current!);
+        timerRef.current = null;
+        const storedPlayerId = localStorage.getItem('playerId');
+        if (currentTurn.id === storedPlayerId) {
+          emitSecureEvent('auto_play_card', {
+            roomId
+          });
         }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+};
+
+  const handleAutoCardPlayed = (data: AutoCardPlayedDataType) => {
+    setMyCards((prev) => prev.filter(card => card !== data.playedCard));
+  }
 
   return {
     playerId,

@@ -37,6 +37,7 @@ export async function handlePlayCard(
 
     await sendEncryptedEvent("play_card", { playerName, card }, roomId, io);
     const currentPlayer = room.players.find((p) => p.id === playerId);
+
     if (currentPlayer) {
       currentPlayer.cards = currentPlayer.cards.filter((c) => c !== card);
     }

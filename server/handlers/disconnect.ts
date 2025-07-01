@@ -3,7 +3,7 @@ import { getNextEligiblePlayer } from "../utils/helper.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 
 export function handleDisconnect(socket: any, io: any) {
-  socket.on("disconnect", async() => {
+  socket.on("disconnect", async () => {
     try {
       const rooms = getAllRooms();
 
@@ -30,16 +30,21 @@ export function handleDisconnect(socket: any, io: any) {
             );
           }
 
-          await sendEncryptedEvent(
-            "player_left",
-            {
+          if (room.players.length === 0) {
+            delete rooms[roomId];
+          } else {
+            await sendEncryptedEvent(
+              "player_left",
+              {
+                roomId,
+                playerName: player.name,
+                players: room.players,
+                currentTurn: room.currentTurn,
+              },
               roomId,
-              playerName: player.name,
-              playerId: player.id,
-            },
-            roomId,
-            io
-          );
+              io
+            );
+          }
         }
       }
     } catch (error) {
