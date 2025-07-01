@@ -282,7 +282,7 @@ export default function GameStarted({
                     alt={card}
                     width={100}
                     height={150}
-                    className="rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-4 transition-all"
+                    className="rounded-lg shadow-lg hover:shadow-2xl transform hover:-translate-y-4 transition-all"
                   />
                 </div>
               );

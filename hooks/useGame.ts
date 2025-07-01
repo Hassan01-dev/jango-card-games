@@ -383,13 +383,32 @@ const useGame = (roomIdParam: string) => {
 
   const handleSort = (myCards: string[], setMyCards: Function) => {
     const suitOrder = { hearts: 1, clubs: 2, diamonds: 3, spades: 4 };
+    const rankOrder = {
+      ace: 14,
+      king: 13, 
+      queen: 12,
+      jack: 11,
+      10: 10,
+      9: 9,
+      8: 8,
+      7: 7,
+      6: 6,
+      5: 5,
+      4: 4,
+      3: 3,
+      2: 2
+    };
     const sorted = [...myCards].sort((a, b) => {
       const [aRank, , aSuit] = a.split("_");
       const [bRank, , bSuit] = b.split("_");
       const suitDiff =
         suitOrder[aSuit as keyof typeof suitOrder] -
         suitOrder[bSuit as keyof typeof suitOrder];
-      return suitDiff !== 0 ? suitDiff : parseInt(aRank) - parseInt(bRank);
+      if (suitDiff !== 0) return suitDiff;
+      
+      const aRankValue = rankOrder[aRank.toLowerCase() as keyof typeof rankOrder];
+      const bRankValue = rankOrder[bRank.toLowerCase() as keyof typeof rankOrder];
+      return bRankValue - aRankValue;
     });
     setMyCards(sorted);
   };
