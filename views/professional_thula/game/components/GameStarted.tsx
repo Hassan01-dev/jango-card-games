@@ -139,7 +139,8 @@ export default function GameStarted({
           <div className="mt-4 px-4">
             <div className="turn-indicator text-white bg-green-700/50 px-6 py-2 rounded-full shadow">
               <span className="animate-pulse inline-block w-3 h-3 bg-green-400 rounded-full mr-2" />
-              {currentTurn.id === playerId ? "Your" : `${currentTurn.name}'s`} Turn
+              {currentTurn.id === playerId ? "Your" : `${currentTurn.name}'s`}{" "}
+              Turn
             </div>
           </div>
         </div>
@@ -175,11 +176,16 @@ export default function GameStarted({
           );
         })}
 
-        <div>
-          <Button onClick={handleRequestCard} className="absolute bottom-[15%] left-4">
-            Request Card
-          </Button>
-        </div>
+        {myCards.length < 5 && (
+          <div>
+            <Button
+              onClick={handleRequestCard}
+              className="absolute bottom-[15%] left-4"
+            >
+              Request Card
+            </Button>
+          </div>
+        )}
 
         {/* Player Cards at Bottom */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-5xl px-4">
