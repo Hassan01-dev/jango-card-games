@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { useEffect, useRef, useState } from "react";
+import { io, Socket } from "socket.io-client";
 
-const socket = io("https://hassanraza-jango-card-57.deno.dev", {
+const socket = io(
+  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
+  {
     transports: ["websocket"],
-  });
-  // const socket = io("http://localhost:3001", {
-  //   transports: ["websocket"]
-  // });
-  
-  export const useSocket = () => {
+  }
+);
+
+export const useSocket = () => {
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<Socket>(socket);
 
@@ -18,19 +18,19 @@ const socket = io("https://hassanraza-jango-card-57.deno.dev", {
     socketRef.current = socket;
     socket.connect();
 
-    socket.on('connect', () => {
-      console.log("Connected")
+    socket.on("connect", () => {
+      console.log("Connected");
       setIsConnected(true);
     });
 
-    socket.on('disconnect', () => {
-      console.log("Disconnected")
+    socket.on("disconnect", () => {
+      console.log("Disconnected");
       setIsConnected(false);
     });
 
     return () => {
-      socket.off('connect');
-      socket.off('disconnect');
+      socket.off("connect");
+      socket.off("disconnect");
       socket.disconnect();
     };
   }, []);

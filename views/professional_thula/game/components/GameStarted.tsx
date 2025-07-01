@@ -63,7 +63,7 @@ export default function GameStarted({
 
   useEffect(() => {
     if (thullaOccured) {
-      const audio = new Audio("/thulla.wav");
+      const audio = new Audio("/thulla_shaheer.mp3");
       audio.play();
     }
   }, [thullaOccured]);
