@@ -6,6 +6,7 @@ import GameNotStarted from "./GameNotStarted";
 import GameStarted from "./GameStarted";
 
 import useGame from "@/hooks/useGame";
+import toast from "react-hot-toast";
 
 export default function Game({ roomId: roomIdParam }: {roomId: string}) {
   const router = useRouter();
@@ -46,11 +47,12 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     if (!isUserInfo) return;
 
     if (!playerName || !playerId) {
+      toast.error("Please enter your name before joining");
       router.replace(`/professional_thula?roomId=${roomId}`);
     } else {
       emitJoinGame();
     }
-  }, [roomId, playerName, playerId]);
+  }, [roomId, playerName, playerId, isUserInfo]);
 
   const playingSuit =
     playedCards.length > 0 ? playedCards[0].split("_")[2] : "";
