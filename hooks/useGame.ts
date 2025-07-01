@@ -110,9 +110,6 @@ const useGame = (roomIdParam: string): UseGameReturn => {
         payload
       )) as DecryptedPayload;
 
-      console.log("event_type", event_type)
-      console.log("data", data)
-
       switch (event_type) {
         case "game_created":
           handleGameCreated(data as GameCreatedDataType);
@@ -266,7 +263,6 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     playerName,
     playerId,
   }: RequestReceivedDataType) => {
-    console.log("handleRequestReceived", playerName, playerId)
     setRequestData({
       playerName,
       playerId,

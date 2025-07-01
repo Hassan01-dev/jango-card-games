@@ -43,7 +43,6 @@ export class CardDeck {
 
   public dealCard(): string | null {
     if (this.cards.length === 0) {
-      console.log("No more cards in the deck");
       return null;
     }
 

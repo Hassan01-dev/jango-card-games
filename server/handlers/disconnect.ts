@@ -9,11 +9,9 @@ export function handleDisconnect(socket: any, io: any) {
       for (const roomId in rooms) {
         const room = rooms[roomId];
         const player = room.players.find((p) => p.socketId === socket.id);
-        console.log("player", player);
         const playerIndex = room.players.findIndex(
           (p) => p.socketId === socket.id
         );
-        console.log("playerIndex", playerIndex);
 
         if (player && playerIndex !== -1) {
           room.players.splice(playerIndex, 1);

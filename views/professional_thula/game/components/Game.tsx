@@ -41,8 +41,6 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     requestData
   } = useGame(roomIdParam);
 
-  console.log("Played Cards:", playedCards)
-
   useEffect(() => {
     if (!isUserInfo) return;
 
