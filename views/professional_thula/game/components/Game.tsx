@@ -14,7 +14,6 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     playerId,
     playerName,
     roomId,
-    joinedPlayerList,
     ownerId,
     currentTurn,
     playedCards,
@@ -39,7 +38,8 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     handleApproveRequest,
     handleRejectRequest,
     requestData,
-    turnTimer
+    turnTimer,
+    handleKickPlayer,
   } = useGame(roomIdParam);
 
   useEffect(() => {
@@ -79,10 +79,12 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       handleRejectRequest={handleRejectRequest}
       requestData={requestData}
       turnTimer={turnTimer}
+      handleKickPlayer={handleKickPlayer}
+      ownerId={ownerId}
     />
   ) : (
     <GameNotStarted
-      playerNames={joinedPlayerList}
+      opponents={opponents}
       handleStartGame={handleStartGame}
       playerId={playerId}
       ownerId={ownerId}
@@ -90,6 +92,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       roomId={roomId}
       chat={chat}
       emitChatEvent={emitChatEvent}
+      handleKickPlayer={handleKickPlayer}
     />
   );
 }

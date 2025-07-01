@@ -31,7 +31,9 @@ export default function GameStarted({
   handleApproveRequest,
   handleRejectRequest,
   requestData,
-  turnTimer
+  turnTimer,
+  handleKickPlayer,
+  ownerId
 }: {
   roomId: string;
   playerId: string;
@@ -54,7 +56,9 @@ export default function GameStarted({
   handleApproveRequest: () => void;
   handleRejectRequest: () => void;
   requestData: RequestReceivedDataType | null;
-  turnTimer: number
+  turnTimer: number;
+  handleKickPlayer: (playerId: string) => void;
+  ownerId: string;
 }) {
   const playerName =
     typeof window !== "undefined"
@@ -70,6 +74,9 @@ export default function GameStarted({
 
   const radius = 270;
   const angleStep = 360 / Math.max(opponents.length, 1);
+  const isOwner = playerId === ownerId;
+
+  console.log(isOwner, playerId, ownerId, playerName);
 
   return (
     <>
@@ -175,6 +182,16 @@ export default function GameStarted({
                 <div className="text-sm text-green-200">
                   Cards: {opponent.cardsCount}
                 </div>
+                {isOwner && opponent.id !== ownerId && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleKickPlayer(opponent.id)}
+                    className="cursor-pointer"
+                  >
+                    <Image src="/kick.svg" alt="Kick" width={20} height={20} />
+                  </Button>
+                )}
               </div>
             </div>
           );

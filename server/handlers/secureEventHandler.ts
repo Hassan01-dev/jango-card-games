@@ -12,6 +12,7 @@ import {
   handleApproveRequestCard,
   handleRejectRequestCard,
 } from "./handleRequestCard.ts";
+import { handleKickPlayer } from "./handleKickPlayer.ts";
 import {
   CreateRoomEventData,
   JoinGameEventData,
@@ -23,6 +24,7 @@ import {
   RequestCardEventData,
   ApproveRequestCardEventData,
   RejectRequestCardEventData,
+  KickPlayerEventData,
 } from "../utils/types.ts";
 
 export function handleSecureEvent(socket: any, io: any) {
@@ -56,10 +58,21 @@ export function handleSecureEvent(socket: any, io: any) {
           await handleRequestCard(socket, io, data as RequestCardEventData);
           break;
         case "approve_request_card":
-          await handleApproveRequestCard(socket, io, data as ApproveRequestCardEventData);
+          await handleApproveRequestCard(
+            socket,
+            io,
+            data as ApproveRequestCardEventData
+          );
           break;
         case "reject_request_card":
-          await handleRejectRequestCard(socket, io, data as RejectRequestCardEventData);
+          await handleRejectRequestCard(
+            socket,
+            io,
+            data as RejectRequestCardEventData
+          );
+          break;
+        case "kick_player":
+          await handleKickPlayer(socket, io, data as KickPlayerEventData);
           break;
         default:
           console.warn("Unknown event_type:", event_type);

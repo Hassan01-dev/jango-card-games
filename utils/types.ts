@@ -16,7 +16,9 @@ export type EventType =
   | "error"
   | "chat_message"
   | "request_rejected"
-  | "play_card";
+  | "play_card"
+  | "player_kicked"
+  | "kicked";
 
 export type GameCreatedDataType = {
   roomId: string;
@@ -107,7 +109,7 @@ export type PlayCardDataType = {
   card: string;
 }
 
-export type PlayerLeftDataType = { roomId: string; playerName: string }
+export type PlayerLeftDataType = { roomId: string; playerName: string, playerId: string }
 
 export type UseGameReturn = {
   playerId: string;
@@ -154,4 +156,5 @@ export type UseGameReturn = {
   emitChatEvent: (msgData: IMsgDataTypes) => void;
   handleApproveRequest: () => void;
   handleRejectRequest: () => void;
+  handleKickPlayer: (kickedPlayerId: string) => void;
 };

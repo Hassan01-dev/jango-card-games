@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import GameChat from "./GameChat";
-import { IMsgDataTypes } from "@/utils/types";
+import { IMsgDataTypes, OpponentType } from "@/utils/types";
 
 interface Props {
-  playerNames: string[];
+  opponents: OpponentType[];
   handleStartGame: () => void;
   playerId: string;
   ownerId: string;
@@ -17,10 +17,11 @@ interface Props {
   roomId: string;
   chat: IMsgDataTypes[];
   emitChatEvent: (msgData: IMsgDataTypes) => void;
+  handleKickPlayer: (playerId: string) => void;
 }
 
 export default function GameNotStarted({
-  playerNames,
+  opponents,
   handleStartGame,
   playerId,
   ownerId,
@@ -28,11 +29,12 @@ export default function GameNotStarted({
   roomId,
   chat,
   emitChatEvent,
+  handleKickPlayer,
 }: Props) {
   const isOwner = playerId === ownerId;
 
   // Position players evenly in a circle
-  const angleStep = 360 / Math.max(playerNames.length, 1);
+  const angleStep = 360 / Math.max(opponents.length, 1);
   const radius = 200; // radius of the circle
 
   return (
@@ -49,7 +51,7 @@ export default function GameNotStarted({
           />
 
           {/* Player badges around the circle */}
-          {playerNames.map((name, index) => {
+          {opponents.map((opponent, index) => {
             const angle = angleStep * index - 90; // -90 to start from top
             const x = radius * Math.cos((angle * Math.PI) / 180);
             const y = radius * Math.sin((angle * Math.PI) / 180);
@@ -66,9 +68,19 @@ export default function GameNotStarted({
                   top: `calc(50% + ${y}px)`,
                 }}
               >
-                <div>{name}</div>
-                {ownerId === name && <Badge variant="default">Owner</Badge>}
-                {playerId === name && <Badge variant="secondary">You</Badge>}
+                <div>{opponent.name}</div>
+                {ownerId === opponent.id && <Badge variant="default">Owner</Badge>}
+                {playerId === opponent.id && <Badge variant="secondary">You</Badge>}
+                {isOwner && playerId !== opponent.id && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleKickPlayer(opponent.id)}
+                    className="ml-2"
+                  >
+                    <Image src="/kick.svg" alt="Kick" width={20} height={20} />
+                  </Button>
+                )}
               </div>
             );
           })}

@@ -1,4 +1,5 @@
 import { getAllRooms } from "../state/roomManager.ts";
+import { getNextEligiblePlayer } from "../utils/helper.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 
 export function handleDisconnect(socket: any, io: any) {
@@ -16,13 +17,25 @@ export function handleDisconnect(socket: any, io: any) {
         if (player && playerIndex !== -1) {
           room.players.splice(playerIndex, 1);
 
+          if (room.currentTurn?.id === player.id) {
+            const nextPlayer = getNextEligiblePlayer(room, playerIndex);
+            room.currentTurn = nextPlayer;
+            await sendEncryptedEvent(
+              "update_turn",
+              {
+                currentTurn: room.currentTurn,
+              },
+              roomId,
+              io
+            );
+          }
+
           await sendEncryptedEvent(
             "player_left",
             {
               roomId,
               playerName: player.name,
-              players: room.players,
-              currentTurn: room.currentTurn,
+              playerId: player.id,
             },
             roomId,
             io

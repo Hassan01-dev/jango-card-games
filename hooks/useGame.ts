@@ -28,7 +28,7 @@ import {
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
 
-const useGame = (roomIdParam: string): UseGameReturn => {
+const useGame = (roomIdParam: string) => {
   const { socket } = useSocket();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,7 +41,6 @@ const useGame = (roomIdParam: string): UseGameReturn => {
   const [playerId, setPlayerId] = useState<string>("");
   const [ownerId, setOwnerId] = useState<string>("");
   const [roomId, setRoomId] = useState<string>(roomIdParam);
-  const [joinedPlayerList, setJoinedPlayerList] = useState<string[]>([]);
   const [opponents, setOpponents] = useState<OpponentType[]>([]);
   const [myCards, setMyCards] = useState<string[]>([]);
   const [thullaOccured, setThullaOccured] = useState(false);
@@ -181,6 +180,13 @@ const useGame = (roomIdParam: string): UseGameReturn => {
           toast.error((data as ErrorType).message);
           router.replace("/professional_thula");
           break;
+        case "player_kicked":
+          handlePlayerKicked(data as { players: OpponentType[] });
+          break;
+        case "kicked":
+          toast.error("You have been kicked from the room.");
+          router.replace("/professional_thula");
+          break;
         default:
           console.warn("Unhandled event_type:", event_type);
       }
@@ -192,20 +198,25 @@ const useGame = (roomIdParam: string): UseGameReturn => {
   // Event Handlers
 
   const handleGameCreated = (data: GameCreatedDataType) => {
-    const { roomId } = data
+    const { roomId } = data;
     router.push(`/professional_thula/${roomId}`);
+  };
+
+  const handlePlayerKicked = (data: { players: OpponentType[] }) => {
+    const { players } = data;
+    setOpponents(players.filter((p) => p.id !== playerId));
   };
 
   const handlePlayCard = (data: PlayCardDataType) => {
     const { playerName, card } = data;
     setPlayedCards((prev) => [...prev, card]);
-  }
+  };
 
   const handleNonStartedGameJoined = ({
     players,
     ownerId,
   }: NonStartedRoomJoinedDataType) => {
-    setJoinedPlayerList(players.map((p) => p.name));
+    setOpponents(players.map((p) => ({ ...p, cardsCount: 0 })));
     setOwnerId(ownerId);
   };
 
@@ -215,7 +226,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     currentTurn,
   }: HandReceivedDataType) => {
     setMyCards(hand);
-    setOpponents(opponents);
+    setOpponents([...opponents, { id: playerId, name: playerName, cardsCount: hand.length }]);
     setCurrentTurn(currentTurn);
     setIsLoading(false);
   };
@@ -228,10 +239,10 @@ const useGame = (roomIdParam: string): UseGameReturn => {
 
   const handlePlayerLeft = ({
     roomId: leftRoomId,
-    playerName,
+    playerId,
   }: PlayerLeftDataType) => {
     if (leftRoomId === roomId) {
-      setJoinedPlayerList((prev) => prev.filter((name) => name !== playerName));
+      setOpponents((prev) => prev.filter((p) => p.id !== playerId));
     }
   };
 
@@ -278,8 +289,8 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     setRequestData({
       playerName,
       playerId,
-    })
-    setIsRequestReceived(true)
+    });
+    setIsRequestReceived(true);
   };
 
   const handleApproveRequest = () => {
@@ -288,23 +299,31 @@ const useGame = (roomIdParam: string): UseGameReturn => {
       requesterPlayerId: requestData?.playerId,
       playerId,
     });
-    setIsRequestReceived(false)
-    setRequestData(null)
+    setIsRequestReceived(false);
+    setRequestData(null);
   };
 
   const handleRejectRequest = () => {
     emitSecureEvent("reject_request_card", {
       roomId,
       playerName,
-      requesterPlayerId: requestData?.playerId
+      requesterPlayerId: requestData?.playerId,
     });
-    setIsRequestReceived(false)
-    setRequestData(null)
+    setIsRequestReceived(false);
+    setRequestData(null);
   };
 
   const handleRequestRejected = ({ playerName }: RequestRejectedDataType) => {
     toast.error(`${playerName} rejected your request`);
-  }
+  };
+
+  const handleKickPlayer = (kickedPlayerId: string) => {
+    emitSecureEvent("kick_player", {
+      roomId,
+      playerId: kickedPlayerId,
+      ownerId,
+    });
+  };
 
   // Game Actions
 
@@ -330,7 +349,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
   const emitJoinGame = () => {
     if (!socket || !roomId || !playerName) return;
     emitSecureEvent("join_game", { roomId, playerName, playerId });
-  }
+  };
 
   const handleCardPlayed = (card: string) => {
     setIsCardPlayed(true);
@@ -346,7 +365,9 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     }
   };
 
-  const handleRequestCard = () => emitSecureEvent("request_card", { roomId, playerId })
+  const handleRequestCard = () =>
+    emitSecureEvent("request_card", { roomId, playerId });
+
   const handleStartGame = () => emitSecureEvent("start_game", { roomId });
 
   const handleSort = (myCards: string[], setMyCards: Function) => {
@@ -362,9 +383,9 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     setMyCards(sorted);
   };
 
-  const emitChatEvent = (msgData: IMsgDataTypes) =>{
+  const emitChatEvent = (msgData: IMsgDataTypes) => {
     emitSecureEvent("game_chat", msgData);
-  }
+  };
 
   const handleChatMessage = (data: IMsgDataTypes) => {
     setChat((prev) => [...prev, data]);
@@ -385,12 +406,13 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     stopTimer();
     setTurnTimer(15);
     timerRef.current = setInterval(() => {
-      setTurnTimer(prev => {
+      setTurnTimer((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current!);
           timerRef.current = null;
           if (currentTurn.id === playerId && myCards.length > 0) {
-            const randomCard = myCards[Math.floor(Math.random() * myCards.length)];
+            const randomCard =
+              myCards[Math.floor(Math.random() * myCards.length)];
             handleCardPlayed(randomCard);
           }
           return 0;
@@ -404,7 +426,6 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     playerId,
     playerName,
     roomId,
-    joinedPlayerList,
     ownerId,
     opponents,
     myCards,
@@ -425,7 +446,6 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     joinGame,
     setPlayerName,
     setRoomId,
-    setJoinedPlayerList,
     setOwnerId,
     setMyCards,
     setOpponents,
@@ -445,6 +465,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     emitChatEvent,
     handleApproveRequest,
     handleRejectRequest,
+    handleKickPlayer,
   };
 };
 
