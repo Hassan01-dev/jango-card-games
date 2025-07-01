@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import GameNotStarted from "./GameNotStarted";
 import GameStarted from "./GameStarted";
@@ -41,6 +41,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     requestData,
     turnTimer,
     handleKickPlayer,
+    nextTurn,
   } = useGame(roomIdParam);
 
   useEffect(() => {
@@ -83,6 +84,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       turnTimer={turnTimer}
       handleKickPlayer={handleKickPlayer}
       ownerId={ownerId}
+      nextTurn={nextTurn}
     />
   ) : (
     <GameNotStarted

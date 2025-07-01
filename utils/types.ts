@@ -67,6 +67,7 @@ export type HandReceivedDataType = {
 
 export type UpdateTurnDataType = {
   currentTurn: TurnType;
+  nextTurn: TurnType;
   playersDetail: OpponentType[];
 };
 

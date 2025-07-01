@@ -4,7 +4,7 @@ import Image from "next/image";
 import GameChat from "./GameChat";
 import Confetti from "react-confetti";
 import { useEffect } from "react";
-import { IMsgDataTypes, OpponentType, RequestReceivedDataType } from "@/utils/types";
+import { IMsgDataTypes, OpponentType, RequestReceivedDataType, TurnType } from "@/utils/types";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,8 @@ export default function GameStarted({
   requestData,
   turnTimer,
   handleKickPlayer,
-  ownerId
+  ownerId,
+  nextTurn
 }: {
   roomId: string;
   playerId: string;
@@ -59,6 +60,7 @@ export default function GameStarted({
   turnTimer: number;
   handleKickPlayer: (playerId: string) => void;
   ownerId: string;
+  nextTurn: TurnType;
 }) {
   const playerName =
     typeof window !== "undefined"
@@ -76,7 +78,8 @@ export default function GameStarted({
   const angleStep = 360 / Math.max(opponents.length, 1);
   const isOwner = playerId === ownerId;
 
-  console.log(isOwner, playerId, ownerId, playerName);
+
+  console.log(nextTurn, opponents)
 
   return (
     <>
@@ -87,7 +90,7 @@ export default function GameStarted({
             Game Table
           </div>
 
-          <div>{turnTimer}</div>
+          {/* <div>{turnTimer}</div> */}
 
           {isLoading && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -146,12 +149,21 @@ export default function GameStarted({
               <p>{looser} lost the game!</p>
             </div>
           )}
-
-          <div className="mt-4 px-4">
-            <div className="turn-indicator text-white bg-green-700/50 px-6 py-2 rounded-full shadow">
-              <span className="animate-pulse inline-block w-3 h-3 bg-green-400 rounded-full mr-2" />
-              {currentTurn.id === playerId ? "Your" : `${currentTurn.name}'s`}{" "}
-              Turn
+          <div className="mt-6 px-6">
+            <div className="relative turn-indicator text-white bg-gradient-to-r from-emerald-600/60 to-green-600/60 px-8 py-3 rounded-full shadow-lg backdrop-blur-sm border border-emerald-500/20">
+              <div 
+                className="absolute left-0 top-0 h-full bg-gradient-to-r from-emerald-500/80 to-green-500/80 rounded-full transition-all duration-1000 ease-in-out"
+                style={{
+                  width: `${(turnTimer / 15) * 100}%`
+                }}
+              />
+              <div className="relative z-10 flex items-center justify-center font-medium tracking-wide">
+                <span className="animate-pulse inline-block w-3 h-3 bg-emerald-300 rounded-full mr-3 shadow-lg shadow-emerald-500/50" />
+                <span className="text-emerald-50">
+                  {currentTurn.id === playerId ? "Your" : `${currentTurn.name}'s`}{" "}
+                  Turn
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -197,7 +209,7 @@ export default function GameStarted({
           );
         })}
 
-        {myCards.length < 5 && (
+        {(opponents.find((opponent) => opponent.id === nextTurn.id)?.cardsCount || 6) < 5 && !isLoading && (
           <div>
             <Button
               onClick={handleRequestCard}

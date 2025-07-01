@@ -83,10 +83,12 @@ export async function handlePlayCard(
       room.noOfTurns = 0;
 
       room.currentTurn = { id: highest.playerId, name: highest.playerName };
+      const nextNextPlayer = getNextEligiblePlayer(room, room.players.findIndex((p) => p.id === highest.playerId) + 1);
       await sendEncryptedEvent(
         "update_turn",
         {
           currentTurn: room.currentTurn,
+          nextTurn: { id: nextNextPlayer?.id, name: nextNextPlayer?.name },
           playersDetail: room.players.map((p) => ({
             id: p.id,
             name: p.name,
@@ -112,9 +114,11 @@ export async function handlePlayCard(
       await sendEncryptedEvent("empty_table", {}, roomId, io);
 
       let nextTurnPlayer = room.players.find((p) => p.id === highest.playerId);
+      let nextNextPlayer;
       if (!nextTurnPlayer || nextTurnPlayer.isWon) {
         const startIndex = room.players.findIndex((p) => p.id === playerId);
         nextTurnPlayer = getNextEligiblePlayer(room, startIndex);
+        nextNextPlayer = getNextEligiblePlayer(room, startIndex + 1);
       }
 
       if (!nextTurnPlayer) {
@@ -129,6 +133,7 @@ export async function handlePlayCard(
         "update_turn",
         {
           currentTurn: room.currentTurn,
+          nextTurn: { id: nextNextPlayer?.id, name: nextNextPlayer?.name },
           playersDetail: room.players.map((p) => ({
             id: p.id,
             name: p.name,
@@ -145,6 +150,7 @@ export async function handlePlayCard(
     // Pass to next eligible player
     const currentIndex = room.players.findIndex((p) => p.id === playerId);
     const nextPlayer = getNextEligiblePlayer(room, currentIndex);
+    const nextNextPlayer = getNextEligiblePlayer(room, currentIndex + 1);
     if (!nextPlayer) {
       throw new Error("No next player found");
     }
@@ -154,6 +160,7 @@ export async function handlePlayCard(
       "update_turn",
       {
         currentTurn: room.currentTurn,
+        nextTurn: nextNextPlayer,
         playersDetail: room.players.map((p) => ({
           id: p.id,
           name: p.name,

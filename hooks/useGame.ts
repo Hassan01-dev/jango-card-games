@@ -51,6 +51,10 @@ const useGame = (roomIdParam: string) => {
     id: "",
     name: "",
   });
+  const [nextTurn, setNextTurn] = useState<TurnType>({
+    id: "",
+    name: "",
+  });
   const [gameOver, setGameOver] = useState(false);
   const [looser, setLooser] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -254,8 +258,10 @@ const useGame = (roomIdParam: string) => {
   const handleUpdateTurn = ({
     currentTurn,
     playersDetail,
+    nextTurn,
   }: UpdateTurnDataType) => {
     setCurrentTurn(currentTurn);
+    setNextTurn(nextTurn);
     setIsCardPlayed(false);
     setOpponents(playersDetail.filter((p) => p.id !== playerId));
     startTimer(currentTurn);
@@ -476,6 +482,7 @@ const startTimer = (currentTurn: TurnType) => {
     handleApproveRequest,
     handleRejectRequest,
     handleKickPlayer,
+    nextTurn,
   };
 };
 

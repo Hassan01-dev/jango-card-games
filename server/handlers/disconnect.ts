@@ -19,11 +19,18 @@ export function handleDisconnect(socket: any, io: any) {
 
           if (room.currentTurn?.id === player.id) {
             const nextPlayer = getNextEligiblePlayer(room, playerIndex);
+            const nextNextPlayer = getNextEligiblePlayer(room, playerIndex + 1);
             room.currentTurn = nextPlayer;
             await sendEncryptedEvent(
               "update_turn",
               {
                 currentTurn: room.currentTurn,
+                nextTurn: { id: nextNextPlayer?.id, name: nextNextPlayer?.name },
+                playersDetail: room.players.map((p) => ({
+                  id: p.id,
+                  name: p.name,
+                  cardsCount: p.cards.length,
+                })),
               },
               roomId,
               io

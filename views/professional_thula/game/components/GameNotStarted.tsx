@@ -73,7 +73,7 @@ export default function GameNotStarted({
                 {playerId === opponent.id && <Badge variant="secondary">You</Badge>}
                 {isOwner && playerId !== opponent.id && (
                   <Button
-                    variant="destructive"
+                    variant="ghost"
                     size="sm"
                     onClick={() => handleKickPlayer(opponent.id)}
                     className="ml-2"
