@@ -21,9 +21,9 @@ export default function RootLayout({
       <head>
          <meta
           name="google-adsense-account"
-          content="ca-pub-8741211413490579"
+          content="ca-pub-3901174951575931"
         />
-        <AdSense pId="8741211413490579"/>
+        <AdSense pId="3901174951575931"/>
       </head>
       <body className={inter.className}>
         <Toaster position="top-center" reverseOrder={true} />
