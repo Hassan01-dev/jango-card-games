@@ -38,7 +38,8 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     isRequestReceived,
     handleApproveRequest,
     handleRejectRequest,
-    requestData
+    requestData,
+    turnTimer
   } = useGame(roomIdParam);
 
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       handleApproveRequest={handleApproveRequest}
       handleRejectRequest={handleRejectRequest}
       requestData={requestData}
+      turnTimer={turnTimer}
     />
   ) : (
     <GameNotStarted

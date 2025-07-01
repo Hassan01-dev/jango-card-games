@@ -107,6 +107,8 @@ export type PlayCardDataType = {
   card: string;
 }
 
+export type PlayerLeftDataType = { roomId: string; playerName: string }
+
 export type UseGameReturn = {
   playerId: string;
   playerName: string;
@@ -127,6 +129,7 @@ export type UseGameReturn = {
   chat: IMsgDataTypes[];
   isRequestReceived: boolean;
   requestData: RequestReceivedDataType | null;
+  turnTimer: number;
   createGame: () => void;
   joinGame: () => void;
   setPlayerName: (name: string) => void;

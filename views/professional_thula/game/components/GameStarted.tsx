@@ -30,7 +30,8 @@ export default function GameStarted({
   isRequestReceived,
   handleApproveRequest,
   handleRejectRequest,
-  requestData
+  requestData,
+  turnTimer
 }: {
   roomId: string;
   playerId: string;
@@ -53,6 +54,7 @@ export default function GameStarted({
   handleApproveRequest: () => void;
   handleRejectRequest: () => void;
   requestData: RequestReceivedDataType | null;
+  turnTimer: number
 }) {
   const playerName =
     typeof window !== "undefined"
@@ -77,6 +79,8 @@ export default function GameStarted({
           <div className="text-2xl sm:text-3xl font-bold text-white mb-4">
             Game Table
           </div>
+
+          <div>{turnTimer}</div>
 
           {isLoading && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">

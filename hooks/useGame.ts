@@ -23,6 +23,7 @@ import {
   RequestRejectedDataType,
   ErrorType,
   PlayCardDataType,
+  PlayerLeftDataType,
 } from "@/utils/types";
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
@@ -55,6 +56,8 @@ const useGame = (roomIdParam: string): UseGameReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCardPlayed, setIsCardPlayed] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [turnTimer, setTurnTimer] = useState(15);
+  const timerRef = useRef<NodeJS.Timeout | null>(null); 
   const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -90,7 +93,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
   }, [socket]);
 
   useEffect(() => {
-    if (!roomId) return; 
+    if (!roomId) return;
 
     if (currentTurn?.id === playerId) {
       const audio = new Audio("/turn.wav");
@@ -98,6 +101,19 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     }
   }, [roomId, currentTurn, playerId]);
 
+  useEffect(() => {
+    if (gameStarted && !isLoading) {
+      startTimer();
+    } else {
+      stopTimer();
+    }
+  }, [gameStarted, isLoading]);
+
+  useEffect(() => {
+    return () => {
+      stopTimer();
+    };
+  }, []);
 
   const emitSecureEvent = async (event_type: string, data: any) => {
     const encrypted = await encryptPayload({ event_type, data });
@@ -109,7 +125,6 @@ const useGame = (roomIdParam: string): UseGameReturn => {
       const { event_type, data } = (await decryptPayload(
         payload
       )) as DecryptedPayload;
-
       switch (event_type) {
         case "game_created":
           handleGameCreated(data as GameCreatedDataType);
@@ -127,7 +142,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
           handleStartedRoomJoined(data as StartedRoomJoinedDataType);
           break;
         case "player_left":
-          handlePlayerLeft(data as { roomId: string; playerName: string });
+          handlePlayerLeft(data as PlayerLeftDataType);
           break;
         case "update_turn":
           handleUpdateTurn(data as UpdateTurnDataType);
@@ -163,8 +178,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
           handlePlayCard(data as PlayCardDataType);
           break;
         case "error":
-          const error = data as ErrorType;
-          toast.error(error.message);
+          toast.error((data as ErrorType).message);
           router.replace("/professional_thula");
           break;
         default:
@@ -215,10 +229,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
   const handlePlayerLeft = ({
     roomId: leftRoomId,
     playerName,
-  }: {
-    roomId: string;
-    playerName: string;
-  }) => {
+  }: PlayerLeftDataType) => {
     if (leftRoomId === roomId) {
       setJoinedPlayerList((prev) => prev.filter((name) => name !== playerName));
     }
@@ -231,6 +242,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     setCurrentTurn(currentTurn);
     setIsCardPlayed(false);
     setOpponents(playersDetail.filter((p) => p.id !== playerId));
+    startTimer();
   };
 
   const handlePlayedCards = ({ card }: CardPlayedDataType) => {
@@ -328,6 +340,10 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     if (remaining.length === 0) {
       emitSecureEvent("won", { roomId, playerName });
     }
+
+    if (currentTurn.id === playerId) {
+      stopTimer();
+    }
   };
 
   const handleRequestCard = () => emitSecureEvent("request_card", { roomId, playerId })
@@ -357,6 +373,33 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     }
   };
 
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setTurnTimer(0);
+  };
+
+  const startTimer = () => {
+    stopTimer();
+    setTurnTimer(15);
+    timerRef.current = setInterval(() => {
+      setTurnTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          timerRef.current = null;
+          if (currentTurn.id === playerId && myCards.length > 0) {
+            const randomCard = myCards[Math.floor(Math.random() * myCards.length)];
+            handleCardPlayed(randomCard);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   return {
     playerId,
     playerName,
@@ -377,6 +420,7 @@ const useGame = (roomIdParam: string): UseGameReturn => {
     chat,
     isRequestReceived,
     requestData,
+    turnTimer,
     createGame,
     joinGame,
     setPlayerName,
