@@ -7,7 +7,7 @@ import { handleDisconnect } from "./handlers/disconnect.ts";
 
 const io = new Server({
   cors: {
-    origin: ["https://jango-card-games.vercel.app", "http://localhost:3000", "https://playlab.live"],
+    origin: ["http://localhost:3000", "https://cards.playlab.live"],
   },
 });
 
