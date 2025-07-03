@@ -19,7 +19,8 @@ export type EventType =
   | "play_card"
   | "player_kicked"
   | "kicked"
-  | "auto_card_played";
+  | "auto_card_played"
+  | "game_won";
 
 export type GameCreatedDataType = {
   roomId: string;
@@ -141,6 +142,7 @@ export type UseGameReturn = {
   isRequestReceived: boolean;
   requestData: RequestReceivedDataType | null;
   turnTimer: number;
+  isWinner: boolean;
   createGame: () => void;
   joinGame: () => void;
   setPlayerName: (name: string) => void;

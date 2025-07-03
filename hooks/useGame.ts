@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { encryptPayload, decryptPayload } from "@/utils/crypto";
 import {
-  UseGameReturn,
   GameCreatedDataType,
   DecryptedPayload,
   EncryptedPayload,
@@ -56,6 +55,7 @@ const useGame = (roomIdParam: string) => {
     name: "",
   });
   const [gameOver, setGameOver] = useState(false);
+  const [isWinner, setIsWinner] = useState(false);
   const [looser, setLooser] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isCardPlayed, setIsCardPlayed] = useState(false);
@@ -196,6 +196,9 @@ const useGame = (roomIdParam: string) => {
           toast.error("You have been kicked from the room.");
           router.replace("/professional_thula");
           break;
+        case "game_won":
+          setIsWinner(true);
+          break;
         default:
           console.warn("Unhandled event_type:", event_type);
       }
@@ -305,6 +308,8 @@ const useGame = (roomIdParam: string) => {
   };
 
   const handleApproveRequest = () => {
+    if(isWinner) return toast.error("You can't approve request when you are winner");
+
     emitSecureEvent("approve_request_card", {
       roomId,
       requesterPlayerId: requestData?.playerId,
@@ -315,6 +320,8 @@ const useGame = (roomIdParam: string) => {
   };
 
   const handleRejectRequest = () => {
+    if(isWinner) return toast.error("You can't reject request when you are winner");
+
     emitSecureEvent("reject_request_card", {
       roomId,
       playerName,
@@ -363,21 +370,22 @@ const useGame = (roomIdParam: string) => {
   };
 
   const handleCardPlayed = (card: string) => {
+    if(isWinner) return toast.error("You can't play card when you are winner");
+
     setIsCardPlayed(true);
     const remaining = myCards.filter((c) => c !== card);
     setMyCards(remaining);
     emitSecureEvent("play_card", { roomId, playerName, card, playerId });
-    if (remaining.length === 0) {
-      emitSecureEvent("won", { roomId, playerName });
-    }
 
     if (currentTurn.id === playerId) {
       stopTimer();
     }
   };
 
-  const handleRequestCard = () =>
+  const handleRequestCard = () => {
+    if(isWinner) return toast.error("You can't request card when you are winner");
     emitSecureEvent("request_card", { roomId, playerId });
+  }
 
   const handleStartGame = () => emitSecureEvent("start_game", { roomId });
 
@@ -477,6 +485,8 @@ const startTimer = (currentTurn: TurnType) => {
     isRequestReceived,
     requestData,
     turnTimer,
+    isWinner,
+    nextTurn,
     createGame,
     joinGame,
     setPlayerName,
@@ -500,8 +510,7 @@ const startTimer = (currentTurn: TurnType) => {
     emitChatEvent,
     handleApproveRequest,
     handleRejectRequest,
-    handleKickPlayer,
-    nextTurn,
+    handleKickPlayer
   };
 };
 

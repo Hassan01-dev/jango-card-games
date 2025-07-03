@@ -51,6 +51,14 @@ export async function handlePlayCard(
     if (parsed.suit !== leadSuit && !room.isFirstTurn) {
       await waitFor();
       await sendEncryptedEvent("play_card", { playerName, card }, roomId, io);
+      for (const player of room.players) {
+        console.log("For Player", player.name, player.isWon, player.cards.length);
+        if (player.cards.length === 0 && !player.isWon) {
+          player.isWon = true;
+          await sendEncryptedEvent("player_won", { playerName: player.name }, roomId, io);
+          await sendEncryptedEvent("game_won", {}, player.socketId, io);
+        }
+      }
       await sendEncryptedEvent(
         "thulla",
         {
@@ -112,6 +120,15 @@ export async function handlePlayCard(
       room.isFirstTurn = false;
       await waitFor();
       await sendEncryptedEvent("empty_table", {}, roomId, io);
+
+      for (const player of room.players) {
+        console.log("For Player", player.name, player.isWon, player.cards.length);
+        if (player.cards.length === 0 && !player.isWon) {
+          player.isWon = true;
+          await sendEncryptedEvent("player_won", { playerName: player.name }, roomId, io);
+          await sendEncryptedEvent("game_won", {}, player.socketId, io);
+        }
+      }
 
       let nextTurnPlayer = room.players.find((p) => p.id === highest.playerId);
       let nextNextPlayer;

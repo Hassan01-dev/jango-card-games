@@ -4,9 +4,21 @@ import Image from "next/image";
 import GameChat from "./GameChat";
 import Confetti from "react-confetti";
 import { useEffect } from "react";
-import { IMsgDataTypes, OpponentType, RequestReceivedDataType, TurnType } from "@/utils/types";
+import {
+  IMsgDataTypes,
+  OpponentType,
+  RequestReceivedDataType,
+  TurnType,
+} from "@/utils/types";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogDescription,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 export default function GameStarted({
@@ -34,7 +46,8 @@ export default function GameStarted({
   turnTimer,
   handleKickPlayer,
   ownerId,
-  nextTurn
+  nextTurn,
+  isWinner,
 }: {
   roomId: string;
   playerId: string;
@@ -61,6 +74,7 @@ export default function GameStarted({
   handleKickPlayer: (playerId: string) => void;
   ownerId: string;
   nextTurn: TurnType;
+  isWinner: boolean;
 }) {
   const playerName =
     typeof window !== "undefined"
@@ -77,9 +91,6 @@ export default function GameStarted({
   const radius = 270;
   const angleStep = 360 / Math.max(opponents.length, 1);
   const isOwner = playerId === ownerId;
-
-
-  console.log(nextTurn, opponents)
 
   return (
     <>
@@ -151,16 +162,18 @@ export default function GameStarted({
           )}
           <div className="mt-6 px-6">
             <div className="relative turn-indicator text-white bg-gradient-to-r from-emerald-600/60 to-green-600/60 px-8 py-3 rounded-full shadow-lg backdrop-blur-sm border border-emerald-500/20">
-              <div 
+              <div
                 className="absolute left-0 top-0 h-full bg-gradient-to-r from-emerald-500/80 to-green-500/80 rounded-full transition-all duration-1000 ease-in-out"
                 style={{
-                  width: `${(turnTimer / 15) * 100}%`
+                  width: `${(turnTimer / 15) * 100}%`,
                 }}
               />
               <div className="relative z-10 flex items-center justify-center font-medium tracking-wide">
                 <span className="animate-pulse inline-block w-3 h-3 bg-emerald-300 rounded-full mr-3 shadow-lg shadow-emerald-500/50" />
                 <span className="text-emerald-50">
-                  {currentTurn.id === playerId ? "Your" : `${currentTurn.name}'s`}{" "}
+                  {currentTurn.id === playerId
+                    ? "Your"
+                    : `${currentTurn.name}'s`}{" "}
                   Turn
                 </span>
               </div>
@@ -209,86 +222,93 @@ export default function GameStarted({
           );
         })}
 
-        {(opponents.find((opponent) => opponent.id === nextTurn.id)?.cardsCount || 6) < 5 && !isLoading && (
-          <div>
-            <Button
-              onClick={handleRequestCard}
-              className="absolute bottom-[15%] left-4"
-            >
-              Request Card
-            </Button>
-          </div>
-        )}
+        {!isWinner &&
+          (opponents.find((opponent) => opponent.id === nextTurn.id)
+            ?.cardsCount || 6) < 5 &&
+          !isLoading && (
+            <div>
+              <Button
+                onClick={handleRequestCard}
+                className="absolute bottom-[15%] left-4"
+              >
+                Request Card
+              </Button>
+            </div>
+          )}
 
         {/* Player Cards at Bottom */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-5xl px-4">
-          <div className="flex items-center gap-4 mb-2">
-            <div
-              className={cn(
-                "w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-xl font-bold text-white",
-                currentTurn.id === playerId &&
-                  "ring-2 ring-yellow-400 animate-pulse"
-              )}
-            >
-              {playerName?.[0]?.toUpperCase()}
-            </div>
-            <div className="text-white">
-              <h3 className="text-lg font-semibold">{playerName}</h3>
-              <p className="text-green-300 text-sm">Cards: {myCards.length}</p>
-              <button
-                onClick={() => handleSort(playingSuit)}
-                className="text-sm underline"
+        {!isWinner && (
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-5xl px-4">
+            <div className="flex items-center gap-4 mb-2">
+              <div
+                className={cn(
+                  "w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-xl font-bold text-white",
+                  currentTurn.id === playerId &&
+                    "ring-2 ring-yellow-400 animate-pulse"
+                )}
               >
-                Sort
-              </button>
+                {playerName?.[0]?.toUpperCase()}
+              </div>
+              <div className="text-white">
+                <h3 className="text-lg font-semibold">{playerName}</h3>
+                <p className="text-green-300 text-sm">
+                  Cards: {myCards.length}
+                </p>
+                <button
+                  onClick={() => handleSort(playingSuit)}
+                  className="text-sm underline"
+                >
+                  Sort
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-center relative min-h-[200px]">
+              {myCards.map((card, index) => {
+                const middleIndex = Math.floor(myCards.length / 2);
+                const rotation = index - middleIndex;
+                const [, , suit] = card.split("_");
+
+                const isPlayerTurn = currentTurn.id === playerId;
+                const hasLeadSuit = myCards.some(
+                  (c) => c.split("_")[2] === playingSuit
+                );
+                const mustFollowSuit = !!playingSuit && hasLeadSuit;
+                const isDisabled =
+                  !isPlayerTurn ||
+                  (mustFollowSuit && suit !== playingSuit) ||
+                  isCardPlayed;
+
+                return (
+                  <div
+                    key={index}
+                    className={`relative transition duration-300 ${
+                      isDisabled
+                        ? "cursor-not-allowed brightness-50"
+                        : "cursor-pointer"
+                    }`}
+                    style={{
+                      transform: `rotate(${rotation}deg)`,
+                      zIndex: index,
+                      marginLeft: index === 0 ? 0 : "-30px",
+                    }}
+                    onClick={() => {
+                      if (!isDisabled) handleCardPlayed(card);
+                    }}
+                  >
+                    <Image
+                      src={`/images/card_images/${card}.png`}
+                      alt={card}
+                      width={100}
+                      height={150}
+                      className="rounded-lg shadow-lg hover:shadow-2xl transform hover:-translate-y-4 transition-all"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
-
-          <div className="flex justify-center relative min-h-[200px]">
-            {myCards.map((card, index) => {
-              const middleIndex = Math.floor(myCards.length / 2);
-              const rotation = index - middleIndex;
-              const [, , suit] = card.split("_");
-
-              const isPlayerTurn = currentTurn.id === playerId;
-              const hasLeadSuit = myCards.some(
-                (c) => c.split("_")[2] === playingSuit
-              );
-              const mustFollowSuit = !!playingSuit && hasLeadSuit;
-              const isDisabled =
-                !isPlayerTurn ||
-                (mustFollowSuit && suit !== playingSuit) ||
-                isCardPlayed;
-
-              return (
-                <div
-                  key={index}
-                  className={`relative transition duration-300 ${
-                    isDisabled
-                      ? "cursor-not-allowed brightness-50"
-                      : "cursor-pointer"
-                  }`}
-                  style={{
-                    transform: `rotate(${rotation}deg)`,
-                    zIndex: index,
-                    marginLeft: index === 0 ? 0 : "-30px",
-                  }}
-                  onClick={() => {
-                    if (!isDisabled) handleCardPlayed(card);
-                  }}
-                >
-                  <Image
-                    src={`/images/card_images/${card}.png`}
-                    alt={card}
-                    width={100}
-                    height={150}
-                    className="rounded-lg shadow-lg hover:shadow-2xl transform hover:-translate-y-4 transition-all"
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        )}
 
         {/* Chat Area */}
         <div className="absolute right-4 bottom-4 w-76">

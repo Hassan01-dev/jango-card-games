@@ -42,6 +42,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     turnTimer,
     handleKickPlayer,
     nextTurn,
+    isWinner
   } = useGame(roomIdParam);
 
   useEffect(() => {
@@ -85,6 +86,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       handleKickPlayer={handleKickPlayer}
       ownerId={ownerId}
       nextTurn={nextTurn}
+      isWinner={isWinner}
     />
   ) : (
     <GameNotStarted

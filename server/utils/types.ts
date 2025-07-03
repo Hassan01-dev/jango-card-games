@@ -61,11 +61,6 @@ export type StartGameEventData = {
   roomId: string;
 };
 
-export type WonEventData = {
-  roomId: string;
-  playerName: string;
-};
-
 export type RequestCardEventData = {
   roomId: string;
   playerId: string;

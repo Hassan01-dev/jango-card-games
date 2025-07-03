@@ -3,7 +3,6 @@ import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 import { handleCreateRoomEvent } from "./handleCreateGame.ts";
 import { handleGameChat } from "./gameChat.ts";
 import { handlePlayCard } from "./playCard.ts";
-import { handleWon } from "./won.ts";
 import { handleStartGame } from "./handleStartGame.ts";
 import { handleJoinGame } from "./handleJoinGame.ts";
 import {
@@ -19,7 +18,6 @@ import {
   GameChatEventData,
   PlayCardEventData,
   StartGameEventData,
-  WonEventData,
   RequestCardEventData,
   ApproveRequestCardEventData,
   RejectRequestCardEventData,
@@ -49,9 +47,6 @@ export function handleSecureEvent(socket: any, io: any) {
           break;
         case "start_game":
           await handleStartGame(socket, io, data as StartGameEventData);
-          break;
-        case "won":
-          await handleWon(socket, io, data as WonEventData);
           break;
         case "request_card":
           await handleRequestCard(socket, io, data as RequestCardEventData);
