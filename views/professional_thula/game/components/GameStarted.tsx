@@ -48,6 +48,7 @@ export default function GameStarted({
   ownerId,
   nextTurn,
   isWinner,
+  handleSendAudioMessage
 }: {
   roomId: string;
   playerId: string;
@@ -75,6 +76,7 @@ export default function GameStarted({
   ownerId: string;
   nextTurn: TurnType;
   isWinner: boolean;
+  handleSendAudioMessage: (key: string) => void;
 }) {
   const playerName =
     typeof window !== "undefined"
@@ -83,7 +85,7 @@ export default function GameStarted({
 
   useEffect(() => {
     if (thullaOccured) {
-      const audio = new Audio("/thulla_shaheer.mp3");
+      const audio = new Audio("/thulla.wav");
       audio.play();
     }
   }, [thullaOccured]);
@@ -242,6 +244,7 @@ export default function GameStarted({
               roomId={roomId}
               chat={chat}
               emitChatEvent={emitChatEvent}
+              handleSendAudioMessage={handleSendAudioMessage}
             />
           </div>
         </div>

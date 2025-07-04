@@ -199,6 +199,9 @@ const useGame = (roomIdParam: string) => {
         case "game_won":
           setIsWinner(true);
           break;
+        case "audio_message":
+          handleAudioMessage(data as {audioKey: string});
+          break;
         default:
           console.warn("Unhandled event_type:", event_type);
       }
@@ -208,6 +211,11 @@ const useGame = (roomIdParam: string) => {
   };
 
   // Event Handlers
+  const handleAudioMessage = (data: {audioKey: string}) => {
+    const { audioKey } = data;
+    const audio = new Audio(`/audio/${audioKey}.mp3`);
+    audio.play().catch((e) => console.error("Audio play failed:", e));
+  };
 
   const handleGameCreated = (data: GameCreatedDataType) => {
     const { roomId } = data;
@@ -465,6 +473,13 @@ const startTimer = (currentTurn: TurnType) => {
     setMyCards((prev) => prev.filter(card => card !== data.playedCard));
   }
 
+  const handleSendAudioMessage = (audioKey: string) => {
+    emitSecureEvent("audio_message", {
+      roomId,
+      audioKey
+    });
+  }
+
   return {
     playerId,
     playerName,
@@ -510,7 +525,8 @@ const startTimer = (currentTurn: TurnType) => {
     emitChatEvent,
     handleApproveRequest,
     handleRejectRequest,
-    handleKickPlayer
+    handleKickPlayer,
+    handleSendAudioMessage
   };
 };
 

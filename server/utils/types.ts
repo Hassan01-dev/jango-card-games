@@ -84,6 +84,11 @@ export type KickPlayerEventData = {
   ownerId: string;
 };
 
+export type AudioMessageType = {
+  roomId: string;
+  audioKey: string;
+};
+
 export type EventType =
   | "create_room"
   | "join_game"
@@ -96,7 +101,8 @@ export type EventType =
   | "approve_request_card"
   | "reject_request_card"
   | "kick_player"
-  | "auto_play_card";
+  | "auto_play_card"
+  | "audio_message";
 
 export type SecureEventPayload = {
   event_type: EventType;

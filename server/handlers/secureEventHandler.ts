@@ -22,8 +22,10 @@ import {
   ApproveRequestCardEventData,
   RejectRequestCardEventData,
   KickPlayerEventData,
+  AudioMessageType,
 } from "../utils/types.ts";
 import { handeleAutoPlayCard } from "./handleAutoPlayCard.ts";
+import { handleAudioMessage } from "./handleAudioMessage.ts";
 
 export function handleSecureEvent(socket: any, io: any) {
   socket.on("secure_event", async (encryptedPayload: string) => {
@@ -70,6 +72,9 @@ export function handleSecureEvent(socket: any, io: any) {
           break;
         case "auto_play_card":
           await handeleAutoPlayCard(socket, io, data as { roomId: string });
+          break;
+        case "audio_message":
+          await handleAudioMessage(socket, io, data as AudioMessageType);
           break;
         default:
           console.warn("Unknown event_type:", event_type);

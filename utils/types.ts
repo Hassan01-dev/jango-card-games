@@ -20,7 +20,8 @@ export type EventType =
   | "player_kicked"
   | "kicked"
   | "auto_card_played"
-  | "game_won";
+  | "game_won"
+  | "audio_message";
 
 export type GameCreatedDataType = {
   roomId: string;
@@ -168,4 +169,5 @@ export type UseGameReturn = {
   handleApproveRequest: () => void;
   handleRejectRequest: () => void;
   handleKickPlayer: (kickedPlayerId: string) => void;
+  handleSendAudioMessage: (key: string) => void;
 };

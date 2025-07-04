@@ -41,6 +41,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     requestData,
     turnTimer,
     handleKickPlayer,
+    handleSendAudioMessage,
     nextTurn,
     isWinner
   } = useGame(roomIdParam);
@@ -87,6 +88,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       ownerId={ownerId}
       nextTurn={nextTurn}
       isWinner={isWinner}
+      handleSendAudioMessage={handleSendAudioMessage}
     />
   ) : (
     <GameNotStarted
@@ -99,6 +101,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       chat={chat}
       emitChatEvent={emitChatEvent}
       handleKickPlayer={handleKickPlayer}
+      handleSendAudioMessage={handleSendAudioMessage}
     />
   );
 }

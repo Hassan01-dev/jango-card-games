@@ -18,6 +18,7 @@ interface Props {
   chat: IMsgDataTypes[];
   emitChatEvent: (msgData: IMsgDataTypes) => void;
   handleKickPlayer: (playerId: string) => void;
+  handleSendAudioMessage: (key: string) => void;
 }
 
 export default function GameNotStarted({
@@ -30,6 +31,7 @@ export default function GameNotStarted({
   chat,
   emitChatEvent,
   handleKickPlayer,
+  handleSendAudioMessage
 }: Props) {
   const isOwner = playerId === ownerId;
 
@@ -97,12 +99,13 @@ export default function GameNotStarted({
         </div>
       </div>
 
-      <div className="absolute right-4 bottom-4 w-76">
+      <div className="absolute right-4 bottom-1/3 w-76">
         <GameChat
           playerName={playerName}
           roomId={roomId}
           chat={chat}
           emitChatEvent={emitChatEvent}
+          handleSendAudioMessage={handleSendAudioMessage}
         />
       </div>
     </>
