@@ -94,176 +94,197 @@ export default function GameStarted({
 
   return (
     <>
-      <div className="w-full h-screen bg-gradient-to-b from-green-950 to-green-800 overflow-y-auto">
-        {/* Game Table in Center */}
-        <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-green-800 to-green-900 rounded-full shadow-2xl border border-green-600/30 backdrop-blur-sm flex flex-col items-center justify-center z-10">
-          <div className="text-2xl sm:text-3xl font-bold text-white mb-4">
-            Game Table
+      <div className="relative w-full h-screen bg-gradient-to-b from-green-950 to-green-800 grid grid-rows-[9fr_3fr]">
+        {/* Top Section: Game Table + Chat */}
+        <div className="grid grid-cols-[10fr_2fr] w-full h-full px-9">
+          {/* Game Table */}
+          <div className="relative flex items-center justify-center">
+            <div className="relative w-[400px] h-[400px]">
+              <div className="w-full h-full bg-gradient-to-br from-green-800 to-green-900 rounded-full shadow-2xl border border-green-600/30 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+                <div className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                  Game Table
+                </div>
+
+                {isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Image
+                      src="/dealing.gif"
+                      alt="Loading"
+                      width={200}
+                      height={200}
+                      className="rounded-2xl"
+                    />
+                  </div>
+                )}
+
+                {!gameOver && (
+                  <div className="relative h-[200px] w-full flex justify-center items-center">
+                    {playedCards.map((card, index) => (
+                      <div
+                        key={index}
+                        className="absolute transition-all duration-300"
+                        style={{
+                          transform: `rotate(${
+                            (index - playedCards.length / 2) * 15
+                          }deg) translateY(${index * 2}px)`,
+                          zIndex: index,
+                        }}
+                      >
+                        <Image
+                          src={`/images/card_images/${card}.png`}
+                          alt={card}
+                          width={120}
+                          height={168}
+                          className="rounded-xl shadow-lg hover:shadow-2xl"
+                          style={{
+                            filter:
+                              "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
+                            backfaceVisibility: "hidden",
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {thullaOccured && (
+                  <Image
+                    src="/thulla.gif"
+                    alt="Thulla"
+                    width={200}
+                    height={200}
+                    className="mt-4"
+                  />
+                )}
+
+                {gameOver && (
+                  <div className="absolute bg-white p-6 rounded-lg shadow-xl z-50">
+                    <h2 className="text-xl font-bold mb-2">Game Over</h2>
+                    <p>{looser} lost the game!</p>
+                  </div>
+                )}
+
+                <div className="mt-6 px-6">
+                  <div className="relative turn-indicator text-white bg-gradient-to-r from-emerald-600/60 to-green-600/60 px-8 py-3 rounded-full shadow-lg backdrop-blur-sm border border-emerald-500/20">
+                    <div
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-emerald-500/80 to-green-500/80 rounded-full transition-all duration-1000 ease-in-out"
+                      style={{
+                        width: `${(turnTimer / 15) * 100}%`,
+                      }}
+                    />
+                    <div className="relative z-10 flex items-center justify-center font-medium tracking-wide">
+                      <span className="animate-pulse inline-block w-3 h-3 bg-emerald-300 rounded-full mr-3 shadow-lg shadow-emerald-500/50" />
+                      <span className="text-emerald-50">
+                        {currentTurn.id === playerId
+                          ? "Your"
+                          : `${currentTurn.name}'s`}{" "}
+                        Turn
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Opponents */}
+              {opponents.map((opponent, index) => {
+                const angle = angleStep * index - 90;
+                const x = radius * Math.cos((angle * Math.PI) / 180);
+                const y = radius * Math.sin((angle * Math.PI) / 180);
+
+                return (
+                  <div
+                    key={index}
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2 text-center"
+                    style={{
+                      left: `calc(50% + ${x}px)`,
+                      top: `calc(50% + ${y}px)`,
+                    }}
+                  >
+                    <div
+                      className={cn(
+                        "bg-green-700 text-white px-3 py-2 rounded-xl shadow-lg w-32",
+                        currentTurn.id === opponent.id &&
+                          "ring-2 ring-yellow-400 animate-pulse"
+                      )}
+                    >
+                      <div className="font-semibold truncate">
+                        {opponent.name}
+                      </div>
+                      <div className="text-sm text-green-200">
+                        Cards: {opponent.cardsCount}
+                      </div>
+                      {isOwner && opponent.id !== ownerId && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleKickPlayer(opponent.id)}
+                          className="cursor-pointer"
+                        >
+                          <Image
+                            src="/kick.svg"
+                            alt="Kick"
+                            width={20}
+                            height={20}
+                          />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* <div>{turnTimer}</div> */}
-
-          {isLoading && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <Image
-                src="/dealing.gif"
-                alt="Loading"
-                width={200}
-                height={200}
-                className="rounded-2xl"
-              />
-            </div>
-          )}
-
-          {!gameOver && (
-            <div className="relative h-[200px] w-full flex justify-center items-center">
-              {playedCards.map((card, index) => (
-                <div
-                  key={index}
-                  className="absolute transition-all duration-300"
-                  style={{
-                    transform: `rotate(${
-                      (index - playedCards.length / 2) * 15
-                    }deg) translateY(${index * 2}px)`,
-                    zIndex: index,
-                  }}
-                >
-                  <Image
-                    src={`/images/card_images/${card}.png`}
-                    alt={card}
-                    width={120}
-                    height={168}
-                    className="rounded-xl shadow-lg hover:shadow-2xl"
-                    style={{
-                      filter: "drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3))",
-                      backfaceVisibility: "hidden",
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          {thullaOccured && (
-            <Image
-              src="/thulla.gif"
-              alt="Thulla"
-              width={200}
-              height={200}
-              className="mt-4"
+          {/* Chat Section */}
+          <div className="flex items-center justify-center">
+            <GameChat
+              playerName={playerName}
+              roomId={roomId}
+              chat={chat}
+              emitChatEvent={emitChatEvent}
             />
-          )}
-
-          {gameOver && (
-            <div className="absolute bg-white p-6 rounded-lg shadow-xl z-50">
-              <h2 className="text-xl font-bold mb-2">Game Over</h2>
-              <p>{looser} lost the game!</p>
-            </div>
-          )}
-          <div className="mt-6 px-6">
-            <div className="relative turn-indicator text-white bg-gradient-to-r from-emerald-600/60 to-green-600/60 px-8 py-3 rounded-full shadow-lg backdrop-blur-sm border border-emerald-500/20">
-              <div
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-emerald-500/80 to-green-500/80 rounded-full transition-all duration-1000 ease-in-out"
-                style={{
-                  width: `${(turnTimer / 15) * 100}%`,
-                }}
-              />
-              <div className="relative z-10 flex items-center justify-center font-medium tracking-wide">
-                <span className="animate-pulse inline-block w-3 h-3 bg-emerald-300 rounded-full mr-3 shadow-lg shadow-emerald-500/50" />
-                <span className="text-emerald-50">
-                  {currentTurn.id === playerId
-                    ? "Your"
-                    : `${currentTurn.name}'s`}{" "}
-                  Turn
-                </span>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Opponents Around Table */}
-        {opponents.map((opponent, index) => {
-          const angle = angleStep * index - 90;
-          const x = radius * Math.cos((angle * Math.PI) / 180);
-          const y = radius * Math.sin((angle * Math.PI) / 180);
-
-          return (
-            <div
-              key={index}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 text-center"
-              style={{
-                left: `calc(50% + ${x}px)`,
-                top: `calc(40% + ${y}px)`,
-              }}
-            >
-              <div
-                className={cn(
-                  "bg-green-700 text-white px-3 py-2 rounded-xl shadow-lg w-32",
-                  currentTurn.id === opponent.id &&
-                    "ring-2 ring-yellow-400 animate-pulse"
-                )}
-              >
-                <div className="font-semibold truncate">{opponent.name}</div>
-                <div className="text-sm text-green-200">
-                  Cards: {opponent.cardsCount}
+        {!isWinner && (
+          <div className="w-full px-6 py-2 flex items-start">
+            {/* Player Info + Actions - Left Side */}
+            <div className="flex flex-col gap-4 pl-8">
+              <div className="flex items-center gap-4">
+                <div
+                  className={cn(
+                    "w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-xl font-bold text-white",
+                    currentTurn.id === playerId &&
+                      "ring-2 ring-yellow-400 animate-pulse"
+                  )}
+                >
+                  {playerName?.[0]?.toUpperCase()}
                 </div>
-                {isOwner && opponent.id !== ownerId && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleKickPlayer(opponent.id)}
-                    className="cursor-pointer"
-                  >
-                    <Image src="/kick.svg" alt="Kick" width={20} height={20} />
+                <div>
+                  <div className="text-white">
+                    <h3 className="text-lg font-semibold">{playerName}</h3>
+                    <p className="text-green-300 text-sm">
+                      Cards: {myCards.length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Button onClick={() => handleSort(playingSuit)} className="w-fit">
+                Sort
+              </Button>
+
+              {(opponents.find((op) => op.id === nextTurn.id)?.cardsCount ||
+                6) < 5 &&
+                !isLoading && (
+                  <Button onClick={handleRequestCard} className="w-fit">
+                    Request Card
                   </Button>
                 )}
-              </div>
-            </div>
-          );
-        })}
-
-        {!isWinner &&
-          (opponents.find((opponent) => opponent.id === nextTurn.id)
-            ?.cardsCount || 6) < 5 &&
-          !isLoading && (
-            <div>
-              <Button
-                onClick={handleRequestCard}
-                className="absolute bottom-[15%] left-4"
-              >
-                Request Card
-              </Button>
-            </div>
-          )}
-
-        {/* Player Cards at Bottom */}
-        {!isWinner && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-5xl px-4">
-            <div className="flex items-center gap-4 mb-2">
-              <div
-                className={cn(
-                  "w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-xl font-bold text-white",
-                  currentTurn.id === playerId &&
-                    "ring-2 ring-yellow-400 animate-pulse"
-                )}
-              >
-                {playerName?.[0]?.toUpperCase()}
-              </div>
-              <div className="text-white">
-                <h3 className="text-lg font-semibold">{playerName}</h3>
-                <p className="text-green-300 text-sm">
-                  Cards: {myCards.length}
-                </p>
-                <button
-                  onClick={() => handleSort(playingSuit)}
-                  className="text-sm underline"
-                >
-                  Sort
-                </button>
-              </div>
             </div>
 
-            <div className="flex justify-center relative min-h-[200px]">
+            {/* Player Cards - Right Side */}
+            <div className="flex justify-end relative min-h-[200px] max-w-5xl w-full">
               {myCards.map((card, index) => {
                 const middleIndex = Math.floor(myCards.length / 2);
                 const rotation = index - middleIndex;
@@ -309,29 +330,9 @@ export default function GameStarted({
             </div>
           </div>
         )}
-
-        {/* Chat Area */}
-        <div className="absolute right-4 bottom-4 w-76">
-          <GameChat
-            playerName={playerName}
-            roomId={roomId}
-            chat={chat}
-            emitChatEvent={emitChatEvent}
-          />
-        </div>
-
-        {/* Confetti on Thulla */}
-        {thullaOccured && (
-          <Confetti
-            width={typeof window !== "undefined" ? window.innerWidth : 1000}
-            height={typeof window !== "undefined" ? window.innerHeight : 800}
-            recycle={false}
-            numberOfPieces={100}
-            gravity={0.5}
-          />
-        )}
       </div>
 
+      {/* Request Dialog */}
       <Dialog open={isRequestReceived && requestData !== null}>
         <DialogContent className="z-[9999]">
           <DialogHeader className="text-center">
@@ -350,6 +351,17 @@ export default function GameStarted({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confetti */}
+      {thullaOccured && (
+        <Confetti
+          width={typeof window !== "undefined" ? window.innerWidth : 1000}
+          height={typeof window !== "undefined" ? window.innerHeight : 800}
+          recycle={false}
+          numberOfPieces={100}
+          gravity={0.5}
+        />
+      )}
     </>
   );
 }
