@@ -9,10 +9,14 @@ import { IMsgDataTypes } from "@/utils/types";
 import { MoreVertical } from "lucide-react"; // or any icon of your choice
 
 const chatOptions = [
+  { label: "Hiiii", key: "hi" },
+  { label: "Arigato (Male)", key: "arigato_male" },
+  { label: "Arigato (Female)", key: "arigato_female" },
+  { label: "Choco Minto", key: "choco_minto" },
   { label: "Missile", key: "missile" },
-  { label: "Pan Di Siri", key: "pds" },
-  { label: "Tabah", key: "tabah" },
   { label: "Thulla", key: "thulla" },
+  { label: "Pan Di Siri", key: "pds" },
+  { label: "Oh Shit!", key: "oh_shit" },
 ];
 
 const GameChat = ({
