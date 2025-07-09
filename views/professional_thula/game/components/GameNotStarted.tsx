@@ -41,8 +41,8 @@ export default function GameNotStarted({
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8 space-y-8 bg-background text-foreground">
-        <Card className="relative w-[500px] h-[500px] rounded-full border-2 border-muted shadow-xl flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8 space-y-8 text-foreground">
+        <Card className="bg-white/10 relative w-[500px] h-[500px] rounded-full border-2 border-white/20 shadow-xl flex items-center justify-center">
           {/* Centered waiting gif */}
           <Image
             src="/Waiting.gif"
@@ -63,7 +63,7 @@ export default function GameNotStarted({
                 key={index}
                 className={cn(
                   "absolute transform -translate-x-1/2 -translate-y-1/2 text-center",
-                  "text-sm font-medium bg-muted px-3 py-1 rounded-full shadow-md"
+                  "text-sm font-medium bg-white/20 text-white px-3 py-1 rounded-full shadow-md"
                 )}
                 style={{
                   left: `calc(50% + ${x}px)`,

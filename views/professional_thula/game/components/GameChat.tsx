@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { IMsgDataTypes } from "@/utils/types";
-import { MoreVertical } from "lucide-react"; // or any icon of your choice
+import { MoreVertical } from "lucide-react";
 
 const chatOptions = [
   { label: "Hiiii", key: "hi" },
@@ -24,7 +24,7 @@ const GameChat = ({
   roomId,
   chat,
   emitChatEvent,
-  handleSendAudioMessage
+  handleSendAudioMessage,
 }: {
   playerName: string;
   roomId: string;
@@ -73,10 +73,10 @@ const GameChat = ({
   }, [chat]);
 
   return (
-    <Card className="w-full max-w-md mx-auto p-4 shadow-lg space-y-4 relative">
+    <Card className="w-full max-w-md mx-auto p-4 shadow-2xl space-y-4 relative rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md backdrop-saturate-150 text-white">
       <h2 className="text-xl font-semibold text-center">Game Chat</h2>
 
-      <ScrollArea className="h-64 rounded-md border p-2 bg-muted/20 space-y-3 overflow-y-auto">
+      <ScrollArea className="h-64 rounded-xl border border-white/20 p-2 bg-white/10 backdrop-blur-sm backdrop-saturate-150 space-y-3 overflow-y-auto">
         {chat.map(({ user, message, time }, index) => {
           const isMe = user === playerName;
           return (
@@ -85,14 +85,14 @@ const GameChat = ({
               className={`flex ${isMe ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[70%] px-3 py-2 rounded-xl shadow-sm ${
+                className={`max-w-[70%] px-4 py-2 rounded-xl shadow-md ${
                   isMe
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground"
+                    ? "bg-blue-500/20 text-blue-100 backdrop-blur-sm"
+                    : "bg-white/20 text-white backdrop-blur-sm"
                 }`}
               >
                 <p className="text-sm font-medium">{message}</p>
-                <p className="text-xs text-muted-foreground text-right mt-1">
+                <p className="text-xs text-white/60 text-right mt-1">
                   {user} @ {time}
                 </p>
               </div>
@@ -102,35 +102,42 @@ const GameChat = ({
         <div ref={bottomRef} />
       </ScrollArea>
 
-      <form onSubmit={sendData} className="flex items-center gap-2 relative">
+      <form
+        onSubmit={sendData}
+        className="flex items-center gap-2 relative bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/20"
+      >
         <Input
           type="text"
-          placeholder="Type your message..."
+          placeholder="Your message..."
           value={currentMsg}
           onChange={(e) => setCurrentMsg(e.target.value)}
-          className="flex-1"
+          className="flex-1 bg-transparent text-white border-none focus:ring-0"
         />
-        <Button type="submit">Send</Button>
+        <Button type="submit" className="bg-white/10 hover:bg-white/20">
+          Send
+        </Button>
 
         <div className="relative">
           <Button
             type="button"
             variant="ghost"
-            className="p-2"
+            className="p-2 text-white bg-white/10 hover:bg-white/20"
             onClick={() => setShowDropdown((prev) => !prev)}
           >
             <MoreVertical size={20} />
           </Button>
 
           {showDropdown && (
-            <div className="absolute right-0 top-full mt-2 bg-white border rounded shadow-md z-50">
+            <div className="absolute right-0 top-full mt-2 bg-white/10 border border-white/20 rounded shadow-md z-50 backdrop-blur-md p-1">
               {chatOptions.map((opt) => (
                 <button
                   key={opt.key}
                   disabled={disabledKey === opt.key}
                   onClick={() => handleDropdownSelect(opt.key)}
-                  className={`block w-64 text-left px-4 py-2 text-sm hover:bg-muted ${
-                    disabledKey === opt.key ? "opacity-50 cursor-not-allowed" : ""
+                  className={`block w-64 text-left px-4 py-2 text-sm text-white bg-white/10 hover:bg-white/20 rounded ${
+                    disabledKey === opt.key
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
                   }`}
                 >
                   {opt.label}

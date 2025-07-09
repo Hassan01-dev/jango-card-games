@@ -96,13 +96,13 @@ export default function GameStarted({
 
   return (
     <>
-      <div className="relative w-full h-screen bg-gradient-to-b from-green-950 to-green-800 grid grid-rows-[9fr_3fr]">
+      <div className="relative w-full h-screen grid grid-rows-[9fr_3fr]">
         {/* Top Section: Game Table + Chat */}
         <div className="grid grid-cols-[10fr_2fr] w-full h-full px-9">
           {/* Game Table */}
           <div className="relative flex items-center justify-center">
             <div className="relative w-[400px] h-[400px]">
-              <div className="w-full h-full bg-gradient-to-br from-green-800 to-green-900 rounded-full shadow-2xl border border-green-600/30 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+              <div className="w-full h-full bg-white/10 rounded-full shadow-2xl border border-white/20 backdrop-blur-sm flex flex-col items-center justify-center z-10">
                 <div className="text-2xl sm:text-3xl font-bold text-white mb-4">
                   Game Table
                 </div>
@@ -167,15 +167,15 @@ export default function GameStarted({
                 )}
 
                 <div className="mt-6 px-6">
-                  <div className="relative turn-indicator text-white bg-gradient-to-r from-emerald-600/60 to-green-600/60 px-8 py-3 rounded-full shadow-lg backdrop-blur-sm border border-emerald-500/20">
+                  <div className="relative turn-indicator text-white  px-8 py-3 rounded-full shadow-lg backdrop-blur-sm border border-emerald-500/20">
                     <div
-                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-emerald-500/80 to-green-500/80 rounded-full transition-all duration-1000 ease-in-out"
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-white/10 to-white/20 rounded-full transition-all duration-1000 ease-in-out"
                       style={{
                         width: `${(turnTimer / 15) * 100}%`,
                       }}
                     />
                     <div className="relative z-10 flex items-center justify-center font-medium tracking-wide">
-                      <span className="animate-pulse inline-block w-3 h-3 bg-emerald-300 rounded-full mr-3 shadow-lg shadow-emerald-500/50" />
+                      <span className="animate-pulse inline-block w-3 h-3 bg-white/60 rounded-full mr-3 shadow-lg shadow-white/80" />
                       <span className="text-emerald-50">
                         {currentTurn.id === playerId
                           ? "Your"
@@ -204,7 +204,7 @@ export default function GameStarted({
                   >
                     <div
                       className={cn(
-                        "bg-green-700 text-white px-3 py-2 rounded-xl shadow-lg w-32",
+                        "bg-white/20 text-white px-3 py-2 rounded-xl shadow-lg w-32",
                         currentTurn.id === opponent.id &&
                           "ring-2 ring-yellow-400 animate-pulse"
                       )}
@@ -212,7 +212,7 @@ export default function GameStarted({
                       <div className="font-semibold truncate">
                         {opponent.name}
                       </div>
-                      <div className="text-sm text-green-200">
+                      <div className="text-sm text-white">
                         Cards: {opponent.cardsCount}
                       </div>
                       {isOwner && opponent.id !== ownerId && (
@@ -250,13 +250,13 @@ export default function GameStarted({
         </div>
 
         {!isWinner && (
-          <div className="w-full px-6 py-2 flex items-start">
+          <div className="grid grid-cols-[2fr_10fr] w-full py-2 px-16">
             {/* Player Info + Actions - Left Side */}
-            <div className="flex flex-col gap-4 pl-8">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center gap-4">
                 <div
                   className={cn(
-                    "w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-xl font-bold text-white",
+                    "w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-xl font-bold text-white",
                     currentTurn.id === playerId &&
                       "ring-2 ring-yellow-400 animate-pulse"
                   )}
@@ -266,7 +266,7 @@ export default function GameStarted({
                 <div>
                   <div className="text-white">
                     <h3 className="text-lg font-semibold">{playerName}</h3>
-                    <p className="text-green-300 text-sm">
+                    <p className="text-white/60 text-sm">
                       Cards: {myCards.length}
                     </p>
                   </div>
@@ -287,7 +287,7 @@ export default function GameStarted({
             </div>
 
             {/* Player Cards - Right Side */}
-            <div className="flex justify-end relative min-h-[200px] max-w-5xl w-full">
+            <div className="flex">
               {myCards.map((card, index) => {
                 const middleIndex = Math.floor(myCards.length / 2);
                 const rotation = index - middleIndex;

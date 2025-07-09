@@ -12,8 +12,8 @@ export default function Game() {
     useGame("");
 
   return (
-    <div className="flex justify-center mt-24">
-      <Card className="w-full max-w-xl p-6 shadow-xl space-y-6 rounded-2xl">
+    <div className="flex justify-center items-center h-screen">
+      <Card className="bg-white/10 border border-white/20 text-white w-full max-w-xl p-6 shadow-xl space-y-6 rounded-2xl">
         <div>
           <Label htmlFor="player_name" className="text-sm mb-1 block">
             Your Name
@@ -22,6 +22,7 @@ export default function Game() {
             id="player_name"
             placeholder="Enter your name"
             value={playerName}
+            className="flex-1 bg-transparent text-white border-white/30 focus:ring-0"
             onChange={(e) => setPlayerName(e.target.value)}
           />
         </div>
@@ -30,7 +31,7 @@ export default function Game() {
           Create Room
         </Button>
 
-        <Separator className="my-4" />
+        <Separator className="my-4 bg-white/30" />
 
         <div>
           <Label htmlFor="room_id" className="text-sm mb-1 block">
@@ -40,6 +41,7 @@ export default function Game() {
             id="room_id"
             placeholder="Enter room ID"
             value={roomId}
+            className="flex-1 bg-transparent text-white border-white/30 focus:ring-0"
             onChange={(e) => setRoomId(e.target.value)}
           />
         </div>

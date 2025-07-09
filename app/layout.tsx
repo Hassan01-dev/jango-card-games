@@ -19,6 +19,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+         <title>Cards - Playlab</title>
+         <meta name="keywords" content="card games, online card games, thulla, professional thulla, thulla card game, playlab, cards playlab, thulla playlab" />
          <meta
           name="google-adsense-account"
           content="ca-pub-3901174951575931"
