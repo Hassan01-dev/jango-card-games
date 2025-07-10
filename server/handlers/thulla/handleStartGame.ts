@@ -1,7 +1,7 @@
-import { getRoom } from "../state/roomManager.ts";
-import { CardDeck } from "../utils/cardDeck.ts";
-import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { PlayCardEventData, Player, StartGameEventData } from "../utils/types.ts";
+import { getRoom } from "../../state/roomManager.ts";
+import { CardDeck } from "../../utils/cardDeck.ts";
+import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
+import { PlayCardEventData, Player, StartGameEventData } from "../../utils/types.ts";
 import { handlePlayCard } from "./playCard.ts";
 
 export async function handleStartGame(
@@ -22,11 +22,12 @@ export async function handleStartGame(
     room.currentTurn = { id: firstPlayer.id, name: firstPlayer.name };
     room.isStarted = true;
 
-    await sendEncryptedEvent("game_started", {}, roomId, io);
+    await sendEncryptedEvent("thulla", "game_started", {}, roomId, io);
 
     setTimeout(async () => {
       room.players.forEach(async (player) => {
         await sendEncryptedEvent(
+          "thulla",
           "hand_received",
           {
             currentTurn: room.currentTurn,
@@ -50,6 +51,7 @@ export async function handleStartGame(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        "thulla",
         "error",
         { message: error.message },
         socket.id,

@@ -2,8 +2,9 @@ import { getAllRooms } from "../state/roomManager.ts";
 import { getNextEligiblePlayer } from "../utils/helper.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 
-export function handleDisconnect(socket: any, io: any) {
+export function handleDisconnect(socket: any, io: any, ) {
   socket.on("disconnect", async () => {
+    const game = "thulla"
     try {
       const rooms = getAllRooms();
 
@@ -22,6 +23,7 @@ export function handleDisconnect(socket: any, io: any) {
             const nextNextPlayer = getNextEligiblePlayer(room, playerIndex + 1);
             room.currentTurn = nextPlayer;
             await sendEncryptedEvent(
+              game,
               "update_turn",
               {
                 currentTurn: room.currentTurn,
@@ -41,6 +43,7 @@ export function handleDisconnect(socket: any, io: any) {
             delete rooms[roomId];
           } else {
             await sendEncryptedEvent(
+              game,
               "player_left",
               {
                 roomId,
@@ -56,6 +59,7 @@ export function handleDisconnect(socket: any, io: any) {
       }
     } catch (error) {
       await sendEncryptedEvent(
+        game,
         "error",
         { message: error.message },
         socket.id,

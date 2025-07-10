@@ -1,8 +1,8 @@
-import { parseCard } from "../utils/parseCard.ts";
-import { getRoom } from "../state/roomManager.ts";
-import { getNextEligiblePlayer } from "../utils/helper.ts";
-import { PlayCardEventData } from "../utils/types.ts";
-import { sendEncryptedEvent } from "../utils/socketResponse.ts";
+import { parseCard } from "../../utils/parseCard.ts";
+import { getRoom } from "../../state/roomManager.ts";
+import { getNextEligiblePlayer } from "../../utils/helper.ts";
+import { PlayCardEventData } from "../../utils/types.ts";
+import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
 async function waitFor() {
   return new Promise((resolve) => {
@@ -35,7 +35,7 @@ export async function handlePlayCard(
     };
     room.playedCards.push(playedCard);
 
-    await sendEncryptedEvent("play_card", { playerName, card }, roomId, io);
+    await sendEncryptedEvent("thulla", "play_card", { playerName, card }, roomId, io);
     const currentPlayer = room.players.find((p) => p.id === playerId);
 
     if (currentPlayer) {
@@ -50,18 +50,19 @@ export async function handlePlayCard(
     // 🔥 Thulla detection
     if (parsed.suit !== leadSuit && !room.isFirstTurn) {
       await waitFor();
-      await sendEncryptedEvent("play_card", { playerName, card }, roomId, io);
+      await sendEncryptedEvent("thulla", "play_card", { playerName, card }, roomId, io);
       for (const player of room.players) {
         if (player.cards.length === 0 && !player.isWon) {
           player.isWon = true;
-          await sendEncryptedEvent("player_won", { playerName: player.name }, roomId, io);
-          await sendEncryptedEvent("game_won", {}, player.socketId, io);
+          await sendEncryptedEvent("thulla", "player_won", { playerName: player.name }, roomId, io);
+          await sendEncryptedEvent("thulla", "game_won", {}, player.socketId, io);
         }
       }
 
       const remainingPlayers = room.players.filter((player) => !player.isWon);
       if (remainingPlayers.length === 1) {
         await sendEncryptedEvent(
+          "thulla",
           "game_over",
           { looser: remainingPlayers[0].name },
           roomId,
@@ -71,6 +72,7 @@ export async function handlePlayCard(
       }
 
       await sendEncryptedEvent(
+        "thulla",
         "thulla",
         {
           triggeredBy: playerName,
@@ -82,6 +84,7 @@ export async function handlePlayCard(
       );
 
       await sendEncryptedEvent(
+        "thulla",
         "cards_taken",
         {
           cards: room.playedCards.map((c) => c.card),
@@ -104,6 +107,7 @@ export async function handlePlayCard(
       room.currentTurn = { id: highest.playerId, name: highest.playerName };
       const nextNextPlayer = getNextEligiblePlayer(room, room.players.findIndex((p) => p.id === highest.playerId) + 1);
       await sendEncryptedEvent(
+        "thulla",
         "update_turn",
         {
           currentTurn: room.currentTurn,
@@ -130,19 +134,20 @@ export async function handlePlayCard(
       room.noOfTurns = 0;
       room.isFirstTurn = false;
       await waitFor();
-      await sendEncryptedEvent("empty_table", {}, roomId, io);
+      await sendEncryptedEvent("thulla", "empty_table", {}, roomId, io);
 
       for (const player of room.players) {
         if (player.cards.length === 0 && !player.isWon) {
           player.isWon = true;
-          await sendEncryptedEvent("player_won", { playerName: player.name }, roomId, io);
-          await sendEncryptedEvent("game_won", {}, player.socketId, io);
+          await sendEncryptedEvent("thulla", "player_won", { playerName: player.name }, roomId, io);
+          await sendEncryptedEvent("thulla", "game_won", {}, player.socketId, io);
         }
       }
 
       const remainingPlayers = room.players.filter((player) => !player.isWon);
       if (remainingPlayers.length === 1) {
         await sendEncryptedEvent(
+          "thulla",
           "game_over",
           { looser: remainingPlayers[0].name },
           roomId,
@@ -168,6 +173,7 @@ export async function handlePlayCard(
       };
 
       await sendEncryptedEvent(
+        "thulla",
         "update_turn",
         {
           currentTurn: room.currentTurn,
@@ -195,6 +201,7 @@ export async function handlePlayCard(
 
     room.currentTurn = { id: nextPlayer.id, name: nextPlayer.name };
     await sendEncryptedEvent(
+      "thulla",
       "update_turn",
       {
         currentTurn: room.currentTurn,
@@ -211,6 +218,7 @@ export async function handlePlayCard(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        "thulla",
         "error",
         { message: error.message },
         socket.id,

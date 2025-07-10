@@ -5,11 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
-import useGame from "@/hooks/useGame";
+import useThullaGame from "@/hooks/useThullaGame";
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function Game() {
-  const { playerName, setPlayerName, roomId, setRoomId, createGame, joinGame } =
-    useGame("");
+  const searchParams = useSearchParams();
+
+  const { playerName, setPlayerName, createGame, joinGame } = useThullaGame("");
+  const [roomId, setRoomId] = useState(searchParams.get("roomId") || "");
 
   return (
     <div className="flex justify-center items-center h-screen">
@@ -46,7 +50,7 @@ export default function Game() {
           />
         </div>
 
-        <Button onClick={joinGame} variant="secondary" className="w-full">
+        <Button onClick={() => joinGame(roomId)} variant="secondary" className="w-full">
           Join Room
         </Button>
       </Card>

@@ -1,6 +1,6 @@
-import { getRoom } from "../state/roomManager.ts";
-import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { JoinGameEventData } from "../utils/types.ts";
+import { getRoom } from "../../state/roomManager.ts";
+import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
+import { JoinGameEventData } from "../../utils/types.ts";
 
 export async function handleJoinGame(
   socket: any,
@@ -36,6 +36,7 @@ export async function handleJoinGame(
     }
 
     await sendEncryptedEvent(
+      "thulla",
       "non_started_room_joined",
       {
         players: targetRoom?.players,
@@ -48,6 +49,7 @@ export async function handleJoinGame(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        "thulla",
         "error",
         { message: error.message },
         socket.id,

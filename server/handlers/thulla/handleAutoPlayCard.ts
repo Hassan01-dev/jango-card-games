@@ -1,6 +1,6 @@
-import { getRoom } from "../state/roomManager.ts";
-import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { PlayCardEventData } from "../utils/types.ts";
+import { getRoom } from "../../state/roomManager.ts";
+import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
+import { PlayCardEventData } from "../../utils/types.ts";
 import { handlePlayCard } from "./playCard.ts";
 
 export async function handeleAutoPlayCard(
@@ -40,10 +40,11 @@ export async function handeleAutoPlayCard(
     const data = {roomId, card: selectedCard, playerName: currentPlayer.name, playerId: currentPlayer.id}
     await handlePlayCard(socket, io, data as PlayCardEventData);
 
-    await sendEncryptedEvent("auto_card_played", { playedCard: selectedCard }, currentPlayer.socketId, io);
+    await sendEncryptedEvent("thulla", "auto_card_played", { playedCard: selectedCard }, currentPlayer.socketId, io);
   } catch (error: any) {
     console.error("Error in createRoom handler:", error.message);
     await sendEncryptedEvent(
+      "thulla",
       "error",
       { message: error.message },
       socket.id,

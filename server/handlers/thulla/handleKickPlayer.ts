@@ -1,6 +1,6 @@
-import { getRoom } from "../state/roomManager.ts";
-import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { KickPlayerEventData } from "../utils/types.ts";
+import { getRoom } from "../../state/roomManager.ts";
+import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
+import { KickPlayerEventData } from "../../utils/types.ts";
 
 export async function handleKickPlayer(
   socket: any,
@@ -26,6 +26,7 @@ export async function handleKickPlayer(
     targetRoom.players = targetRoom.players.filter((p) => p.id !== playerId);
 
     await sendEncryptedEvent(
+      "thulla",
       "player_kicked",
       {
         players: targetRoom.players,
@@ -36,6 +37,7 @@ export async function handleKickPlayer(
     );
 
     await sendEncryptedEvent(
+      "thulla",
       "kicked",
       { message: "You have been kicked from the room" },
       playerToKick.socketId,
@@ -44,6 +46,7 @@ export async function handleKickPlayer(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        "thulla",
         "error",
         { message: error.message },
         socket.id,

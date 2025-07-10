@@ -28,10 +28,9 @@ import {
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
 
-const useGame = (roomIdParam: string) => {
+const useThullaGame = (roomIdParam: string) => {
   const { socket } = useSocket();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [requestData, setRequestData] = useState<RequestReceivedDataType | null>(null);
   const [isRequestReceived, setIsRequestReceived] = useState<boolean>(false);
@@ -79,13 +78,8 @@ const useGame = (roomIdParam: string) => {
       typeof window !== "undefined" ? localStorage.getItem("playerId") : "";
     if (savedId) setPlayerId(savedId);
 
-    const queryRoomId = searchParams.get("roomId");
-    if (queryRoomId) {
-      setRoomId(queryRoomId);
-    }
-
     setIsUserInfo(true);
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     if (!socket) return;
@@ -120,15 +114,18 @@ const useGame = (roomIdParam: string) => {
   }, []);
 
   const emitSecureEvent = async (event_type: string, data: any) => {
-    const encrypted = await encryptPayload({ event_type, data });
+    const encrypted = await encryptPayload({ game: "thulla", event_type, data });
     socket?.emit("secure_event", encrypted);
   };
 
   const handleEncryptedEvent = async (payload: EncryptedPayload) => {
     try {
-      const { event_type, data } = (await decryptPayload(
+      const { game, event_type, data } = (await decryptPayload(
         payload
       )) as DecryptedPayload;
+
+      if(game !== "thulla") return;
+
       switch (event_type) {
         case "game_created":
           handleGameCreated(data as GameCreatedDataType);
@@ -363,7 +360,8 @@ const useGame = (roomIdParam: string) => {
     emitSecureEvent("create_room", { playerId: newId, playerName });
   };
 
-  const joinGame = () => {
+  const joinGame = (roomId: string) => {
+    setRoomId(roomId);
     if (!playerName.trim()) return alert("Enter name before joining game");
 
     const newId = crypto.randomUUID();
@@ -530,4 +528,4 @@ const startTimer = (currentTurn: TurnType) => {
   };
 };
 
-export default useGame;
+export default useThullaGame;

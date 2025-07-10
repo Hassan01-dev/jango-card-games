@@ -105,6 +105,7 @@ export type EventType =
   | "audio_message";
 
 export type SecureEventPayload = {
+  game: string;
   event_type: EventType;
   data: any;
 };

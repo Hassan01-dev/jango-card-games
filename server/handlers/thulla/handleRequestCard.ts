@@ -1,11 +1,11 @@
-import { getRoom } from "../state/roomManager.ts";
-import { getNextEligiblePlayer } from "../utils/helper.ts";
-import { sendEncryptedEvent } from "../utils/socketResponse.ts";
+import { getRoom } from "../../state/roomManager.ts";
+import { getNextEligiblePlayer } from "../../utils/helper.ts";
+import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 import {
   ApproveRequestCardEventData,
   RejectRequestCardEventData,
   RequestCardEventData,
-} from "../utils/types.ts";
+} from "../../utils/types.ts";
 
 export async function handleRequestCard(
   socket: any,
@@ -28,6 +28,7 @@ export async function handleRequestCard(
     );
 
     await sendEncryptedEvent(
+      "thulla",
       "request_received",
       {
         playerName: currentPlayer.name,
@@ -39,6 +40,7 @@ export async function handleRequestCard(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        "thulla",
         "error",
         { message: error.message },
         socket.id,
@@ -75,6 +77,7 @@ export async function handleApproveRequestCard(
     currentPlayer.isWon = true;
 
     await sendEncryptedEvent(
+      "thulla",
       "player_won",
       {
         playerName: currentPlayer.name,
@@ -85,6 +88,7 @@ export async function handleApproveRequestCard(
     );
 
     await sendEncryptedEvent(
+      "thulla",
       "hand_received",
       {
         currentTurn: room.currentTurn,
@@ -102,6 +106,7 @@ export async function handleApproveRequestCard(
     );
 
     await sendEncryptedEvent(
+      "thulla",
       "hand_received",
       {
         currentTurn: room.currentTurn,
@@ -120,6 +125,7 @@ export async function handleApproveRequestCard(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        "thulla",
         "error",
         { message: error.message },
         socket.id,
@@ -149,6 +155,7 @@ export async function handleRejectRequestCard(
     if (!requesterPlayer) throw new Error("Requester Player not found");
 
     await sendEncryptedEvent(
+      "thulla",
       "request_rejected",
       {
         playerName,
@@ -159,6 +166,7 @@ export async function handleRejectRequestCard(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        "thulla",
         "error",
         { message: error.message },
         socket.id,

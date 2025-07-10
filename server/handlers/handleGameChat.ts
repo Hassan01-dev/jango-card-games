@@ -5,6 +5,7 @@ import { GameChatEventData } from "../utils/types.ts";
 export async function handleGameChat(
   socket: any,
   io: any,
+  game: string,
   data: GameChatEventData
 ) {
   const { roomId, message, user, time } = data;
@@ -14,10 +15,11 @@ export async function handleGameChat(
     const room = getRoom(roomId);
     if (!room) throw new Error("Room not found");
 
-    await sendEncryptedEvent("chat_message", { roomId, message, user, time }, roomId, io);
+    await sendEncryptedEvent(game, "chat_message", { roomId, message, user, time }, roomId, io);
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        game,
         "error",
         { message: error.message },
         socket.id,

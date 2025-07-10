@@ -5,6 +5,7 @@ import { AudioMessageType } from "../utils/types.ts";
 export async function handleAudioMessage(
   socket: any,
   io: any,
+  game: string,
   data: AudioMessageType
 ) {
   const { roomId, audioKey } = data;
@@ -14,6 +15,7 @@ export async function handleAudioMessage(
     if (!targetRoom) throw new Error("Room not found");
 
     await sendEncryptedEvent(
+      game,
       "audio_message",
       {
         audioKey
@@ -24,6 +26,7 @@ export async function handleAudioMessage(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
+        game,
         "error",
         { message: error.message },
         socket.id,

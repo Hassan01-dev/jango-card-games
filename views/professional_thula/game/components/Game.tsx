@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import GameNotStarted from "./GameNotStarted";
 import GameStarted from "./GameStarted";
 
-import useGame from "@/hooks/useGame";
+import useThullaGame from "@/hooks/useThullaGame";
 import toast from "react-hot-toast";
 
 export default function Game({ roomId: roomIdParam }: {roomId: string}) {
@@ -44,7 +44,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     handleSendAudioMessage,
     nextTurn,
     isWinner
-  } = useGame(roomIdParam);
+  } = useThullaGame(roomIdParam);
 
   useEffect(() => {
     if (!isUserInfo) return;

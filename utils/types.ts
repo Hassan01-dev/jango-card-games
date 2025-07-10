@@ -23,6 +23,8 @@ export type EventType =
   | "game_won"
   | "audio_message";
 
+export type GameTypes = "thulla"
+
 export type GameCreatedDataType = {
   roomId: string;
 };
@@ -35,6 +37,7 @@ export type AutoCardPlayedDataType = {
 }
 
 export type DecryptedPayload<T = unknown> = {
+  game: GameTypes
   event_type: EventType;
   data: T;
 };
