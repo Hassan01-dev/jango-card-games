@@ -1,11 +1,7 @@
 import { getRoom } from "../../state/roomManager.ts";
+import { ApproveRequestCardEventData, RejectRequestCardEventData, RequestCardEventData } from "../../types/thulla.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
-import {
-  ApproveRequestCardEventData,
-  RejectRequestCardEventData,
-  RequestCardEventData,
-} from "../../utils/types.ts";
 
 export async function handleRequestCard(
   socket: any,

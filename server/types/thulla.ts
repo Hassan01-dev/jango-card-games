@@ -1,4 +1,10 @@
+import { PlayedCard } from "./main.ts";
+
 export const rooms: RoomCollection = {};
+
+export type RoomCollection = {
+  [key: string]: Room;
+};
 
 export type Player = {
   id: string;
@@ -19,19 +25,6 @@ export type Room = {
   isFirstTurn: boolean;
 };
 
-export type PlayedCard = {
-  playerName: string;
-  card: string;
-  suit: string;
-  value: number;
-  socketId: string;
-  playerId: string;
-};
-
-export type RoomCollection = {
-  [key: string]: Room;
-};
-
 export type CreateRoomEventData = {
   playerId: string;
   playerName: string;
@@ -39,20 +32,6 @@ export type CreateRoomEventData = {
 
 export type JoinGameEventData = {
   roomId: string;
-  playerName: string;
-  playerId: string;
-};
-
-export type GameChatEventData = {
-  roomId: string;
-  message: string;
-  user: string;
-  time: string;
-};
-
-export type PlayCardEventData = {
-  roomId: string;
-  card: string;
   playerName: string;
   playerId: string;
 };
@@ -76,17 +55,6 @@ export type RejectRequestCardEventData = {
   roomId: string;
   playerName: string;
   requesterPlayerId: string;
-};
-
-export type KickPlayerEventData = {
-  roomId: string;
-  playerId: string;
-  ownerId: string;
-};
-
-export type AudioMessageType = {
-  roomId: string;
-  audioKey: string;
 };
 
 export type EventType =

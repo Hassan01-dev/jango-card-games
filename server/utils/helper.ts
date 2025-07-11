@@ -1,4 +1,4 @@
-import { Room } from "./types.ts";
+import { Room } from "../types/thulla.ts";
 
 export const generatRoomId = (): string => {
   const bytes = crypto.getRandomValues(new Uint8Array(6)); // 6 bytes = 48 bits

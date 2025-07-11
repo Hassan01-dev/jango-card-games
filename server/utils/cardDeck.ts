@@ -1,4 +1,4 @@
-import { Player } from "./types.ts";
+import { Player } from "../types/thulla.ts";
 
 const suits = ["hearts", "diamonds", "clubs", "spades"];
 const ranks = [

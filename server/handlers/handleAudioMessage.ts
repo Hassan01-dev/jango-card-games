@@ -1,6 +1,6 @@
 import { getRoom } from "../state/roomManager.ts";
+import { AudioMessageType } from "../types/main.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { AudioMessageType } from "../utils/types.ts";
 
 export async function handleAudioMessage(
   socket: any,

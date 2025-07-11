@@ -1,5 +1,5 @@
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { ApproveRequestCardEventData, AudioMessageType, CreateRoomEventData, EventType, GameChatEventData, JoinGameEventData, KickPlayerEventData, PlayCardEventData, RejectRequestCardEventData, RequestCardEventData, StartGameEventData } from "../utils/types.ts";
+import { ApproveRequestCardEventData, CreateRoomEventData, EventType, JoinGameEventData, RejectRequestCardEventData, RequestCardEventData, StartGameEventData } from "../types/thulla.ts";
 import { handeleAutoPlayCard } from "./thulla/handleAutoPlayCard.ts";
 import { handleCreateRoomEvent } from "./thulla/handleCreateGame.ts";
 import { handleJoinGame } from "./thulla/handleJoinGame.ts";
@@ -9,6 +9,7 @@ import { handleStartGame } from "./thulla/handleStartGame.ts";
 import { handleAudioMessage } from "./handleAudioMessage.ts"
 import { handleGameChat } from "./handleGameChat.ts"
 import { handlePlayCard } from "./thulla/handlePlayCard.ts";
+import { AudioMessageType, GameChatEventData, KickPlayerEventData, PlayCardEventData } from "../types/main.ts";
 
 const handleThullaGameEvents = async (
   socket: any,

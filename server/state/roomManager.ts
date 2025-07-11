@@ -1,4 +1,4 @@
-import { Room, RoomCollection } from "../utils/types.ts";
+import { Room, RoomCollection } from "../types/thulla.ts";
 
 const rooms: RoomCollection = {};
 

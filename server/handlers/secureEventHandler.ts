@@ -1,6 +1,6 @@
+import { SecureEventPayload } from "../types/main.ts";
 import { decryptPayload } from "../utils/crypto.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { SecureEventPayload } from "../utils/types.ts";
 
 import handleThullaGameEvents from "./handleThullaGameEvents.ts";
 

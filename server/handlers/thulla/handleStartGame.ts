@@ -1,7 +1,8 @@
 import { getRoom } from "../../state/roomManager.ts";
+import { PlayCardEventData } from "../../types/main.ts";
+import { Player, StartGameEventData } from "../../types/thulla.ts";
 import { CardDeck } from "../../utils/cardDeck.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
-import { PlayCardEventData, Player, StartGameEventData } from "../../utils/types.ts";
 import { handlePlayCard } from "./handlePlayCard.ts";
 
 export async function handleStartGame(

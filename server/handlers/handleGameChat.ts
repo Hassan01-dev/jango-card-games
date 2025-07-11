@@ -1,6 +1,6 @@
 import { getRoom } from "../state/roomManager.ts";
+import { GameChatEventData } from "../types/main.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { GameChatEventData } from "../utils/types.ts";
 
 export async function handleGameChat(
   socket: any,

@@ -1,8 +1,8 @@
 import { parseCard } from "../../utils/parseCard.ts";
 import { getRoom } from "../../state/roomManager.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
-import { PlayCardEventData } from "../../utils/types.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
+import { PlayCardEventData } from "../../types/main.ts";
 
 async function waitFor() {
   return new Promise((resolve) => {
