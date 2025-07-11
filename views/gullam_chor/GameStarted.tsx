@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import GameChat from "./GameChat";
+import GameChat from "../components/GameChat";
 import Confetti from "react-confetti";
 import { useEffect } from "react";
 import {

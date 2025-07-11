@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from 'react-hot-toast'
 import "@styles/globals.css";
-import AdSense from "@views/professional_thula/AdSense";
+import AdSense from "@views/components/AdSense";
 
 const inter = Inter({ subsets: ["latin"] });
 

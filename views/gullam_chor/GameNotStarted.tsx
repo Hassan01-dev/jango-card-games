@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import GameChat from "./GameChat";
+import GameChat from "../components/GameChat";
 import { IMsgDataTypes, OpponentType } from "@/utils/types";
 
 interface Props {
