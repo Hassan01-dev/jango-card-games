@@ -1,3 +1,4 @@
+import { connections } from "../../main.ts";
 import { getRoom } from "../../state/roomManager.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 import { JoinGameEventData } from "../../utils/types.ts";
@@ -9,6 +10,10 @@ export async function handleJoinGame(
 ) {
   const { roomId, playerName, playerId } = data;
   try {
+    connections[socket.id] = {
+      gameType: "thulla",
+    };
+
     if (!roomId || !playerName || !playerId) {
       throw new Error("Room ID, player name and player ID required");
     }

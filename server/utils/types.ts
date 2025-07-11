@@ -1,3 +1,5 @@
+export const rooms: RoomCollection = {};
+
 export type Player = {
   id: string;
   name: string;
@@ -29,8 +31,6 @@ export type PlayedCard = {
 export type RoomCollection = {
   [key: string]: Room;
 };
-
-export const rooms: RoomCollection = {};
 
 export type CreateRoomEventData = {
   playerId: string;

@@ -2,7 +2,7 @@ import { getRoom } from "../../state/roomManager.ts";
 import { CardDeck } from "../../utils/cardDeck.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 import { PlayCardEventData, Player, StartGameEventData } from "../../utils/types.ts";
-import { handlePlayCard } from "./playCard.ts";
+import { handlePlayCard } from "./handlePlayCard.ts";
 
 export async function handleStartGame(
   socket: any,

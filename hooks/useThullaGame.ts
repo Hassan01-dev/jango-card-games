@@ -124,6 +124,8 @@ const useThullaGame = (roomIdParam: string) => {
         payload
       )) as DecryptedPayload;
 
+      console.log(game, event_type, data);
+
       if(game !== "thulla") return;
 
       switch (event_type) {

@@ -5,6 +5,8 @@ import "jsr:@std/dotenv/load";
 import { handleSecureEvent } from "./handlers/secureEventHandler.ts";
 import { handleDisconnect } from "./handlers/disconnect.ts";
 
+export const connections = {} as { [key: string]: any };
+
 const io = new Server({
   cors: {
     origin: ["http://localhost:3000", "https://cards.playlab.live"],
@@ -13,9 +15,8 @@ const io = new Server({
 
 io.on("connection", (socket: any) => {
   console.log(`socket ${socket.id} connected`);
-
-  handleDisconnect(socket, io);
-  handleSecureEvent(socket, io);
+  handleDisconnect(socket, io, connections);
+  handleSecureEvent(socket, io, connections);
 });
 
 await serve(io.handler(), {

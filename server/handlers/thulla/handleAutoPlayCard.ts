@@ -1,7 +1,7 @@
 import { getRoom } from "../../state/roomManager.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 import { PlayCardEventData } from "../../utils/types.ts";
-import { handlePlayCard } from "./playCard.ts";
+import { handlePlayCard } from "./handlePlayCard.ts";
 
 export async function handeleAutoPlayCard(
   socket: any,

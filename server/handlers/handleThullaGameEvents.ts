@@ -8,6 +8,7 @@ import { handleApproveRequestCard, handleRejectRequestCard, handleRequestCard } 
 import { handleStartGame } from "./thulla/handleStartGame.ts";
 import { handleAudioMessage } from "./handleAudioMessage.ts"
 import { handleGameChat } from "./handleGameChat.ts"
+import { handlePlayCard } from "./thulla/handlePlayCard.ts";
 
 const handleThullaGameEvents = async (
   socket: any,
@@ -26,7 +27,7 @@ const handleThullaGameEvents = async (
       await handleGameChat(socket, io, "thulla", data as GameChatEventData);
       break;
     case "play_card":
-      await handeleAutoPlayCard(socket, io, data as PlayCardEventData);
+      await handlePlayCard(socket, io, data as PlayCardEventData);
       break;
     case "start_game":
       await handleStartGame(socket, io, data as StartGameEventData);
