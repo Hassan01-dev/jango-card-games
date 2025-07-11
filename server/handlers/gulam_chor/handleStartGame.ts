@@ -1,18 +1,18 @@
-import { getRoom } from "../../state/roomManager.ts";
-import { StartGameEventData } from "../../types/thulla.ts";
+import { getThullaRoom } from "../../state/roomManager.ts";
+import { ThullaStartGameEventData } from "../../types/thulla.ts";
 import { CardDeck } from "../../utils/cardDeck.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
 export async function handleStartGame(
   socket: any,
   io: any,
-  data: StartGameEventData
+  data: ThullaStartGameEventData
 ) {
   const { roomId } = data;
   try {
     if (!roomId) throw new Error("Invalid play");
 
-    const room = getRoom(roomId);
+    const room = getThullaRoom(roomId);
     if (!room) throw new Error("Room not found");
 
     // const currentDeck = new CardDeck();

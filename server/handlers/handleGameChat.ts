@@ -1,4 +1,3 @@
-import { getRoom } from "../state/roomManager.ts";
 import { GameChatEventData } from "../types/main.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 
@@ -11,9 +10,6 @@ export async function handleGameChat(
   const { roomId, message, user, time } = data;
   try {
     if (!roomId || !message) throw new Error("Invalid chat data");
-
-    const room = getRoom(roomId);
-    if (!room) throw new Error("Room not found");
 
     await sendEncryptedEvent(game, "chat_message", { roomId, message, user, time }, roomId, io);
   } catch (error: unknown) {

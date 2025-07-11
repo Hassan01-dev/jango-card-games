@@ -1,11 +1,11 @@
-import { getAllRooms } from "../../state/roomManager.ts";
+import { getAllThullaRooms } from "../../state/roomManager.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
 const handleThullaDisconnect = async (socket: any, io: any) => {
   const game = "thulla";
   try {
-    const rooms = getAllRooms();
+    const rooms = getAllThullaRooms();
 
     for (const roomId in rooms) {
       const room = rooms[roomId];

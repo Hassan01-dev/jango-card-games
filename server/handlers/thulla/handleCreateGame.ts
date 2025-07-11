@@ -1,18 +1,18 @@
-import { createRoom } from "../../state/roomManager.ts";
-import { CreateRoomEventData } from "../../types/thulla.ts";
+import { createThullaRoom } from "../../state/roomManager.ts";
+import { ThullaCreateRoomEventData } from "../../types/thulla.ts";
 import { generatRoomId } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
 export async function handleCreateRoomEvent(
   socket: any,
   io: any,
-  data: CreateRoomEventData
+  data: ThullaCreateRoomEventData
 ) {
   try {
     const { playerId, playerName } = data;
     const roomId = generatRoomId();
 
-    createRoom(roomId, playerId, playerName);
+    createThullaRoom(roomId, playerId, playerName);
 
     await sendEncryptedEvent("thulla", "game_created", { roomId }, socket.id, io);
   } catch (error: any) {

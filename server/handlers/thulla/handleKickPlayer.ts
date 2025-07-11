@@ -1,4 +1,4 @@
-import { getRoom } from "../../state/roomManager.ts";
+import { getThullaRoom } from "../../state/roomManager.ts";
 import { KickPlayerEventData } from "../../types/main.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
@@ -13,7 +13,7 @@ export async function handleKickPlayer(
       throw new Error("Room ID, player ID and owner ID are required");
     }
 
-    const targetRoom = getRoom(roomId);
+    const targetRoom = getThullaRoom(roomId);
     if (!targetRoom) throw new Error("Room not found");
 
     if (targetRoom.ownerId !== ownerId) {

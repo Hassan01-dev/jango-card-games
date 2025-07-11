@@ -1,18 +1,18 @@
-import { getRoom } from "../../state/roomManager.ts";
-import { ApproveRequestCardEventData, RejectRequestCardEventData, RequestCardEventData } from "../../types/thulla.ts";
+import { getThullaRoom } from "../../state/roomManager.ts";
+import { ThullaApproveRequestCardEventData, ThullaRejectRequestCardEventData, ThullaRequestCardEventData } from "../../types/thulla.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
 export async function handleRequestCard(
   socket: any,
   io: any,
-  data: RequestCardEventData
+  data: ThullaRequestCardEventData
 ) {
   const { roomId, playerId } = data;
   try {
     if (!roomId) throw new Error("Invalid play");
 
-    const room = getRoom(roomId);
+    const room = getThullaRoom(roomId);
     if (!room) throw new Error("Room not found");
 
     const currentPlayer = room.players.find((player) => player.id === playerId);
@@ -51,13 +51,13 @@ export async function handleRequestCard(
 export async function handleApproveRequestCard(
   socket: any,
   io: any,
-  data: ApproveRequestCardEventData
+  data: ThullaApproveRequestCardEventData
 ) {
   const { roomId, playerId, requesterPlayerId } = data;
   try {
     if (!roomId) throw new Error("Invalid play");
 
-    const room = getRoom(roomId);
+    const room = getThullaRoom(roomId);
     if (!room) throw new Error("Room not found");
 
     const requesterPlayer = room.players.find(
@@ -136,13 +136,13 @@ export async function handleApproveRequestCard(
 export async function handleRejectRequestCard(
   socket: any,
   io: any,
-  data: RejectRequestCardEventData
+  data: ThullaRejectRequestCardEventData
 ) {
   const { roomId, playerName, requesterPlayerId } = data;
   try {
     if (!roomId) throw new Error("Invalid play");
 
-    const room = getRoom(roomId);
+    const room = getThullaRoom(roomId);
     if (!room) throw new Error("Room not found");
 
     const requesterPlayer = room.players.find(

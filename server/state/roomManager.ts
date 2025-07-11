@@ -1,13 +1,13 @@
-import { Room, RoomCollection } from "../types/thulla.ts";
+import { ThullaRoom, ThullaRoomCollection } from "../types/thulla.ts";
 
-const rooms: RoomCollection = {};
+const thullaRooms: ThullaRoomCollection = {};
 
-export const getRoom = (roomId: string): Room | undefined => {
-  return rooms[roomId];
+export const getThullaRoom = (roomId: string): ThullaRoom | undefined => {
+  return thullaRooms[roomId];
 }
 
-export const createRoom = (roomId: string, playerId: string, playerName: string): void => {
-  rooms[roomId] = {
+export const createThullaRoom = (roomId: string, playerId: string, playerName: string): void => {
+  thullaRooms[roomId] = {
     players: [],
     currentTurn: null,
     playedCards: [],
@@ -19,10 +19,10 @@ export const createRoom = (roomId: string, playerId: string, playerName: string)
   };
 };
 
-export const deleteRoom = (roomId: string): void => {
-  delete rooms[roomId];
+export const deleteThullaRoom = (roomId: string): void => {
+  delete thullaRooms[roomId];
 }
 
-export const getAllRooms = (): RoomCollection => {
-  return rooms;
+export const getAllThullaRooms = (): ThullaRoomCollection => {
+  return thullaRooms;
 }

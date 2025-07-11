@@ -1,11 +1,11 @@
-import { Room } from "../types/thulla.ts";
+import { ThullaRoom } from "../types/thulla.ts";
 
 export const generatRoomId = (): string => {
   const bytes = crypto.getRandomValues(new Uint8Array(6)); // 6 bytes = 48 bits
   return btoa(String.fromCharCode(...bytes)).replace(/[/+=]/g, '').slice(0, 8); // Safe, short string
 };
 
-export const getNextEligiblePlayer = (room: Room, startIndex: number) => {
+export const getNextEligiblePlayer = (room: ThullaRoom, startIndex: number) => {
   const players = room.players;
   let index = startIndex;
   let count = 0;

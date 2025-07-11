@@ -1,12 +1,12 @@
 import { PlayedCard } from "./main.ts";
 
-export const rooms: RoomCollection = {};
+export const rooms: ThullaRoomCollection = {};
 
-export type RoomCollection = {
-  [key: string]: Room;
+export type ThullaRoomCollection = {
+  [key: string]: ThullaRoom;
 };
 
-export type Player = {
+export type ThullaPlayer = {
   id: string;
   name: string;
   socketId: string;
@@ -14,8 +14,8 @@ export type Player = {
   isWon: boolean;
 };
 
-export type Room = {
-  players: Player[];
+export type ThullaRoom = {
+  players: ThullaPlayer[];
   currentTurn: { id: string; name: string } | null;
   playedCards: PlayedCard[];
   noOfTurns: number;
@@ -25,39 +25,39 @@ export type Room = {
   isFirstTurn: boolean;
 };
 
-export type CreateRoomEventData = {
+export type ThullaCreateRoomEventData = {
   playerId: string;
   playerName: string;
 };
 
-export type JoinGameEventData = {
+export type ThullaJoinGameEventData = {
   roomId: string;
   playerName: string;
   playerId: string;
 };
 
-export type StartGameEventData = {
+export type ThullaStartGameEventData = {
   roomId: string;
 };
 
-export type RequestCardEventData = {
+export type ThullaRequestCardEventData = {
   roomId: string;
   playerId: string;
 };
 
-export type ApproveRequestCardEventData = {
+export type ThullaApproveRequestCardEventData = {
   roomId: string;
   requesterPlayerId: string;
   playerId: string;
 };
 
-export type RejectRequestCardEventData = {
+export type ThullaRejectRequestCardEventData = {
   roomId: string;
   playerName: string;
   requesterPlayerId: string;
 };
 
-export type EventType =
+export type ThullaEventType =
   | "create_room"
   | "join_game"
   | "game_chat"
@@ -71,9 +71,3 @@ export type EventType =
   | "kick_player"
   | "auto_play_card"
   | "audio_message";
-
-export type SecureEventPayload = {
-  game: string;
-  event_type: EventType;
-  data: any;
-};

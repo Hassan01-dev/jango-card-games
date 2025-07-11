@@ -1,7 +1,4 @@
 import { connections } from "../main.ts";
-import { getAllRooms } from "../state/roomManager.ts";
-import { getNextEligiblePlayer } from "../utils/helper.ts";
-import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 import handleThullaDisconnect from "./thulla/handleDisconnect.ts";
 
 const handleJackTheifDisconnect = (socket: any, io: any) => {

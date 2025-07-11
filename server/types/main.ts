@@ -1,3 +1,5 @@
+import { ThullaEventType } from "./thulla.ts";
+
 export type PlayedCard = {
   playerName: string;
   card: string;
@@ -32,23 +34,11 @@ export type AudioMessageType = {
   audioKey: string;
 };
 
-export type EventType =
-  | "create_room"
-  | "join_game"
-  | "game_chat"
-  | "play_card"
-  | "disconnect"
-  | "start_game"
-  | "won"
-  | "request_card"
-  | "approve_request_card"
-  | "reject_request_card"
-  | "kick_player"
-  | "auto_play_card"
-  | "audio_message";
+export type GameType =
+  | "thulla";
 
 export type SecureEventPayload = {
-  game: string;
-  event_type: EventType;
+  game: GameType;
+  event_type: ThullaEventType;
   data: any;
 };

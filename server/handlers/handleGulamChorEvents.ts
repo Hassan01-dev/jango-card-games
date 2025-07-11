@@ -1,5 +1,5 @@
-import { AudioMessageType, EventType, GameChatEventData, KickPlayerEventData } from "../types/main.ts";
-import { CreateRoomEventData, JoinGameEventData } from "../types/thulla.ts";
+import { AudioMessageType, GameChatEventData, KickPlayerEventData } from "../types/main.ts";
+import { ThullaCreateRoomEventData, ThullaEventType, ThullaJoinGameEventData } from "../types/thulla.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 import { handleCreateRoomEvent } from "./gulam_chor/handleCreateGame.ts";
 import { handleJoinGame } from "./gulam_chor/handleJoinGame.ts";
@@ -11,15 +11,15 @@ import { handleGameChat } from "./handleGameChat.ts"
 const handleThullaGameEvents = async (
   socket: any,
   io: any,
-  event_type: EventType,
+  event_type: ThullaEventType,
   data: any
 ) => {
   switch (event_type) {
     case "create_room":
-      await handleCreateRoomEvent(socket, io, data as CreateRoomEventData);
+      await handleCreateRoomEvent(socket, io, data as ThullaCreateRoomEventData);
       break;
     case "join_game":
-      await handleJoinGame(socket, io, data as JoinGameEventData);
+      await handleJoinGame(socket, io, data as ThullaJoinGameEventData);
       break;
     case "game_chat":
       await handleGameChat(socket, io, "thulla", data as GameChatEventData);

@@ -1,4 +1,3 @@
-import { getRoom } from "../state/roomManager.ts";
 import { AudioMessageType } from "../types/main.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 
@@ -10,10 +9,6 @@ export async function handleAudioMessage(
 ) {
   const { roomId, audioKey } = data;
   try {
-    
-    const targetRoom = getRoom(roomId);
-    if (!targetRoom) throw new Error("Room not found");
-
     await sendEncryptedEvent(
       game,
       "audio_message",

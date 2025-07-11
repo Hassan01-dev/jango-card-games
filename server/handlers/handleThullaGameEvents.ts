@@ -1,5 +1,5 @@
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { ApproveRequestCardEventData, CreateRoomEventData, EventType, JoinGameEventData, RejectRequestCardEventData, RequestCardEventData, StartGameEventData } from "../types/thulla.ts";
+import { ThullaApproveRequestCardEventData, ThullaCreateRoomEventData, ThullaEventType, ThullaJoinGameEventData, ThullaRejectRequestCardEventData, ThullaRequestCardEventData, ThullaStartGameEventData } from "../types/thulla.ts";
 import { handeleAutoPlayCard } from "./thulla/handleAutoPlayCard.ts";
 import { handleCreateRoomEvent } from "./thulla/handleCreateGame.ts";
 import { handleJoinGame } from "./thulla/handleJoinGame.ts";
@@ -14,15 +14,15 @@ import { AudioMessageType, GameChatEventData, KickPlayerEventData, PlayCardEvent
 const handleThullaGameEvents = async (
   socket: any,
   io: any,
-  event_type: EventType,
+  event_type: ThullaEventType,
   data: any
 ) => {
   switch (event_type) {
     case "create_room":
-      await handleCreateRoomEvent(socket, io, data as CreateRoomEventData);
+      await handleCreateRoomEvent(socket, io, data as ThullaCreateRoomEventData);
       break;
     case "join_game":
-      await handleJoinGame(socket, io, data as JoinGameEventData);
+      await handleJoinGame(socket, io, data as ThullaJoinGameEventData);
       break;
     case "game_chat":
       await handleGameChat(socket, io, "thulla", data as GameChatEventData);
@@ -31,23 +31,23 @@ const handleThullaGameEvents = async (
       await handlePlayCard(socket, io, data as PlayCardEventData);
       break;
     case "start_game":
-      await handleStartGame(socket, io, data as StartGameEventData);
+      await handleStartGame(socket, io, data as ThullaStartGameEventData);
       break;
     case "request_card":
-      await handleRequestCard(socket, io, data as RequestCardEventData);
+      await handleRequestCard(socket, io, data as ThullaRequestCardEventData);
       break;
     case "approve_request_card":
       await handleApproveRequestCard(
         socket,
         io,
-        data as ApproveRequestCardEventData
+        data as ThullaApproveRequestCardEventData
       );
       break;
     case "reject_request_card":
       await handleRejectRequestCard(
         socket,
         io,
-        data as RejectRequestCardEventData
+        data as ThullaRejectRequestCardEventData
       );
       break;
     case "kick_player":

@@ -1,4 +1,4 @@
-import { getRoom } from "../../state/roomManager.ts";
+import { getThullaRoom } from "../../state/roomManager.ts";
 import { PlayCardEventData } from "../../types/main.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 import { handlePlayCard } from "./handlePlayCard.ts";
@@ -12,7 +12,7 @@ export async function handeleAutoPlayCard(
   try {
     if (!roomId) throw new Error("Invalid play");
 
-    const room = getRoom(roomId);
+    const room = getThullaRoom(roomId);
     if (!room) throw new Error("Room not found");
     
     const currentTurn = room.currentTurn;

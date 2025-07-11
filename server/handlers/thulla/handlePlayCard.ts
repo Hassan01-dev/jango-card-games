@@ -1,5 +1,5 @@
 import { parseCard } from "../../utils/parseCard.ts";
-import { getRoom } from "../../state/roomManager.ts";
+import { getThullaRoom } from "../../state/roomManager.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 import { PlayCardEventData } from "../../types/main.ts";
@@ -19,7 +19,7 @@ export async function handlePlayCard(
   try {
     if (!roomId || !card || !playerName) throw new Error("Invalid play");
 
-    const room = getRoom(roomId);
+    const room = getThullaRoom(roomId);
     if (!room) throw new Error("Room not found");
 
     room.playedCards = room.playedCards || [];
