@@ -1,4 +1,4 @@
-import { getThullaRoom } from "../../state/roomManager.ts";
+import { getThullaRoom } from "../../state/thullaRoomManager.ts";
 import { ThullaApproveRequestCardEventData, ThullaRejectRequestCardEventData, ThullaRequestCardEventData } from "../../types/thulla.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";

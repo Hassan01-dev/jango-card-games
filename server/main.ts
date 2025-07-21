@@ -15,8 +15,8 @@ const io = new Server({
 
 io.on("connection", (socket: any) => {
   console.log(`socket ${socket.id} connected`);
-  handleDisconnect(socket, io, connections);
-  handleSecureEvent(socket, io, connections);
+  handleDisconnect(socket, io);
+  handleSecureEvent(socket, io);
 });
 
 await serve(io.handler(), {

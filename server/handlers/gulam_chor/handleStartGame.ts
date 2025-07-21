@@ -1,32 +1,32 @@
-import { getThullaRoom } from "../../state/roomManager.ts";
-import { ThullaStartGameEventData } from "../../types/thulla.ts";
+import { getGulamChorRoom } from "../../state/gulamChorRoomManager.ts";
+import { GulamChorPlayer, GulamChorStartGameEventData } from "../../types/gulamChor.ts";
 import { CardDeck } from "../../utils/cardDeck.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
 export async function handleStartGame(
   socket: any,
   io: any,
-  data: ThullaStartGameEventData
+  data: GulamChorStartGameEventData
 ) {
   const { roomId } = data;
   try {
     if (!roomId) throw new Error("Invalid play");
 
-    const room = getThullaRoom(roomId);
+    const room = getGulamChorRoom(roomId);
     if (!room) throw new Error("Room not found");
 
-    // const currentDeck = new CardDeck();
-    // currentDeck.shuffleDeck();
-    // const firstPlayer = currentDeck.distributeCards(room.players) as Player;
-    // room.currentTurn = { id: firstPlayer.id, name: firstPlayer.name };
-    // room.isStarted = true;
+    const currentDeck = new CardDeck();
+    currentDeck.shuffleDeck();
+    const firstPlayer = currentDeck.distributeCards(room.players) as GulamChorPlayer;
+    room.currentTurn = { id: firstPlayer.id, name: firstPlayer.name };
+    room.isStarted = true;
 
-    // await sendEncryptedEvent("thulla", "game_started", {}, roomId, io);
+    await sendEncryptedEvent("gulam_chor", "game_started", {}, roomId, io);
 
     // setTimeout(async () => {
     //   room.players.forEach(async (player) => {
     //     await sendEncryptedEvent(
-    //       "thulla",
+    //       "gulam_chor",
     //       "hand_received",
     //       {
     //         currentTurn: room.currentTurn,
@@ -43,14 +43,11 @@ export async function handleStartGame(
     //       io
     //     );
     //   });
-
-    //   const data = {roomId, card: "ace_of_spades", playerName: firstPlayer.name, playerId: firstPlayer.id}
-    //   await handlePlayCard(socket, io, data as PlayCardEventData);
     // }, 4000);
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
-        "thulla",
+        "gulamChor",
         "error",
         { message: error.message },
         socket.id,

@@ -23,7 +23,7 @@ export type EventType =
   | "game_won"
   | "audio_message";
 
-export type GameTypes = "thulla"
+export type GameTypes = "thulla" | "gulam_chor";
 
 export type GameCreatedDataType = {
   roomId: string;

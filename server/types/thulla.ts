@@ -62,7 +62,6 @@ export type ThullaEventType =
   | "join_game"
   | "game_chat"
   | "play_card"
-  | "disconnect"
   | "start_game"
   | "won"
   | "request_card"

@@ -17,6 +17,7 @@ const chatOptions = [
   { label: "Thulla", key: "thulla" },
   { label: "Pan Di Siri", key: "pds" },
   { label: "Oh Shit!", key: "oh_shit" },
+  { label: "Hauli Hauli", key: "hauli_hauli" }
 ];
 
 const GameChat = ({

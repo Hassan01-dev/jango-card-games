@@ -1,4 +1,4 @@
-import { getAllThullaRooms } from "../../state/roomManager.ts";
+import { getAllThullaRooms } from "../../state/thullaRoomManager.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 

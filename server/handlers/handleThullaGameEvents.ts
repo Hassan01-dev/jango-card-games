@@ -3,13 +3,14 @@ import { ThullaApproveRequestCardEventData, ThullaCreateRoomEventData, ThullaEve
 import { handeleAutoPlayCard } from "./thulla/handleAutoPlayCard.ts";
 import { handleCreateRoomEvent } from "./thulla/handleCreateGame.ts";
 import { handleJoinGame } from "./thulla/handleJoinGame.ts";
-import { handleKickPlayer } from "./thulla/handleKickPlayer.ts";
+import { handleKickPlayer } from "./handleKickPlayer.ts";
 import { handleApproveRequestCard, handleRejectRequestCard, handleRequestCard } from "./thulla/handleRequestCard.ts";
 import { handleStartGame } from "./thulla/handleStartGame.ts";
 import { handleAudioMessage } from "./handleAudioMessage.ts"
 import { handleGameChat } from "./handleGameChat.ts"
 import { handlePlayCard } from "./thulla/handlePlayCard.ts";
 import { AudioMessageType, GameChatEventData, KickPlayerEventData, PlayCardEventData } from "../types/main.ts";
+import { getThullaRoom } from "../state/thullaRoomManager.ts";
 
 const handleThullaGameEvents = async (
   socket: any,
@@ -51,7 +52,9 @@ const handleThullaGameEvents = async (
       );
       break;
     case "kick_player":
-      await handleKickPlayer(socket, io, data as KickPlayerEventData);
+      const { roomId } = data as { roomId: string, playerId: string, ownerId: string };
+      const targetRoom = getThullaRoom(roomId);
+      await handleKickPlayer(socket, io, { ...data, targetRoom, game: "thulla"} as KickPlayerEventData);
       break;
     case "auto_play_card":
       await handeleAutoPlayCard(socket, io, data as { roomId: string });

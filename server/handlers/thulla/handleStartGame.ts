@@ -1,4 +1,4 @@
-import { getThullaRoom } from "../../state/roomManager.ts";
+import { getThullaRoom } from "../../state/thullaRoomManager.ts";
 import { PlayCardEventData } from "../../types/main.ts";
 import { ThullaPlayer, ThullaStartGameEventData } from "../../types/thulla.ts";
 import { CardDeck } from "../../utils/cardDeck.ts";

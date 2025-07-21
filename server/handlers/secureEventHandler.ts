@@ -1,6 +1,9 @@
+import { GulamChorEventType } from "../types/gulamChor.ts";
 import { SecureEventPayload } from "../types/main.ts";
+import { ThullaEventType } from "../types/thulla.ts";
 import { decryptPayload } from "../utils/crypto.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
+import handleGulamChorGameEvents from "./handleGulamChorEvents.ts";
 
 import handleThullaGameEvents from "./handleThullaGameEvents.ts";
 
@@ -13,7 +16,10 @@ export function handleSecureEvent(socket: any, io: any) {
 
       switch (game) {
         case "thulla":
-          handleThullaGameEvents(socket, io, event_type, data);
+          handleThullaGameEvents(socket, io, event_type as ThullaEventType, data);
+          break;
+        case "gulam_chor":
+          handleGulamChorGameEvents(socket, io, event_type as GulamChorEventType, data);
           break;
         default:
           console.warn("Unknown game:", game);

@@ -1,5 +1,5 @@
 import { parseCard } from "../../utils/parseCard.ts";
-import { getThullaRoom } from "../../state/roomManager.ts";
+import { getThullaRoom } from "../../state/thullaRoomManager.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 import { PlayCardEventData } from "../../types/main.ts";

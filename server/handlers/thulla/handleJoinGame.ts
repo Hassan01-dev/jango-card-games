@@ -1,5 +1,5 @@
 import { connections } from "../../main.ts";
-import { getThullaRoom } from "../../state/roomManager.ts";
+import { getThullaRoom } from "../../state/thullaRoomManager.ts";
 import { ThullaJoinGameEventData } from "../../types/thulla.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 

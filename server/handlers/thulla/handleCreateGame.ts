@@ -1,4 +1,4 @@
-import { createThullaRoom } from "../../state/roomManager.ts";
+import { createThullaRoom } from "../../state/thullaRoomManager.ts";
 import { ThullaCreateRoomEventData } from "../../types/thulla.ts";
 import { generatRoomId } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
