@@ -13,8 +13,8 @@ export const createGulamChorRoom = (roomId: string, playerId: string, playerName
     playedCards: [],
     noOfTurns: 0,
     isStarted: false,
-    isFirstTurn: true,
     ownerId: playerId,
+    removedCard: "",
     ownerName: playerName,
   };
 };

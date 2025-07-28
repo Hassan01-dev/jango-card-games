@@ -11,6 +11,7 @@ import { IMsgDataTypes, OpponentType } from "@/utils/types";
 interface Props {
   opponents: OpponentType[];
   handleStartGame: () => void;
+  handleStartGameWithHiddenCard: () => void;
   playerId: string;
   ownerId: string;
   playerName: string;
@@ -24,6 +25,7 @@ interface Props {
 export default function GameNotStarted({
   opponents,
   handleStartGame,
+  handleStartGameWithHiddenCard,
   playerId,
   ownerId,
   playerName,
@@ -92,9 +94,16 @@ export default function GameNotStarted({
           <Button
             onClick={handleStartGame}
             disabled={!isOwner}
-            className="w-full"
+            className="w-full my-2"
           >
             {isOwner ? "Start Game" : "Waiting for Owner to Start"}
+          </Button>
+          <Button
+            onClick={handleStartGameWithHiddenCard}
+            disabled={!isOwner}
+            className="w-full my-2"
+          >
+            {isOwner ? "Start Game (With Hidden Card)" : "Waiting for Owner to Start"}
           </Button>
         </div>
       </div>

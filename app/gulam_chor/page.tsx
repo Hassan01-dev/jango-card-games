@@ -11,18 +11,18 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-const isUnderConstruction = true
 export default function Game() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  const isUnderConstruction = searchParams.get("dev") !== "true";
 
   useEffect(() => {
     if (isUnderConstruction) {
       toast.error("This game is currently under development");
       router.push("/");
     }
-  }, []);
-
-  const searchParams = useSearchParams();
+  }, [isUnderConstruction, router]);
 
   const { playerName, setPlayerName, createGame, joinGame } = useGulamChorGame("");
   const [roomId, setRoomId] = useState(searchParams.get("roomId") || "");

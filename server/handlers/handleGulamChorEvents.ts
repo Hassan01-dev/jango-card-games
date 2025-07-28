@@ -7,7 +7,7 @@ import { handleJoinGame } from "./gulam_chor/handleJoinGame.ts";
 import { handleKickPlayer } from "./handleKickPlayer.ts";
 import { handleAudioMessage } from "./handleAudioMessage.ts"
 import { handleGameChat } from "./handleGameChat.ts"
-import { handleStartGame } from "./gulam_chor/handleStartGame.ts";
+import { handleStartGame, handleStartGameWithHiddenCard } from "./gulam_chor/handleStartGame.ts";
 
 
 const handleGulamChorEvents = async (
@@ -25,6 +25,9 @@ const handleGulamChorEvents = async (
       break;
     case "start_game":
       await handleStartGame(socket, io, data as GulamChorStartGameEventData);
+      break;
+    case "start_game_with_hidden_card":
+      await handleStartGameWithHiddenCard(socket, io, data as GulamChorStartGameEventData);
       break;
     case "game_chat":
       await handleGameChat(socket, io, "gulam_chor", data as GameChatEventData);

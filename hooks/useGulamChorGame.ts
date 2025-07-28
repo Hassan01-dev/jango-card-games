@@ -30,6 +30,7 @@ const useGulamChorGame = (roomIdParam: string) => {
 
   const [requestData, setRequestData] = useState<RequestReceivedDataType | null>(null);
   const [isRequestReceived, setIsRequestReceived] = useState<boolean>(false);
+  const [isHiddenCard, setIsHiddenCard] = useState<boolean>(false);
 
   const [isUserInfo, setIsUserInfo] = useState<boolean>(false);
   const [playerName, setPlayerName] = useState<string>("");
@@ -133,6 +134,7 @@ const useGulamChorGame = (roomIdParam: string) => {
         case "game_started":
           toast.success("Game started");
           setGameStarted(true);
+          setIsHiddenCard((data as {isHiddenCard: boolean}).isHiddenCard);
           break;
         case "hand_received":
           handleHandReceived(data as HandReceivedDataType);
@@ -321,6 +323,7 @@ const useGulamChorGame = (roomIdParam: string) => {
   };
 
   const handleStartGame = () => emitSecureEvent("start_game", { roomId })
+  const handleStartGameWithHiddenCard = () => emitSecureEvent("start_game_with_hidden_card", { roomId })
 
   const emitChatEvent = (msgData: IMsgDataTypes) => {
     emitSecureEvent("game_chat", msgData);
@@ -390,6 +393,7 @@ const startTimer = (currentTurn: TurnType) => {
     turnTimer,
     isWinner,
     nextTurn,
+    isHiddenCard,
     createGame,
     joinGame,
     setPlayerName,
@@ -406,6 +410,7 @@ const startTimer = (currentTurn: TurnType) => {
     setGameStarted,
     handleCardPlayed,
     handleStartGame,
+    handleStartGameWithHiddenCard,
     emitJoinGame,
     emitChatEvent,
     handleKickPlayer,

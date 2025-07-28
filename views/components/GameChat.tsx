@@ -17,7 +17,8 @@ const chatOptions = [
   { label: "Thulla", key: "thulla" },
   { label: "Pan Di Siri", key: "pds" },
   { label: "Oh Shit!", key: "oh_shit" },
-  { label: "Hauli Hauli", key: "hauli_hauli" }
+  { label: "Hauli Hauli", key: "hauli_hauli" },
+  { label: "Darkness", key: "darkness" }
 ];
 
 const GameChat = ({
@@ -129,7 +130,7 @@ const GameChat = ({
           </Button>
 
           {showDropdown && (
-            <div className="absolute right-0 top-full mt-2 bg-white/10 border border-white/20 rounded shadow-md z-50 backdrop-blur-md p-1">
+            <div className="absolute right-0 top-full mt-2 bg-white/10 border border-white/20 rounded shadow-md z-50 backdrop-blur-md p-1 h-[200px] overflow-y-auto">
               {chatOptions.map((opt) => (
                 <button
                   key={opt.key}

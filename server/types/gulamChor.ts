@@ -22,7 +22,7 @@ export type GulamChorRoom = {
   isStarted: boolean;
   ownerId: string;
   ownerName: string;
-  isFirstTurn: boolean;
+  removedCard: string;
 };
 
 export type GulamChorCreateRoomEventData = {
@@ -45,6 +45,7 @@ export type GulamChorEventType =
   | "join_game"
   | "game_chat"
   | "start_game"
+  | "start_game_with_hidden_card"
   | "won"
   | "kick_player"
   | "audio_message";
