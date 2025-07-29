@@ -43,7 +43,7 @@ export default function Game() {
           />
         </div>
 
-        <Button onClick={createGame} className="w-full" disabled={roomId !== ""}>
+        <Button onClick={createGame} className="w-full" disabled={!roomId}>
           Create Room
         </Button>
 
