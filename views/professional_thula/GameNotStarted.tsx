@@ -71,18 +71,29 @@ export default function GameNotStarted({
                 }}
               >
                 <div>{opponent.name}</div>
-                {ownerId === opponent.id && <Badge variant="default">Owner</Badge>}
-                {playerId === opponent.id && <Badge variant="secondary">You</Badge>}
-                {isOwner && playerId !== opponent.id && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleKickPlayer(opponent.id)}
-                    className="ml-2"
-                  >
-                    <Image src="/kick.svg" alt="Kick" width={20} height={20} />
-                  </Button>
-                )}
+                <div className="flex items-center gap-1">
+                  {ownerId === opponent.id && (
+                    <Badge variant="default">Owner</Badge>
+                  )}
+                  {playerId === opponent.id && (
+                    <Badge variant="secondary">You</Badge>
+                  )}
+                  {isOwner && playerId !== opponent.id && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleKickPlayer(opponent.id)}
+                      className="ml-2"
+                    >
+                      <Image
+                        src="/kick.svg"
+                        alt="Kick"
+                        width={20}
+                        height={20}
+                      />
+                    </Button>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -91,7 +102,7 @@ export default function GameNotStarted({
         <div className="w-full max-w-sm">
           <Button
             onClick={handleStartGame}
-            disabled={!isOwner}
+            disabled={!isOwner || opponents.length < 2}
             className="w-full"
           >
             {isOwner ? "Start Game" : "Waiting for Owner to Start"}
