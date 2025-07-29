@@ -102,7 +102,7 @@ export default function GameNotStarted({
         <div className="w-full max-w-sm">
           <Button
             onClick={handleStartGame}
-            disabled={!isOwner || opponents.length < 2}
+            disabled={!(isOwner && opponents.length >= 2)}
             className="w-full"
           >
             {isOwner ? "Start Game" : "Waiting for Owner to Start"}

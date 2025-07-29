@@ -16,7 +16,7 @@ export async function handleStartGame(
 
     const room = getThullaRoom(roomId);
     if (!room) throw new Error("Room not found");
-    if (room.players.length < 2) throw new Error("Room must have at least 2 players");``
+    if (room.players.length < 2) throw new Error("Room must have at least 2 players");
 
     const currentDeck = new CardDeck();
     currentDeck.shuffleDeck();
