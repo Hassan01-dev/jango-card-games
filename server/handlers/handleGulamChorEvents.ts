@@ -1,5 +1,5 @@
 import { getGulamChorRoom } from "../state/gulamChorRoomManager.ts";
-import { GulamChorCreateRoomEventData, GulamChorEventType, GulamChorJoinGameEventData, GulamChorStartGameEventData } from "../types/gulamChor.ts";
+import { GulamChorCreateRoomEventData, GulamChorEventType, GulamChorJoinGameEventData, GulamChorRemovePairsEventData, GulamChorStartGameEventData } from "../types/gulamChor.ts";
 import { AudioMessageType, GameChatEventData, KickPlayerEventData } from "../types/main.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 import { handleCreateRoomEvent } from "./gulam_chor/handleCreateGame.ts";
@@ -8,6 +8,7 @@ import { handleKickPlayer } from "./handleKickPlayer.ts";
 import { handleAudioMessage } from "./handleAudioMessage.ts"
 import { handleGameChat } from "./handleGameChat.ts"
 import { handleStartGame, handleStartGameWithHiddenCard } from "./gulam_chor/handleStartGame.ts";
+import { handleRemovePairs } from "./gulam_chor/handleRemovePairs.ts";
 
 
 const handleGulamChorEvents = async (
@@ -39,6 +40,9 @@ const handleGulamChorEvents = async (
       break;
     case "audio_message":
       await handleAudioMessage(socket, io, "gulam_chor", data as AudioMessageType);
+      break;
+    case "remove_pairs":
+      await handleRemovePairs(socket, io, data as GulamChorRemovePairsEventData);
       break;
     default:
       console.warn("Unknown event_type:", event_type);

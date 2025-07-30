@@ -40,6 +40,12 @@ export type GulamChorStartGameEventData = {
   roomId: string;
 };
 
+export type GulamChorRemovePairsEventData = {
+  roomId: string;
+  playerId: string;
+  removedCards: string[];
+};
+
 export type GulamChorEventType =
   | "create_room"
   | "join_game"
@@ -48,4 +54,5 @@ export type GulamChorEventType =
   | "start_game_with_hidden_card"
   | "won"
   | "kick_player"
-  | "audio_message";
+  | "audio_message"
+  | "remove_pairs";

@@ -28,7 +28,8 @@ export default function GameStarted({
   ownerId,
   nextTurn,
   isWinner,
-  handleSendAudioMessage
+  handleSendAudioMessage,
+  handleRemovePairs
 }: {
   roomId: string;
   playerId: string;
@@ -49,6 +50,7 @@ export default function GameStarted({
   nextTurn: TurnType;
   isWinner: boolean;
   handleSendAudioMessage: (key: string) => void;
+  handleRemovePairs: () => void;
 }) {
   const playerName =
     typeof window !== "undefined"
@@ -228,7 +230,7 @@ export default function GameStarted({
                 </div>
               </div>
 
-              <Button className="w-fit">
+              <Button onClick={handleRemovePairs} className="w-fit">
                 Remove Pairs
               </Button>
             </div>
@@ -245,11 +247,7 @@ export default function GameStarted({
                 return (
                   <div
                     key={index}
-                    className={`relative transition duration-300 ${
-                      isDisabled
-                        ? "cursor-not-allowed brightness-50"
-                        : "cursor-pointer"
-                    }`}
+                    className={"relative transition duration-300 cursor-not-allowed brightness-50"}
                     style={{
                       transform: `rotate(${rotation}deg)`,
                       zIndex: index,
@@ -264,7 +262,7 @@ export default function GameStarted({
                       alt={card}
                       width={100}
                       height={150}
-                      className="rounded-lg shadow-lg hover:shadow-2xl transform hover:-translate-y-4 transition-all"
+                      className="rounded-lg shadow-lg"
                     />
                   </div>
                 );

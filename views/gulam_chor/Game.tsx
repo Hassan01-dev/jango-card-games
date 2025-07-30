@@ -37,6 +37,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     chat,
     handleKickPlayer,
     handleSendAudioMessage,
+    handleRemovePairs
   } = useGulamChorGame(roomIdParam);
 
   useEffect(() => {
@@ -71,6 +72,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       nextTurn={nextTurn}
       isWinner={isWinner}
       handleSendAudioMessage={handleSendAudioMessage}
+      handleRemovePairs={handleRemovePairs}
     />
   ) : (
     <GameNotStarted

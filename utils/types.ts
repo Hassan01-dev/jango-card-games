@@ -21,7 +21,8 @@ export type EventType =
   | "kicked"
   | "auto_card_played"
   | "game_won"
-  | "audio_message";
+  | "audio_message"
+  | "pair_removed";
 
 export type GameTypes = "thulla" | "gulam_chor";
 
@@ -123,6 +124,10 @@ export type PlayCardDataType = {
   card: string;
 }
 
+export type PairRemovedDataType = {
+  noOfPairsRemoved: number;
+  playerName: string;
+}
 export type PlayerLeftDataType = { roomId: string; playerName: string, playerId: string }
 
 export type UseGameReturn = {

@@ -20,6 +20,7 @@ import {
   ErrorType,
   PlayCardDataType,
   PlayerLeftDataType,
+  PairRemovedDataType,
 } from "@/utils/types";
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
@@ -180,8 +181,14 @@ const useGulamChorGame = (roomIdParam: string) => {
         case "game_won":
           setIsWinner(true);
           break;
+        case "player_won":
+          handlePlayerWon(data as PlayerWonDataType);
+          break;
         case "audio_message":
           handleAudioMessage(data as {audioKey: string});
+          break;
+        case "pair_removed":
+          handlePairRemoved(data as PairRemovedDataType);
           break;
         default:
           console.warn("Unhandled event_type:", event_type);
@@ -192,6 +199,11 @@ const useGulamChorGame = (roomIdParam: string) => {
   };
 
   // Event Handlers
+  const handlePairRemoved = (data: PairRemovedDataType) => {
+    const { noOfPairsRemoved, playerName } = data;
+    toast.success(`${playerName} removed ${noOfPairsRemoved} pairs`);
+  };
+
   const handleAudioMessage = (data: {audioKey: string}) => {
     const { audioKey } = data;
     const audio = new Audio(`/audio/${audioKey}.mp3`);
@@ -354,9 +366,9 @@ const startTimer = (currentTurn: TurnType) => {
         timerRef.current = null;
         const storedPlayerId = localStorage.getItem('playerId');
         if (currentTurn.id === storedPlayerId) {
-          emitSecureEvent('auto_play_card', {
-            roomId
-          });
+          // emitSecureEvent('auto_play_card', {
+          //   roomId
+          // });
         }
         return 0;
       }
@@ -369,6 +381,40 @@ const startTimer = (currentTurn: TurnType) => {
     emitSecureEvent("audio_message", {
       roomId,
       audioKey
+    });
+  }
+
+
+  const handleRemovePairs = () => {
+    debugger;
+    const removedCards: string[] = [];
+    const remainingCards: string[] = [];
+    const rankGroups = new Map<string, string[]>();
+
+    myCards.forEach((card) => {
+      const rank = card.split('_of_')[0];
+      const group = rankGroups.get(rank) || [];
+      group.push(card);
+      rankGroups.set(rank, group);
+    });
+
+    rankGroups.forEach((cards) => {
+      const pairCount = Math.floor(cards.length / 2);
+      
+      for (let i = 0; i < pairCount * 2; i++) {
+        removedCards.push(cards[i]);
+      }
+      
+      for (let i = pairCount * 2; i < cards.length; i++) {
+        remainingCards.push(cards[i]);
+      }
+    });
+
+    setMyCards(remainingCards);
+    emitSecureEvent("remove_pairs", {
+      roomId,
+      playerId,
+      removedCards
     });
   }
 
@@ -414,7 +460,8 @@ const startTimer = (currentTurn: TurnType) => {
     emitJoinGame,
     emitChatEvent,
     handleKickPlayer,
-    handleSendAudioMessage
+    handleSendAudioMessage,
+    handleRemovePairs
   };
 };
 
