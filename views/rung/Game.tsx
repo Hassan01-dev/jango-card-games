@@ -6,7 +6,7 @@ import GameNotStarted from "./GameNotStarted";
 import GameStarted from "./GameStarted";
 
 import toast from "react-hot-toast";
-import useGulamChorGame from "@/hooks/useGulamChorGame";
+import useRungGame from "@/hooks/useRungGame";
 
 export default function Game({ roomId: roomIdParam }: {roomId: string}) {
   const router = useRouter();
@@ -38,14 +38,14 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     handleKickPlayer,
     handleSendAudioMessage,
     handleRemovePairs
-  } = useGulamChorGame(roomIdParam);
+  } = useRungGame(roomIdParam);
 
   useEffect(() => {
     if (!isUserInfo) return;
 
     if (!playerName || !playerId) {
       toast.error("Please enter your name before joining");
-      router.replace(`/gulam_chor?roomId=${roomId}`);
+      router.replace(`/rung?roomId=${roomId}`);
     } else {
       emitJoinGame();
     }

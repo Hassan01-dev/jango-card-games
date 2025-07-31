@@ -1,24 +1,24 @@
 import { connections } from "../../main.ts";
-import { getGulamChorRoom } from "../../state/gulamChorRoomManager.ts";
-import { GulamChorJoinGameEventData } from "../../types/gulamChor.ts";
+import { getRungRoom } from "../../state/rungRoomManager.ts";
+import { RungJoinGameEventData } from "../../types/rung.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
 export async function handleJoinGame(
   socket: any,
   io: any,
-  data: GulamChorJoinGameEventData
+  data: RungJoinGameEventData
 ) {
   const { roomId, playerName, playerId } = data;
   try {
     connections[socket.id] = {
-      gameType: "thulla",
+      gameType: "rung",
     };
 
     if (!roomId || !playerName || !playerId) {
       throw new Error("Room ID, player name and player ID required");
     }
 
-    const targetRoom = getGulamChorRoom(roomId);
+    const targetRoom = getRungRoom(roomId);
     if (!targetRoom) throw new Error("Room not found");
 
     if (targetRoom.isStarted) {
@@ -41,7 +41,7 @@ export async function handleJoinGame(
     }
 
     await sendEncryptedEvent(
-      "gulam_chor",
+      "rung",
       "non_started_room_joined",
       {
         players: targetRoom?.players,
@@ -54,7 +54,7 @@ export async function handleJoinGame(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
-        "gulam_chor",
+        "rung",
         "error",
         { message: error.message },
         socket.id,

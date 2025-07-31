@@ -24,7 +24,7 @@ export type EventType =
   | "audio_message"
   | "pair_removed";
 
-export type GameTypes = "thulla" | "gulam_chor";
+export type GameTypes = "thulla" | "rung";
 
 export type GameCreatedDataType = {
   roomId: string;

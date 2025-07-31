@@ -1,12 +1,12 @@
 import { PlayedCard } from "./main.ts";
 
-export const rooms: GulamChorRoomCollection = {};
+export const rooms: RungRoomCollection = {};
 
-export type GulamChorRoomCollection = {
-  [key: string]: GulamChorRoom;
+export type RungRoomCollection = {
+  [key: string]: RungRoom;
 };
 
-export type GulamChorPlayer = {
+export type RungPlayer = {
   id: string;
   name: string;
   socketId: string;
@@ -14,8 +14,8 @@ export type GulamChorPlayer = {
   isWon: boolean;
 };
 
-export type GulamChorRoom = {
-  players: GulamChorPlayer[];
+export type RungRoom = {
+  players: RungPlayer[];
   currentTurn: { id: string; name: string } | null;
   playedCards: PlayedCard[];
   noOfTurns: number;
@@ -25,28 +25,28 @@ export type GulamChorRoom = {
   removedCard: string;
 };
 
-export type GulamChorCreateRoomEventData = {
+export type RungCreateRoomEventData = {
   playerId: string;
   playerName: string;
 };
 
-export type GulamChorJoinGameEventData = {
+export type RungJoinGameEventData = {
   roomId: string;
   playerName: string;
   playerId: string;
 };
 
-export type GulamChorStartGameEventData = {
+export type RungStartGameEventData = {
   roomId: string;
 };
 
-export type GulamChorRemovePairsEventData = {
+export type RungRemovePairsEventData = {
   roomId: string;
   playerId: string;
   removedCards: string[];
 };
 
-export type GulamChorEventType =
+export type RungEventType =
   | "create_room"
   | "join_game"
   | "game_chat"

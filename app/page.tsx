@@ -14,12 +14,12 @@ const games = [
       "Experience the classic Thulla game with stunning visuals and smooth gameplay. Play Thulla with your friends and family in a classic setting.",
   },
   {
-    name: "Gulam Chor (Jack Thief)",
+    name: "Rung",
     color: "bg-gradient-to-br from-pink-500 via-red-400 to-yellow-500",
-    url: "gulam_chor",
-    image: "/gulam_chor.png",
+    url: "rung",
+    image: "/rung.png",
     description:
-      "Experience the classic Gulam Chor (Jack Thief) game with stunning visuals and smooth gameplay. Play Thulla with your friends and family in a classic setting.",
+      "Experience the classic Rung game with stunning visuals and smooth gameplay. Play Rung with your friends and family in a classic setting.",
   },
 ];
 

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
-import useGulamChorGame from "@/hooks/useGulamChorGame";
+import useRungGame from "@/hooks/useRungGame";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -24,7 +24,7 @@ export default function Game() {
     }
   }, [isUnderConstruction, router]);
 
-  const { playerName, setPlayerName, createGame, joinGame } = useGulamChorGame("");
+  const { playerName, setPlayerName, createGame, joinGame } = useRungGame("");
   const [roomId, setRoomId] = useState(searchParams.get("roomId") || "");
 
   return (

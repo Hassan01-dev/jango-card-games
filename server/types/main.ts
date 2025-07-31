@@ -1,4 +1,4 @@
-import { GulamChorEventType, GulamChorRoom } from "./gulamChor.ts";
+import { RungEventType, RungRoom } from "./rung.ts";
 import { ThullaEventType, ThullaRoom } from "./thulla.ts";
 
 export type PlayedCard = {
@@ -25,7 +25,7 @@ export type PlayCardEventData = {
 };
 
 export type KickPlayerEventData = {
-  targetRoom: ThullaRoom | GulamChorRoom;
+  targetRoom: ThullaRoom | RungRoom;
   roomId: string;
   playerId: string;
   ownerId: string;
@@ -39,10 +39,10 @@ export type AudioMessageType = {
 
 export type GameType =
   | "thulla"
-  | "gulam_chor";
+  | "rung";
 
 export type SecureEventPayload = {
   game: GameType;
-  event_type: ThullaEventType | GulamChorEventType;
+  event_type: ThullaEventType | RungEventType;
   data: any;
 };

@@ -25,7 +25,7 @@ import {
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
 
-const useGulamChorGame = (roomIdParam: string) => {
+const useRungGame = (roomIdParam: string) => {
   const { socket } = useSocket();
   const router = useRouter();
 
@@ -111,8 +111,7 @@ const useGulamChorGame = (roomIdParam: string) => {
   }, []);
 
   const emitSecureEvent = async (event_type: string, data: any) => {
-    console.log("Emitting event for gulam chor:", event_type, data);
-    const encrypted = await encryptPayload({ game: "gulam_chor", event_type, data });
+    const encrypted = await encryptPayload({ game: "rung", event_type, data });
     socket?.emit("secure_event", encrypted);
   };
 
@@ -122,8 +121,7 @@ const useGulamChorGame = (roomIdParam: string) => {
         payload
       )) as DecryptedPayload;
 
-      console.log(game, event_type, data);
-      if(game !== "gulam_chor") return;
+      if(game !== "rung") return;
 
       switch (event_type) {
         case "game_created":
@@ -169,14 +167,14 @@ const useGulamChorGame = (roomIdParam: string) => {
           break;
         case "error":
           toast.error((data as ErrorType).message);
-          router.replace("/gulam_chor");
+          router.replace("/rung");
           break;
         case "player_kicked":
           handlePlayerKicked(data as { players: OpponentType[] });
           break;
         case "kicked":
           toast.error("You have been kicked from the room.");
-          router.replace("/gulam_chor");
+          router.replace("/rung");
           break;
         case "game_won":
           setIsWinner(true);
@@ -212,7 +210,7 @@ const useGulamChorGame = (roomIdParam: string) => {
 
   const handleGameCreated = (data: GameCreatedDataType) => {
     const { roomId } = data;
-    router.push(`/gulam_chor/${roomId}`);
+    router.push(`/rung/${roomId}`);
   };
 
   const handlePlayerKicked = (data: { players: OpponentType[] }) => {
@@ -313,7 +311,7 @@ const useGulamChorGame = (roomIdParam: string) => {
     const newId = crypto.randomUUID();
     localStorage.setItem("playerId", newId);
     localStorage.setItem("playerName", playerName);
-    router.push(`/gulam_chor/${roomId}`);
+    router.push(`/rung/${roomId}`);
   };
 
   const emitJoinGame = () => {
@@ -465,4 +463,4 @@ const startTimer = (currentTurn: TurnType) => {
   };
 };
 
-export default useGulamChorGame;
+export default useRungGame;

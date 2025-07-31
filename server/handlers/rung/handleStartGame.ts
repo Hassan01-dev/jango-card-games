@@ -1,31 +1,31 @@
-import { getGulamChorRoom } from "../../state/gulamChorRoomManager.ts";
-import { GulamChorPlayer, GulamChorStartGameEventData } from "../../types/gulamChor.ts";
+import { getRungRoom } from "../../state/rungRoomManager.ts";
+import { RungPlayer, RungStartGameEventData } from "../../types/rung.ts";
 import { CardDeck } from "../../utils/cardDeck.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
 export async function handleStartGame(
   socket: any,
   io: any,
-  data: GulamChorStartGameEventData
+  data: RungStartGameEventData
 ) {
   const { roomId } = data;
   try {
     if (!roomId) throw new Error("Invalid play");
 
-    const room = getGulamChorRoom(roomId);
+    const room = getRungRoom(roomId);
     if (!room) throw new Error("Room not found");
 
     const currentDeck = new CardDeck();
     currentDeck.shuffleDeck();
-    room.removedCard = currentDeck.distributeCardsForGulamChor(room.players, "jack_of_spades");
+    // currentDeck.distributeCardsForRung(room.players);
     room.isStarted = true;
 
-    await sendEncryptedEvent("gulam_chor", "game_started", {isHiddenCard: false}, roomId, io);
+    await sendEncryptedEvent("rung", "game_started", {isHiddenCard: false}, roomId, io);
 
     setTimeout(async () => {
       room.players.forEach(async (player) => {
         await sendEncryptedEvent(
-          "gulam_chor",
+          "rung",
           "hand_received",
           {
             currentTurn: room.currentTurn,
@@ -46,7 +46,7 @@ export async function handleStartGame(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
-        "gulamChor",
+        "rung",
         "error",
         { message: error.message },
         socket.id,
@@ -60,26 +60,26 @@ export async function handleStartGame(
 export async function handleStartGameWithHiddenCard(
   socket: any,
   io: any,
-  data: GulamChorStartGameEventData
+  data: RungStartGameEventData
 ) {
   const { roomId } = data;
   try {
     if (!roomId) throw new Error("Invalid play");
 
-    const room = getGulamChorRoom(roomId);
+    const room = getRungRoom(roomId);
     if (!room) throw new Error("Room not found");
 
     const currentDeck = new CardDeck();
     currentDeck.shuffleDeck();
-    room.removedCard = currentDeck.distributeCardsForGulamChor(room.players);
+    // currentDeck.distributeCardsForRung(room.players);
     room.isStarted = true;
 
-    await sendEncryptedEvent("gulam_chor", "game_started", {isHiddenCard: true}, roomId, io);
+    await sendEncryptedEvent("rung", "game_started", {isHiddenCard: true}, roomId, io);
 
     setTimeout(async () => {
       room.players.forEach(async (player) => {
         await sendEncryptedEvent(
-          "gulam_chor",
+          "rung",
           "hand_received",
           {
             currentTurn: room.currentTurn,
@@ -100,7 +100,7 @@ export async function handleStartGameWithHiddenCard(
   } catch (error: unknown) {
     if (error instanceof Error) {
       await sendEncryptedEvent(
-        "gulamChor",
+        "rung",
         "error",
         { message: error.message },
         socket.id,

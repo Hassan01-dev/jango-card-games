@@ -1,4 +1,4 @@
-import { GulamChorPlayer } from "../types/gulamChor.ts";
+import { RungPlayer } from "../types/rung.ts";
 import { ThullaPlayer } from "../types/thulla.ts";
 
 const suits = ["hearts", "diamonds", "clubs", "spades"];
@@ -68,30 +68,6 @@ export class CardDeck {
     }
 
     return firstTurn;
-  }
-
-  public distributeCardsForGulamChor(players: GulamChorPlayer[], card?: string): string {
-    const numPlayers = players.length;
-    let excludedCard: string;
-    let cardIndex: number;
-
-    if (!card) {
-      cardIndex = Math.floor(Math.random() * this.cards.length);
-      excludedCard = this.cards[cardIndex];
-    } else {
-      excludedCard = card;
-      cardIndex = this.cards.indexOf(card);
-    }
-    this.cards.splice(cardIndex, 1);
-
-    let playerIndex = 0;
-    while (this.cards.length > 0) {
-      const dealtCard = this.dealCard()!;
-      players[playerIndex].cards.push(dealtCard);
-      playerIndex = (playerIndex + 1) % numPlayers;
-    }
-
-    return excludedCard;
   }
 
   public resetDeck(): void {
