@@ -113,7 +113,7 @@ const GameChat = ({
           placeholder="Your message..."
           value={currentMsg}
           onChange={(e) => setCurrentMsg(e.target.value)}
-          className="flex-1 bg-transparent text-white border-none focus:ring-0"
+          className="flex-1 bg-transparent text-white border-none focus:ring-0 !placeholder-gray-300"
         />
         <Button type="submit" className="bg-white/10 hover:bg-white/20">
           Send
