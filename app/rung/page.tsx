@@ -15,7 +15,8 @@ export default function Game() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const isUnderConstruction = searchParams.get("dev") !== "true";
+  // const isUnderConstruction = searchParams.get("dev") !== "true";
+  const isUnderConstruction = false;
 
   useEffect(() => {
     if (isUnderConstruction) {

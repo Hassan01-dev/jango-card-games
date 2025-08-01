@@ -1,14 +1,13 @@
 import { getRungRoom } from "../state/rungRoomManager.ts";
-import { RungCreateRoomEventData, RungEventType, RungJoinGameEventData, RungRemovePairsEventData, RungStartGameEventData } from "../types/rung.ts";
+import { RungCreateRoomEventData, RungEventType, RungJoinGameEventData, RungStartGameEventData } from "../types/rung.ts";
 import { AudioMessageType, GameChatEventData, KickPlayerEventData } from "../types/main.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
-import { handleCreateRoomEvent } from "./rung/handleCreateGame.ts";
-import { handleJoinGame } from "./rung/handleJoinGame.ts";
+import { handleCreateRoom } from "./rung/handleCreateRoom.ts";
+import { handleJoinRoom } from "./rung/handleJoinRoom.ts";
 import { handleKickPlayer } from "./handleKickPlayer.ts";
 import { handleAudioMessage } from "./handleAudioMessage.ts"
 import { handleGameChat } from "./handleGameChat.ts"
-import { handleStartGame, handleStartGameWithHiddenCard } from "./rung/handleStartGame.ts";
-
+import { handleStartGame } from "./rung/handleStartGame.ts";
 
 const handleRungEvents = async (
   socket: any,
@@ -18,16 +17,13 @@ const handleRungEvents = async (
 ) => {
   switch (event_type) {
     case "create_room":
-      await handleCreateRoomEvent(socket, io, data as RungCreateRoomEventData);
+      await handleCreateRoom(socket, io, data as RungCreateRoomEventData);
       break;
     case "join_game":
-      await handleJoinGame(socket, io, data as RungJoinGameEventData);
+      await handleJoinRoom(socket, io, data as RungJoinGameEventData);
       break;
     case "start_game":
       await handleStartGame(socket, io, data as RungStartGameEventData);
-      break;
-    case "start_game_with_hidden_card":
-      await handleStartGameWithHiddenCard(socket, io, data as RungStartGameEventData);
       break;
     case "game_chat":
       await handleGameChat(socket, io, "rung", data as GameChatEventData);

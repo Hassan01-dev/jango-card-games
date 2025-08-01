@@ -52,7 +52,7 @@ export class CardDeck {
     }
   }
 
-  public distributeCardsForThulla(players: ThullaPlayer[]): ThullaPlayer {
+  public distributeCardsEvenly(players: ThullaPlayer[]): ThullaPlayer {
     const numPlayers = players.length;
     let firstTurn;
 

@@ -20,7 +20,7 @@ export async function handleStartGame(
 
     const currentDeck = new CardDeck();
     currentDeck.shuffleDeck();
-    const firstPlayer = currentDeck.distributeCardsForThulla(room.players) as ThullaPlayer;
+    const firstPlayer = currentDeck.distributeCardsEvenly(room.players) as ThullaPlayer;
     room.currentTurn = { id: firstPlayer.id, name: firstPlayer.name };
     room.isStarted = true;
 

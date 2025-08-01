@@ -3,7 +3,7 @@ import { RungCreateRoomEventData } from "../../types/rung.ts";
 import { generatRoomId } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
-export async function handleCreateRoomEvent(
+export async function handleCreateRoom(
   socket: any,
   io: any,
   data: RungCreateRoomEventData

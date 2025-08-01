@@ -1,7 +1,5 @@
 import { PlayedCard } from "./main.ts";
 
-export const rooms: ThullaRoomCollection = {};
-
 export type ThullaRoomCollection = {
   [key: string]: ThullaRoom;
 };

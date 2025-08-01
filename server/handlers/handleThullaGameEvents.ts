@@ -1,7 +1,7 @@
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 import { ThullaApproveRequestCardEventData, ThullaCreateRoomEventData, ThullaEventType, ThullaJoinGameEventData, ThullaRejectRequestCardEventData, ThullaRequestCardEventData, ThullaStartGameEventData } from "../types/thulla.ts";
 import { handeleAutoPlayCard } from "./thulla/handleAutoPlayCard.ts";
-import { handleCreateRoomEvent } from "./thulla/handleCreateGame.ts";
+import { handleCreateGame } from "./thulla/handleCreateGame.ts";
 import { handleJoinGame } from "./thulla/handleJoinGame.ts";
 import { handleKickPlayer } from "./handleKickPlayer.ts";
 import { handleApproveRequestCard, handleRejectRequestCard, handleRequestCard } from "./thulla/handleRequestCard.ts";
@@ -20,7 +20,7 @@ const handleThullaGameEvents = async (
 ) => {
   switch (event_type) {
     case "create_room":
-      await handleCreateRoomEvent(socket, io, data as ThullaCreateRoomEventData);
+      await handleCreateGame(socket, io, data as ThullaCreateRoomEventData);
       break;
     case "join_game":
       await handleJoinGame(socket, io, data as ThullaJoinGameEventData);

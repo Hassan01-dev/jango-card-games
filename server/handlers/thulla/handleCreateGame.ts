@@ -3,7 +3,7 @@ import { ThullaCreateRoomEventData } from "../../types/thulla.ts";
 import { generatRoomId } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
-export async function handleCreateRoomEvent(
+export async function handleCreateGame(
   socket: any,
   io: any,
   data: ThullaCreateRoomEventData

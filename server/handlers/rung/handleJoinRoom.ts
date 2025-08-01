@@ -3,7 +3,7 @@ import { getRungRoom } from "../../state/rungRoomManager.ts";
 import { RungJoinGameEventData } from "../../types/rung.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
-export async function handleJoinGame(
+export async function handleJoinRoom(
   socket: any,
   io: any,
   data: RungJoinGameEventData
@@ -24,7 +24,7 @@ export async function handleJoinGame(
     if (targetRoom.isStarted) {
       throw new Error("Cannot join started room as a new player");
     }
-    if (targetRoom?.players.length === 8) throw new Error("Room is full");
+    if (targetRoom?.players.length === 4) throw new Error("Room is full");
 
     socket.join(roomId);
 
@@ -34,6 +34,7 @@ export async function handleJoinGame(
       socketId: socket.id,
       isWon: false,
       cards: [],
+      team: "red",
     });
 
     if (!targetRoom?.currentTurn && targetRoom?.players.length === 1) {

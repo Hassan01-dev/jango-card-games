@@ -14,8 +14,10 @@ export const createRungRoom = (roomId: string, playerId: string, playerName: str
     noOfTurns: 0,
     isStarted: false,
     ownerId: playerId,
-    removedCard: "",
     ownerName: playerName,
+    rungSuit: "",
+    redTeamScore: 0,
+    blueTeamScore: 0,
   };
 };
 

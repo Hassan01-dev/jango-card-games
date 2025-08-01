@@ -1,7 +1,5 @@
 import { PlayedCard } from "./main.ts";
 
-export const rooms: RungRoomCollection = {};
-
 export type RungRoomCollection = {
   [key: string]: RungRoom;
 };
@@ -12,6 +10,7 @@ export type RungPlayer = {
   socketId: string;
   cards: string[];
   isWon: boolean;
+  team: 'red' | 'blue';
 };
 
 export type RungRoom = {
@@ -22,7 +21,9 @@ export type RungRoom = {
   isStarted: boolean;
   ownerId: string;
   ownerName: string;
-  removedCard: string;
+  rungSuit: string;
+  redTeamScore: number;
+  blueTeamScore: number;
 };
 
 export type RungCreateRoomEventData = {

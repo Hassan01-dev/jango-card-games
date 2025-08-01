@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@import './professional_thula.css';
+@import './professional_thulla.css';
 
 @custom-variant dark (&:is(.dark *));
 
