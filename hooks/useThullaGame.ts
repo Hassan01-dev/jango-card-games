@@ -184,14 +184,14 @@ const useThullaGame = (roomIdParam: string) => {
           break;
         case "error":
           toast.error((data as ErrorType).message);
-          router.replace("/professional_thula");
+          router.replace("/professional_thulla");
           break;
         case "player_kicked":
           handlePlayerKicked(data as { players: OpponentType[] });
           break;
         case "kicked":
           toast.error("You have been kicked from the room.");
-          router.replace("/professional_thula");
+          router.replace("/professional_thulla");
           break;
         case "game_won":
           setIsWinner(true);
@@ -216,7 +216,7 @@ const useThullaGame = (roomIdParam: string) => {
 
   const handleGameCreated = (data: GameCreatedDataType) => {
     const { roomId } = data;
-    router.push(`/professional_thula/${roomId}`);
+    router.push(`/professional_thulla/${roomId}`);
   };
 
   const handlePlayerKicked = (data: { players: OpponentType[] }) => {
@@ -367,7 +367,7 @@ const useThullaGame = (roomIdParam: string) => {
     const newId = crypto.randomUUID();
     localStorage.setItem("playerId", newId);
     localStorage.setItem("playerName", playerName);
-    router.push(`/professional_thula/${roomId}`);
+    router.push(`/professional_thulla/${roomId}`);
   };
 
   const emitJoinGame = () => {

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { encryptPayload, decryptPayload } from "@/utils/crypto";
 import {
   GameCreatedDataType,
@@ -13,14 +13,17 @@ import {
   HandReceivedDataType,
   UpdateTurnDataType,
   CardPlayedDataType,
+  ThullaDataType,
+  CardsTakenDataType,
   GameOverDataType,
   PlayerWonDataType,
   RequestReceivedDataType,
   IMsgDataTypes,
+  RequestRejectedDataType,
   ErrorType,
   PlayCardDataType,
   PlayerLeftDataType,
-  PairRemovedDataType,
+  AutoCardPlayedDataType,
 } from "@/utils/types";
 import { useSocket } from "./useSocket";
 import { toast } from "react-hot-toast";
@@ -31,7 +34,6 @@ const useRungGame = (roomIdParam: string) => {
 
   const [requestData, setRequestData] = useState<RequestReceivedDataType | null>(null);
   const [isRequestReceived, setIsRequestReceived] = useState<boolean>(false);
-  const [isHiddenCard, setIsHiddenCard] = useState<boolean>(false);
 
   const [isUserInfo, setIsUserInfo] = useState<boolean>(false);
   const [playerName, setPlayerName] = useState<string>("");
@@ -40,6 +42,7 @@ const useRungGame = (roomIdParam: string) => {
   const [roomId, setRoomId] = useState<string>(roomIdParam);
   const [opponents, setOpponents] = useState<OpponentType[]>([]);
   const [myCards, setMyCards] = useState<string[]>([]);
+  const [thullaOccured, setThullaOccured] = useState(false);
   const [playedCards, setPlayedCards] = useState<string[]>([]);
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
   const [currentTurn, setCurrentTurn] = useState<TurnType>({
@@ -133,7 +136,6 @@ const useRungGame = (roomIdParam: string) => {
         case "game_started":
           toast.success("Game started");
           setGameStarted(true);
-          setIsHiddenCard((data as {isHiddenCard: boolean}).isHiddenCard);
           break;
         case "hand_received":
           handleHandReceived(data as HandReceivedDataType);
@@ -150,6 +152,12 @@ const useRungGame = (roomIdParam: string) => {
         case "card_played":
           handlePlayedCards(data as CardPlayedDataType);
           break;
+        case "thulla":
+          handleThulla(data as ThullaDataType);
+          break;
+        case "cards_taken":
+          handleCardsTaken(data as CardsTakenDataType);
+          break;
         case "empty_table":
           setPlayedCards([]);
           break;
@@ -159,11 +167,20 @@ const useRungGame = (roomIdParam: string) => {
         case "player_won":
           handlePlayerWon(data as PlayerWonDataType);
           break;
+        case "request_received":
+          handleRequestReceived(data as RequestReceivedDataType);
+          break;
         case "chat_message":
           handleChatMessage(data as IMsgDataTypes);
           break;
+        case "request_rejected":
+          handleRequestRejected(data as RequestRejectedDataType);
+          break;
         case "play_card":
           handlePlayCard(data as PlayCardDataType);
+          break;
+        case "auto_card_played":
+          handleAutoCardPlayed(data as AutoCardPlayedDataType);
           break;
         case "error":
           toast.error((data as ErrorType).message);
@@ -179,14 +196,8 @@ const useRungGame = (roomIdParam: string) => {
         case "game_won":
           setIsWinner(true);
           break;
-        case "player_won":
-          handlePlayerWon(data as PlayerWonDataType);
-          break;
         case "audio_message":
           handleAudioMessage(data as {audioKey: string});
-          break;
-        case "pair_removed":
-          handlePairRemoved(data as PairRemovedDataType);
           break;
         default:
           console.warn("Unhandled event_type:", event_type);
@@ -197,11 +208,6 @@ const useRungGame = (roomIdParam: string) => {
   };
 
   // Event Handlers
-  const handlePairRemoved = (data: PairRemovedDataType) => {
-    const { noOfPairsRemoved, playerName } = data;
-    toast.success(`${playerName} removed ${noOfPairsRemoved} pairs`);
-  };
-
   const handleAudioMessage = (data: {audioKey: string}) => {
     const { audioKey } = data;
     const audio = new Audio(`/audio/${audioKey}.mp3`);
@@ -273,6 +279,17 @@ const useRungGame = (roomIdParam: string) => {
     setPlayedCards((prev) => [...prev, card]);
   };
 
+  const handleThulla = ({ triggeredBy, looser }: ThullaDataType) => {
+    toast.success(`${triggeredBy} caught ${looser} with Thulla!`);
+    setThullaOccured(true);
+    setPlayedCards([]);
+    setTimeout(() => setThullaOccured(false), 3000);
+  };
+
+  const handleCardsTaken = ({ cards }: CardsTakenDataType) => {
+    setMyCards((prev) => [...prev, ...cards]);
+  };
+
   const handleGameOver = ({ looser }: GameOverDataType) => {
     toast.success(`${looser} lost the game!`);
     setGameOver(true);
@@ -282,6 +299,45 @@ const useRungGame = (roomIdParam: string) => {
 
   const handlePlayerWon = ({ playerName }: PlayerWonDataType) => {
     toast.success(`${playerName} won the game!`);
+  };
+
+  const handleRequestReceived = ({
+    playerName,
+    playerId,
+  }: RequestReceivedDataType) => {
+    setRequestData({
+      playerName,
+      playerId,
+    });
+    setIsRequestReceived(true);
+  };
+
+  const handleApproveRequest = () => {
+    if(isWinner) return toast.error("You can't approve request when you are winner");
+
+    emitSecureEvent("approve_request_card", {
+      roomId,
+      requesterPlayerId: requestData?.playerId,
+      playerId,
+    });
+    setIsRequestReceived(false);
+    setRequestData(null);
+  };
+
+  const handleRejectRequest = () => {
+    if(isWinner) return toast.error("You can't reject request when you are winner");
+
+    emitSecureEvent("reject_request_card", {
+      roomId,
+      playerName,
+      requesterPlayerId: requestData?.playerId,
+    });
+    setIsRequestReceived(false);
+    setRequestData(null);
+  };
+
+  const handleRequestRejected = ({ playerName }: RequestRejectedDataType) => {
+    toast.error(`${playerName} rejected your request`);
   };
 
   const handleKickPlayer = (kickedPlayerId: string) => {
@@ -332,8 +388,44 @@ const useRungGame = (roomIdParam: string) => {
     }
   };
 
-  const handleStartGame = () => emitSecureEvent("start_game", { roomId })
-  const handleStartGameWithHiddenCard = () => emitSecureEvent("start_game_with_hidden_card", { roomId })
+  const handleRequestCard = () => {
+    if(isWinner) return toast.error("You can't request card when you are winner");
+    emitSecureEvent("request_card", { roomId, playerId });
+  }
+
+  const handleStartGame = () => emitSecureEvent("start_game", { roomId });
+
+  const handleSort = (myCards: string[], setMyCards: Function) => {
+    const suitOrder = { hearts: 1, clubs: 2, diamonds: 3, spades: 4 };
+    const rankOrder = {
+      ace: 14,
+      king: 13, 
+      queen: 12,
+      jack: 11,
+      10: 10,
+      9: 9,
+      8: 8,
+      7: 7,
+      6: 6,
+      5: 5,
+      4: 4,
+      3: 3,
+      2: 2
+    };
+    const sorted = [...myCards].sort((a, b) => {
+      const [aRank, , aSuit] = a.split("_");
+      const [bRank, , bSuit] = b.split("_");
+      const suitDiff =
+        suitOrder[aSuit as keyof typeof suitOrder] -
+        suitOrder[bSuit as keyof typeof suitOrder];
+      if (suitDiff !== 0) return suitDiff;
+      
+      const aRankValue = rankOrder[aRank.toLowerCase() as keyof typeof rankOrder];
+      const bRankValue = rankOrder[bRank.toLowerCase() as keyof typeof rankOrder];
+      return bRankValue - aRankValue;
+    });
+    setMyCards(sorted);
+  };
 
   const emitChatEvent = (msgData: IMsgDataTypes) => {
     emitSecureEvent("game_chat", msgData);
@@ -364,9 +456,9 @@ const startTimer = (currentTurn: TurnType) => {
         timerRef.current = null;
         const storedPlayerId = localStorage.getItem('playerId');
         if (currentTurn.id === storedPlayerId) {
-          // emitSecureEvent('auto_play_card', {
-          //   roomId
-          // });
+          emitSecureEvent('auto_play_card', {
+            roomId
+          });
         }
         return 0;
       }
@@ -375,44 +467,14 @@ const startTimer = (currentTurn: TurnType) => {
   }, 1000);
 };
 
+  const handleAutoCardPlayed = (data: AutoCardPlayedDataType) => {
+    setMyCards((prev) => prev.filter(card => card !== data.playedCard));
+  }
+
   const handleSendAudioMessage = (audioKey: string) => {
     emitSecureEvent("audio_message", {
       roomId,
       audioKey
-    });
-  }
-
-
-  const handleRemovePairs = () => {
-    debugger;
-    const removedCards: string[] = [];
-    const remainingCards: string[] = [];
-    const rankGroups = new Map<string, string[]>();
-
-    myCards.forEach((card) => {
-      const rank = card.split('_of_')[0];
-      const group = rankGroups.get(rank) || [];
-      group.push(card);
-      rankGroups.set(rank, group);
-    });
-
-    rankGroups.forEach((cards) => {
-      const pairCount = Math.floor(cards.length / 2);
-      
-      for (let i = 0; i < pairCount * 2; i++) {
-        removedCards.push(cards[i]);
-      }
-      
-      for (let i = pairCount * 2; i < cards.length; i++) {
-        remainingCards.push(cards[i]);
-      }
-    });
-
-    setMyCards(remainingCards);
-    emitSecureEvent("remove_pairs", {
-      roomId,
-      playerId,
-      removedCards
     });
   }
 
@@ -423,6 +485,7 @@ const startTimer = (currentTurn: TurnType) => {
     ownerId,
     opponents,
     myCards,
+    thullaOccured,
     playedCards,
     currentTurn,
     gameOver,
@@ -437,7 +500,6 @@ const startTimer = (currentTurn: TurnType) => {
     turnTimer,
     isWinner,
     nextTurn,
-    isHiddenCard,
     createGame,
     joinGame,
     setPlayerName,
@@ -445,6 +507,7 @@ const startTimer = (currentTurn: TurnType) => {
     setOwnerId,
     setMyCards,
     setOpponents,
+    setThullaOccured,
     setPlayedCards,
     setCurrentTurn,
     setGameOver,
@@ -453,13 +516,15 @@ const startTimer = (currentTurn: TurnType) => {
     setIsCardPlayed,
     setGameStarted,
     handleCardPlayed,
+    handleSort,
+    handleRequestCard,
     handleStartGame,
-    handleStartGameWithHiddenCard,
     emitJoinGame,
     emitChatEvent,
+    handleApproveRequest,
+    handleRejectRequest,
     handleKickPlayer,
-    handleSendAudioMessage,
-    handleRemovePairs
+    handleSendAudioMessage
   };
 };
 

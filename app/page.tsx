@@ -8,7 +8,7 @@ const games = [
   {
     name: "Professional Thulla",
     color: "bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-600",
-    url: "professional_thula",
+    url: "professional_thulla",
     image: "/thulla.png",
     description:
       "Experience the classic Thulla game with stunning visuals and smooth gameplay. Play Thulla with your friends and family in a classic setting.",

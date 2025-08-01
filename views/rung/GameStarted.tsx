@@ -2,39 +2,62 @@
 
 import Image from "next/image";
 import GameChat from "../components/GameChat";
+import Confetti from "react-confetti";
+import { useEffect } from "react";
 import {
   IMsgDataTypes,
   OpponentType,
+  RequestReceivedDataType,
   TurnType,
 } from "@/utils/types";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogDescription,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 export default function GameStarted({
   roomId,
   playerId,
+  playingSuit,
   myCards,
   handleCardPlayed,
+  handleSort,
+  handleRequestCard,
+  thullaOccured,
   playedCards,
   currentTurn,
   gameOver,
   looser,
   opponents,
   isLoading,
+  isCardPlayed,
   emitChatEvent,
   chat,
+  isRequestReceived,
+  handleApproveRequest,
+  handleRejectRequest,
+  requestData,
   turnTimer,
   handleKickPlayer,
   ownerId,
   nextTurn,
   isWinner,
-  handleSendAudioMessage,
-  handleRemovePairs
+  handleSendAudioMessage
 }: {
   roomId: string;
   playerId: string;
+  playingSuit: string;
   myCards: Array<string>;
   handleCardPlayed: (card: string) => void;
+  handleSort: (suit: string) => void;
+  handleRequestCard: () => void;
+  thullaOccured: boolean;
   playedCards: Array<string>;
   currentTurn: { id: string; name: string };
   gameOver: boolean;
@@ -44,18 +67,28 @@ export default function GameStarted({
   isCardPlayed: boolean;
   emitChatEvent: (msgData: IMsgDataTypes) => void;
   chat: IMsgDataTypes[];
+  isRequestReceived: boolean;
+  handleApproveRequest: () => void;
+  handleRejectRequest: () => void;
+  requestData: RequestReceivedDataType | null;
   turnTimer: number;
   handleKickPlayer: (playerId: string) => void;
   ownerId: string;
   nextTurn: TurnType;
   isWinner: boolean;
   handleSendAudioMessage: (key: string) => void;
-  handleRemovePairs: () => void;
 }) {
   const playerName =
     typeof window !== "undefined"
       ? localStorage.getItem("playerName") || ""
       : "";
+
+  useEffect(() => {
+    if (thullaOccured) {
+      const audio = new Audio("/thulla.wav");
+      audio.play();
+    }
+  }, [thullaOccured]);
 
   const radius = 270;
   const angleStep = 360 / Math.max(opponents.length, 1);
@@ -114,6 +147,16 @@ export default function GameStarted({
                       </div>
                     ))}
                   </div>
+                )}
+
+                {thullaOccured && (
+                  <Image
+                    src="/thulla.gif"
+                    alt="Thulla"
+                    width={200}
+                    height={200}
+                    className="mt-4"
+                  />
                 )}
 
                 {gameOver && (
@@ -230,9 +273,17 @@ export default function GameStarted({
                 </div>
               </div>
 
-              <Button onClick={handleRemovePairs} className="w-fit">
-                Remove Pairs
+              <Button onClick={() => handleSort(playingSuit)} className="w-fit">
+                Sort
               </Button>
+
+              {(opponents.find((op) => op.id === nextTurn.id)?.cardsCount ||
+                6) < 5 &&
+                !isLoading && (
+                  <Button onClick={handleRequestCard} className="w-fit">
+                    Request Card
+                  </Button>
+                )}
             </div>
 
             {/* Player Cards - Right Side */}
@@ -240,14 +291,26 @@ export default function GameStarted({
               {myCards.map((card, index) => {
                 const middleIndex = Math.floor(myCards.length / 2);
                 const rotation = index - middleIndex;
+                const [, , suit] = card.split("_");
 
                 const isPlayerTurn = currentTurn.id === playerId;
-                const isDisabled = !isPlayerTurn;
+                const hasLeadSuit = myCards.some(
+                  (c) => c.split("_")[2] === playingSuit
+                );
+                const mustFollowSuit = !!playingSuit && hasLeadSuit;
+                const isDisabled =
+                  !isPlayerTurn ||
+                  (mustFollowSuit && suit !== playingSuit) ||
+                  isCardPlayed;
 
                 return (
                   <div
                     key={index}
-                    className={"relative transition duration-300 cursor-not-allowed brightness-50"}
+                    className={`relative transition duration-300 ${
+                      isDisabled
+                        ? "cursor-not-allowed brightness-50"
+                        : "cursor-pointer"
+                    }`}
                     style={{
                       transform: `rotate(${rotation}deg)`,
                       zIndex: index,
@@ -262,7 +325,7 @@ export default function GameStarted({
                       alt={card}
                       width={100}
                       height={150}
-                      className="rounded-lg shadow-lg"
+                      className="rounded-lg shadow-lg hover:shadow-2xl transform hover:-translate-y-4 transition-all"
                     />
                   </div>
                 );
@@ -271,6 +334,37 @@ export default function GameStarted({
           </div>
         )}
       </div>
+
+      {/* Request Dialog */}
+      <Dialog open={isRequestReceived && requestData !== null}>
+        <DialogContent className="z-[9999]">
+          <DialogHeader className="text-center">
+            <DialogTitle>Request Received</DialogTitle>
+            <DialogDescription>
+              {requestData?.playerName} requested for your cards
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-center gap-4 pt-4">
+            <Button variant="default" onClick={handleApproveRequest}>
+              Confirm
+            </Button>
+            <Button variant="outline" onClick={handleRejectRequest}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confetti */}
+      {thullaOccured && (
+        <Confetti
+          width={typeof window !== "undefined" ? window.innerWidth : 1000}
+          height={typeof window !== "undefined" ? window.innerHeight : 800}
+          recycle={false}
+          numberOfPieces={100}
+          gravity={0.5}
+        />
+      )}
     </>
   );
 }

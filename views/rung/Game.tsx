@@ -5,39 +5,45 @@ import { useRouter } from "next/navigation";
 import GameNotStarted from "./GameNotStarted";
 import GameStarted from "./GameStarted";
 
-import toast from "react-hot-toast";
 import useRungGame from "@/hooks/useRungGame";
+import toast from "react-hot-toast";
 
 export default function Game({ roomId: roomIdParam }: {roomId: string}) {
   const router = useRouter();
 
   const {
-    gameStarted,
     playerId,
     playerName,
     roomId,
     ownerId,
-    opponents,
-    isUserInfo,
-    myCards,
-    playedCards,
     currentTurn,
+    playedCards,
+    myCards,
+    setMyCards,
+    handleCardPlayed,
+    handleSort,
+    handleRequestCard,
+    thullaOccured,
     gameOver,
     looser,
+    opponents,
     isLoading,
+    isUserInfo,
     isCardPlayed,
-    turnTimer,
-    nextTurn,
-    isWinner,
-    handleCardPlayed,
+    gameStarted,
     handleStartGame,
-    handleStartGameWithHiddenCard,
     emitJoinGame,
     emitChatEvent,
     chat,
+    isRequestReceived,
+    handleApproveRequest,
+    handleRejectRequest,
+    requestData,
+    turnTimer,
     handleKickPlayer,
     handleSendAudioMessage,
-    handleRemovePairs
+    nextTurn,
+    isWinner
   } = useRungGame(roomIdParam);
 
   useEffect(() => {
@@ -51,12 +57,19 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     }
   }, [roomId, playerName, playerId, isUserInfo]);
 
+  const playingSuit =
+    playedCards.length > 0 ? playedCards[0].split("_")[2] : "";
+
   return gameStarted ? (
     <GameStarted
       roomId={roomId}
       playerId={playerId}
+      playingSuit={playingSuit}
       myCards={myCards}
       handleCardPlayed={handleCardPlayed}
+      handleSort={() => handleSort(myCards, setMyCards)}
+      handleRequestCard={handleRequestCard}
+      thullaOccured={thullaOccured}
       playedCards={playedCards}
       currentTurn={currentTurn}
       gameOver={gameOver}
@@ -66,19 +79,21 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       isCardPlayed={isCardPlayed}
       emitChatEvent={emitChatEvent}
       chat={chat}
+      isRequestReceived={isRequestReceived}
+      handleApproveRequest={handleApproveRequest}
+      handleRejectRequest={handleRejectRequest}
+      requestData={requestData}
       turnTimer={turnTimer}
       handleKickPlayer={handleKickPlayer}
       ownerId={ownerId}
       nextTurn={nextTurn}
       isWinner={isWinner}
       handleSendAudioMessage={handleSendAudioMessage}
-      handleRemovePairs={handleRemovePairs}
     />
   ) : (
     <GameNotStarted
       opponents={opponents}
       handleStartGame={handleStartGame}
-      handleStartGameWithHiddenCard={handleStartGameWithHiddenCard}
       playerId={playerId}
       ownerId={ownerId}
       playerName={playerName}

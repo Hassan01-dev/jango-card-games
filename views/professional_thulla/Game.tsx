@@ -51,7 +51,7 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
 
     if (!playerName || !playerId) {
       toast.error("Please enter your name before joining");
-      router.replace(`/professional_thula?roomId=${roomId}`);
+      router.replace(`/professional_thulla?roomId=${roomId}`);
     } else {
       emitJoinGame();
     }
