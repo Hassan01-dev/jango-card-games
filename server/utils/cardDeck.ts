@@ -52,7 +52,18 @@ export class CardDeck {
     }
   }
 
-  public distributeCardsEvenly(players: ThullaPlayer[]): ThullaPlayer {
+  public distributeCardsEvenly(players: [] | RungPlayer[]) {
+    const numPlayers = players.length;
+
+    while (this.cards.length > 0) {
+      for (let i = 0; i < numPlayers && this.cards.length > 0; i++) {
+        const card = this.dealCard()!;
+        players[i].cards.push(card)
+      }
+    }
+  }
+
+  public distributeCardsForThulla(players: ThullaPlayer[]): ThullaPlayer {
     const numPlayers = players.length;
     let firstTurn;
 

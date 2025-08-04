@@ -22,12 +22,14 @@ export type EventType =
   | "auto_card_played"
   | "game_won"
   | "audio_message"
-  | "pair_removed";
+  | "pair_removed"
+  | "team_score";
 
 export type GameTypes = "thulla" | "rung";
 
 export type GameCreatedDataType = {
   roomId: string;
+  rungSuit: string;
 };
 
 export type AutoCardPlayedDataType = {

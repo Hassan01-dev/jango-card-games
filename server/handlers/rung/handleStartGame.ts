@@ -1,5 +1,5 @@
 import { getRungRoom } from "../../state/rungRoomManager.ts";
-import { RungPlayer, RungStartGameEventData } from "../../types/rung.ts";
+import { RungStartGameEventData } from "../../types/rung.ts";
 import { CardDeck } from "../../utils/cardDeck.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 
@@ -20,8 +20,11 @@ export async function handleStartGame(
     currentDeck.shuffleDeck();
     currentDeck.distributeCardsEvenly(room.players);
     room.isStarted = true;
+    room.noOfTurns = 1;
+    const randomPlayer = room.players[Math.floor(Math.random() * room.players.length)];
+    room.currentTurn = { id: randomPlayer.id, name: randomPlayer.name };
 
-    await sendEncryptedEvent("rung", "game_started", {isHiddenCard: false}, roomId, io);
+    await sendEncryptedEvent("rung", "game_started", { rungSuit: room.rungSuit }, roomId, io);
 
     setTimeout(async () => {
       room.players.forEach(async (player) => {
@@ -29,6 +32,7 @@ export async function handleStartGame(
           "rung",
           "hand_received",
           {
+            team: player.team,
             currentTurn: room.currentTurn,
             hand: player.cards,
             opponents: room.players

@@ -1,13 +1,14 @@
 import { RungRoom, RungRoomCollection } from "../types/rung.ts";
 
-const gamulChorRooms: RungRoomCollection = {};
+const rungRooms: RungRoomCollection = {};
 
 export const getRungRoom = (roomId: string): RungRoom | undefined => {
-  return gamulChorRooms[roomId];
+  return rungRooms[roomId];
 }
 
 export const createRungRoom = (roomId: string, playerId: string, playerName: string): void => {
-  gamulChorRooms[roomId] = {
+  const rungSuit = ["hearts", "diamonds", "clubs", "spades"][Math.floor(Math.random() * 4)];
+  rungRooms[roomId] = {
     players: [],
     currentTurn: null,
     playedCards: [],
@@ -15,16 +16,19 @@ export const createRungRoom = (roomId: string, playerId: string, playerName: str
     isStarted: false,
     ownerId: playerId,
     ownerName: playerName,
-    rungSuit: "",
+    rungSuit,
     redTeamScore: 0,
     blueTeamScore: 0,
+    noOfCardsOnTable: 0,
+    noOfTurnsOnTable: 0,
+    lastHighestPlayer: null
   };
 };
 
 export const deleteRungRoom = (roomId: string): void => {
-  delete gamulChorRooms[roomId];
+  delete rungRooms[roomId];
 }
 
 export const getAllRungRooms = (): RungRoomCollection => {
-  return gamulChorRooms;
+  return rungRooms;
 }

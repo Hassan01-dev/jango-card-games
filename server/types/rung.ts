@@ -18,9 +18,12 @@ export type RungRoom = {
   currentTurn: { id: string; name: string } | null;
   playedCards: PlayedCard[];
   noOfTurns: number;
+  noOfCardsOnTable: number;
   isStarted: boolean;
   ownerId: string;
   ownerName: string;
+  noOfTurnsOnTable: number;
+  lastHighestPlayer: { id: string; name: string, team: 'red' | 'blue' } | null;
   rungSuit: string;
   redTeamScore: number;
   blueTeamScore: number;
@@ -56,4 +59,5 @@ export type RungEventType =
   | "won"
   | "kick_player"
   | "audio_message"
-  | "remove_pairs";
+  | "remove_pairs"
+  | "play_card";

@@ -2,8 +2,6 @@
 
 import Image from "next/image";
 import GameChat from "../components/GameChat";
-import Confetti from "react-confetti";
-import { useEffect } from "react";
 import {
   IMsgDataTypes,
   OpponentType,
@@ -29,7 +27,6 @@ export default function GameStarted({
   handleCardPlayed,
   handleSort,
   handleRequestCard,
-  thullaOccured,
   playedCards,
   currentTurn,
   gameOver,
@@ -48,7 +45,10 @@ export default function GameStarted({
   ownerId,
   nextTurn,
   isWinner,
-  handleSendAudioMessage
+  handleSendAudioMessage,
+  turnNo,
+  redTeamScore,
+  blueTeamScore,
 }: {
   roomId: string;
   playerId: string;
@@ -57,7 +57,6 @@ export default function GameStarted({
   handleCardPlayed: (card: string) => void;
   handleSort: (suit: string) => void;
   handleRequestCard: () => void;
-  thullaOccured: boolean;
   playedCards: Array<string>;
   currentTurn: { id: string; name: string };
   gameOver: boolean;
@@ -77,18 +76,14 @@ export default function GameStarted({
   nextTurn: TurnType;
   isWinner: boolean;
   handleSendAudioMessage: (key: string) => void;
+  turnNo: number;
+  redTeamScore: number;
+  blueTeamScore: number;
 }) {
   const playerName =
     typeof window !== "undefined"
       ? localStorage.getItem("playerName") || ""
       : "";
-
-  useEffect(() => {
-    if (thullaOccured) {
-      const audio = new Audio("/thulla.wav");
-      audio.play();
-    }
-  }, [thullaOccured]);
 
   const radius = 270;
   const angleStep = 360 / Math.max(opponents.length, 1);
@@ -98,7 +93,12 @@ export default function GameStarted({
     <>
       <div className="relative w-full h-screen grid grid-rows-[9fr_3fr]">
         {/* Top Section: Game Table + Chat */}
-        <div className="grid grid-cols-[10fr_2fr] w-full h-full px-9">
+        <div className="grid grid-cols-[2fr_8fr_2fr] w-full h-full px-9">
+          <div className="flex flex-col">
+            <span>Turn No: {turnNo}</span>
+            <span>Red Team Score: {redTeamScore}</span>
+            <span>Blue Team Score: {blueTeamScore}</span>
+          </div>
           {/* Game Table */}
           <div className="relative flex items-center justify-center">
             <div className="relative w-[400px] h-[400px]">
@@ -147,16 +147,6 @@ export default function GameStarted({
                       </div>
                     ))}
                   </div>
-                )}
-
-                {thullaOccured && (
-                  <Image
-                    src="/thulla.gif"
-                    alt="Thulla"
-                    width={200}
-                    height={200}
-                    className="mt-4"
-                  />
                 )}
 
                 {gameOver && (
@@ -354,17 +344,6 @@ export default function GameStarted({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Confetti */}
-      {thullaOccured && (
-        <Confetti
-          width={typeof window !== "undefined" ? window.innerWidth : 1000}
-          height={typeof window !== "undefined" ? window.innerHeight : 800}
-          recycle={false}
-          numberOfPieces={100}
-          gravity={0.5}
-        />
-      )}
     </>
   );
 }

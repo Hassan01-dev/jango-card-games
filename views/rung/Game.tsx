@@ -23,7 +23,6 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     handleCardPlayed,
     handleSort,
     handleRequestCard,
-    thullaOccured,
     gameOver,
     looser,
     opponents,
@@ -43,7 +42,10 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
     handleKickPlayer,
     handleSendAudioMessage,
     nextTurn,
-    isWinner
+    isWinner,
+    turnNo,
+    redTeamScore,
+    blueTeamScore,
   } = useRungGame(roomIdParam);
 
   useEffect(() => {
@@ -69,7 +71,6 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       handleCardPlayed={handleCardPlayed}
       handleSort={() => handleSort(myCards, setMyCards)}
       handleRequestCard={handleRequestCard}
-      thullaOccured={thullaOccured}
       playedCards={playedCards}
       currentTurn={currentTurn}
       gameOver={gameOver}
@@ -89,6 +90,9 @@ export default function Game({ roomId: roomIdParam }: {roomId: string}) {
       nextTurn={nextTurn}
       isWinner={isWinner}
       handleSendAudioMessage={handleSendAudioMessage}
+      turnNo={turnNo}
+      redTeamScore={redTeamScore}
+      blueTeamScore={blueTeamScore}
     />
   ) : (
     <GameNotStarted

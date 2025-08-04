@@ -1,6 +1,6 @@
 import { getRungRoom } from "../state/rungRoomManager.ts";
 import { RungCreateRoomEventData, RungEventType, RungJoinGameEventData, RungStartGameEventData } from "../types/rung.ts";
-import { AudioMessageType, GameChatEventData, KickPlayerEventData } from "../types/main.ts";
+import { AudioMessageType, GameChatEventData, KickPlayerEventData, PlayCardEventData } from "../types/main.ts";
 import { sendEncryptedEvent } from "../utils/socketResponse.ts";
 import { handleCreateRoom } from "./rung/handleCreateRoom.ts";
 import { handleJoinRoom } from "./rung/handleJoinRoom.ts";
@@ -8,6 +8,7 @@ import { handleKickPlayer } from "./handleKickPlayer.ts";
 import { handleAudioMessage } from "./handleAudioMessage.ts"
 import { handleGameChat } from "./handleGameChat.ts"
 import { handleStartGame } from "./rung/handleStartGame.ts";
+import { handlePlayCard } from "./rung/handlePlayCard.ts";
 
 const handleRungEvents = async (
   socket: any,
@@ -27,6 +28,9 @@ const handleRungEvents = async (
       break;
     case "game_chat":
       await handleGameChat(socket, io, "rung", data as GameChatEventData);
+      break;
+    case "play_card":
+      await handlePlayCard(socket, io, data as PlayCardEventData);
       break;
     case "kick_player":
       const { roomId } = data as { roomId: string, playerId: string, ownerId: string };

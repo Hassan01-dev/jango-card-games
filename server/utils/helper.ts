@@ -1,3 +1,4 @@
+import { RungRoom } from "../types/rung.ts";
 import { ThullaRoom } from "../types/thulla.ts";
 
 export const generatRoomId = (): string => {
@@ -5,7 +6,7 @@ export const generatRoomId = (): string => {
   return btoa(String.fromCharCode(...bytes)).replace(/[/+=]/g, '').slice(0, 8); // Safe, short string
 };
 
-export const getNextEligiblePlayer = (room: ThullaRoom, startIndex: number) => {
+export const getNextEligiblePlayer = (room: ThullaRoom | RungRoom, startIndex: number) => {
   const players = room.players;
   let index = startIndex;
   let count = 0;

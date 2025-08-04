@@ -3,6 +3,7 @@ import { getThullaRoom } from "../../state/thullaRoomManager.ts";
 import { getNextEligiblePlayer } from "../../utils/helper.ts";
 import { sendEncryptedEvent } from "../../utils/socketResponse.ts";
 import { PlayCardEventData } from "../../types/main.ts";
+import { ThullaPlayer } from "../../types/thulla.ts";
 
 async function waitFor() {
   return new Promise((resolve) => {
@@ -160,8 +161,8 @@ export async function handlePlayCard(
       let nextNextPlayer;
       if (!nextTurnPlayer || nextTurnPlayer.isWon) {
         const startIndex = room.players.findIndex((p) => p.id === playerId);
-        nextTurnPlayer = getNextEligiblePlayer(room, startIndex);
-        nextNextPlayer = getNextEligiblePlayer(room, startIndex + 1);
+        nextTurnPlayer = getNextEligiblePlayer(room, startIndex) as ThullaPlayer;
+        nextNextPlayer = getNextEligiblePlayer(room, startIndex + 1) as ThullaPlayer;
       }
 
       if (!nextTurnPlayer) {

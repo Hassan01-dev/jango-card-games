@@ -13,7 +13,6 @@ import {
   HandReceivedDataType,
   UpdateTurnDataType,
   CardPlayedDataType,
-  ThullaDataType,
   CardsTakenDataType,
   GameOverDataType,
   PlayerWonDataType,
@@ -34,7 +33,7 @@ const useRungGame = (roomIdParam: string) => {
 
   const [requestData, setRequestData] = useState<RequestReceivedDataType | null>(null);
   const [isRequestReceived, setIsRequestReceived] = useState<boolean>(false);
-
+  const [rungSuit, setRungSuit] = useState<string>("");
   const [isUserInfo, setIsUserInfo] = useState<boolean>(false);
   const [playerName, setPlayerName] = useState<string>("");
   const [playerId, setPlayerId] = useState<string>("");
@@ -42,7 +41,6 @@ const useRungGame = (roomIdParam: string) => {
   const [roomId, setRoomId] = useState<string>(roomIdParam);
   const [opponents, setOpponents] = useState<OpponentType[]>([]);
   const [myCards, setMyCards] = useState<string[]>([]);
-  const [thullaOccured, setThullaOccured] = useState(false);
   const [playedCards, setPlayedCards] = useState<string[]>([]);
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
   const [currentTurn, setCurrentTurn] = useState<TurnType>({
@@ -62,6 +60,9 @@ const useRungGame = (roomIdParam: string) => {
   const [turnTimer, setTurnTimer] = useState(15);
   const timerRef = useRef<NodeJS.Timeout | null>(null); 
   const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [redTeamScore, setRedTeamScore] = useState(0);
+  const [blueTeamScore, setBlueTeamScore] = useState(0);
+  const [turnNo, setTurnNo] = useState(1);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -135,7 +136,9 @@ const useRungGame = (roomIdParam: string) => {
           break;
         case "game_started":
           toast.success("Game started");
+          const { rungSuit } = data as { rungSuit: string };
           setGameStarted(true);
+          setRungSuit(rungSuit);
           break;
         case "hand_received":
           handleHandReceived(data as HandReceivedDataType);
@@ -152,14 +155,12 @@ const useRungGame = (roomIdParam: string) => {
         case "card_played":
           handlePlayedCards(data as CardPlayedDataType);
           break;
-        case "thulla":
-          handleThulla(data as ThullaDataType);
-          break;
         case "cards_taken":
           handleCardsTaken(data as CardsTakenDataType);
           break;
         case "empty_table":
           setPlayedCards([]);
+          setTurnNo(prev => prev + 1);
           break;
         case "game_over":
           handleGameOver(data as GameOverDataType);
@@ -195,6 +196,15 @@ const useRungGame = (roomIdParam: string) => {
           break;
         case "game_won":
           setIsWinner(true);
+          break;
+        case "team_score":
+          const { team, score, redTeamScore, blueTeamScore } = data as { team: 'red' | 'blue', score: number, redTeamScore: number, blueTeamScore: number };
+          if(team === 'red'){
+            setRedTeamScore(redTeamScore);
+          } else {
+            setBlueTeamScore(blueTeamScore);
+          }
+          toast.success(`${team} team claims ${score} No of turns`);
           break;
         case "audio_message":
           handleAudioMessage(data as {audioKey: string});
@@ -277,13 +287,6 @@ const useRungGame = (roomIdParam: string) => {
 
   const handlePlayedCards = ({ card }: CardPlayedDataType) => {
     setPlayedCards((prev) => [...prev, card]);
-  };
-
-  const handleThulla = ({ triggeredBy, looser }: ThullaDataType) => {
-    toast.success(`${triggeredBy} caught ${looser} with Thulla!`);
-    setThullaOccured(true);
-    setPlayedCards([]);
-    setTimeout(() => setThullaOccured(false), 3000);
   };
 
   const handleCardsTaken = ({ cards }: CardsTakenDataType) => {
@@ -485,7 +488,6 @@ const startTimer = (currentTurn: TurnType) => {
     ownerId,
     opponents,
     myCards,
-    thullaOccured,
     playedCards,
     currentTurn,
     gameOver,
@@ -500,6 +502,10 @@ const startTimer = (currentTurn: TurnType) => {
     turnTimer,
     isWinner,
     nextTurn,
+    rungSuit,
+    turnNo,
+    blueTeamScore,
+    redTeamScore,
     createGame,
     joinGame,
     setPlayerName,
@@ -507,7 +513,6 @@ const startTimer = (currentTurn: TurnType) => {
     setOwnerId,
     setMyCards,
     setOpponents,
-    setThullaOccured,
     setPlayedCards,
     setCurrentTurn,
     setGameOver,
